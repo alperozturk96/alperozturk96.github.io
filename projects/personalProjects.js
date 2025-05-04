@@ -19,7 +19,7 @@ export const personalProjects = [
   },
   {
     name: 'MyLocker',
-    description: 'This project uses androidx.security:security-crypto along with Jetpack libraries to ensure secure data handling. Users can export their encrypted passwords, which can only be decrypted using their own private key. The private key is never transmitted to any server and remains solely under the user\'s control, placing full responsibility for key management on the user.',
+    description: 'This project uses androidx.security:security-crypto along with Jetpack libraries. Users can export their encrypted passwords, which can only be decrypted using their own private key. The private key is never transmitted to any server and remains solely under the user\'s control, placing full responsibility for key management on the user.',
     tech: ['Kotlin', 'Jetpack Compose'],
     screenshots: ['1.png','2.png']
   }
