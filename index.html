@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alper Ozturk | Portfolio</title>
+    <title>Alper Öztürk</title>
     <style>
         :root {
             color-scheme: dark;
@@ -33,7 +33,29 @@
             margin: 0 0 1rem 0;
         }
         .project-section {
-            margin-bottom: 2.5rem;
+            background: #23272a;
+            border-radius: 1.3rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+            padding: 2.2rem 2.2rem 1.7rem 2.2rem;
+            margin-bottom: 2.7rem;
+            margin-top: 0.7rem;
+            transition: box-shadow 0.2s;
+            border: 1.5px solid #31363c;
+            font-size: 1.15rem;
+        }
+
+        /* Section headings spacing */
+        main > h2 {
+            margin-top: 3.2rem;
+            margin-bottom: 0.5rem;
+            font-size: 1.45rem;
+            color: #fff;
+            letter-spacing: 0.01em;
+        }
+
+        /* Add more spacing between sections */
+        main > h2 + .project-section {
+            margin-top: 1.2rem;
         }
         .project-title {
             font-size: 1.4rem;
@@ -47,6 +69,14 @@
             margin-bottom: 0.6rem;
             margin-top: 0.2rem;
         }
+        .project-desc ul {
+            margin-bottom: 1.2em;
+            margin-top: 0.7em;
+            padding-left: 1.3em;
+        }
+        .project-desc ul li {
+            margin-bottom: 0.7em;
+        }
         .tech-stack {
             display: flex;
             align-items: center;
@@ -55,14 +85,20 @@
             margin-bottom: 1.2rem;
         }
         .tech-icon {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            min-height: 22px;
+            max-width: 22px;
+            max-height: 22px;
             vertical-align: middle;
             margin-right: 0.3rem;
             background: #23272a;
             border-radius: 4px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.14);
             object-fit: contain;
+            padding: 0;
+            display: inline-block;
         }
         .tech-stack span {
             margin-right: 1.1rem;
@@ -152,11 +188,9 @@
 </head>
 <body>
     <header>
-        <h1>Alper Ozturk</h1>
-        <p>Portfolio &mdash; My Projects</p>
+        <h1>Alper Öztürk</h1>
     </header>
     <main id="portfolio">
-        <!-- Projects injected by JS -->
     </main>
     <div class="modal" id="img-modal" tabindex="-1">
       <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
