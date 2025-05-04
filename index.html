@@ -167,7 +167,6 @@
             max-height: 85vh;
             border-radius: 10px;
             box-shadow: 0 4px 32px rgba(0,0,0,0.45);
-            background: #181a1b;
         }
         .modal:after {
             content: '';
@@ -194,7 +193,17 @@
     </main>
     <div class="modal" id="img-modal" tabindex="-1">
       <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+      <button class="modal-arrow" id="modal-prev">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
       <img class="modal-img" id="modal-img" src="" alt="Screenshot enlarged">
+      <button class="modal-arrow" id="modal-next">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
     </div>
     <script src="main.js"></script>
 </body>

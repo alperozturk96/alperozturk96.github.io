@@ -61,19 +61,19 @@ const professionals = [
 const personals = [
   {
     name: 'FirePlayer Android',
-    description: 'Simple, fast, user friendly music player. Media3 is used. MVVM architecture chosen.',
+    description: 'Developed a music player application using the Media3 library in combination with Kotlin coroutines and the MVVM architecture. Designed a user-friendly and intuitive interface that offers a more practical experience compared to typical music player apps. Room Database used for local data storage.',
     tech: ['Kotlin', 'Jetpack Compose'],
     screenshots: ['1.png','2.png','3.png','4.png','5.png']
   },
   {
     name: 'FirePlayer MacOS',
-    description: 'Simple, fast, user friendly music player. AVFoundation is used.',
+    description: 'Developed a macOS music player application using Swift, SwiftUI, and AVFoundation. Native APIs are used to deliver responsive performance and smooth user experience. I use it every day.',
     tech: ['Swift', 'SwiftUI'],
     screenshots: ['1.png','2.png','3.png','4.png']
   },
   {
     name: 'TextLauncher',
-    description: 'Simple, fast, user friendly launcher application for Android. You can create folders, add favorite and hidden apps.',
+    description: 'A simple, fast, and user-friendly launcher application for Android, developed for personal use. It allows users to create folders, mark applications as hidden or favorites, and customize background and content colors. Inspired by my nostalgia for Windows Phone, I designed this launcher by blending its elements with my own preferences.',
     tech: ['Kotlin', 'Jetpack Compose'],
     screenshots: ['1.png','2.png','3.png','4.png','5.png','6.png','7.png']
   },
@@ -152,6 +152,71 @@ window.addEventListener('DOMContentLoaded', function() {
   const modal = document.getElementById('img-modal');
   const modalImg = document.getElementById('modal-img');
   const modalClose = document.getElementById('modal-close');
+
+  // Use arrow buttons from HTML (no need to create them in JS)
+  const modalPrev = document.getElementById('modal-prev');
+  const modalNext = document.getElementById('modal-next');
+
+  let currentModal = {
+    project: null,
+    index: 0,
+    images: []
+  };
+
+  // Update modal image
+  function showModalImage(project, index, images) {
+    if (!images.length) return;
+    currentModal.project = project;
+    currentModal.index = (index + images.length) % images.length;
+    currentModal.images = images;
+    modalImg.src = images[currentModal.index];
+    modalImg.alt = `${project.name} screenshot ${currentModal.index+1}`;
+  }
+
+  // Open modal from image click
+  document.querySelectorAll('.screenshots').forEach(shotsDiv => {
+    shotsDiv.addEventListener('click', e => {
+      if (e.target.tagName === 'IMG') {
+        // Find project and index
+        const section = shotsDiv.closest('.project-section');
+        const title = section && section.querySelector('.project-title')?.textContent;
+        const allProjects = [...professionals, ...personals];
+        const project = allProjects.find(p => p.name === title);
+        if (!project) return;
+        const imgs = Array.from(shotsDiv.querySelectorAll('img')).map(img => img.src);
+        const idx = imgs.indexOf(e.target.src);
+        showModalImage(project, idx, imgs);
+        modal.classList.add('open');
+        modal.focus();
+      }
+    });
+  });
+
+  // Modal navigation
+  function nextImg() {
+    if (!currentModal.images.length) return;
+    showModalImage(currentModal.project, currentModal.index + 1, currentModal.images);
+  }
+  function prevImg() {
+    if (!currentModal.images.length) return;
+    showModalImage(currentModal.project, currentModal.index - 1, currentModal.images);
+  }
+  modalNext.onclick = nextImg;
+  modalPrev.onclick = prevImg;
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (!modal.classList.contains('open')) return;
+    if (e.key === 'ArrowRight') {
+      nextImg();
+    } else if (e.key === 'ArrowLeft') {
+      prevImg();
+    } else if (e.key === 'Escape') {
+      modal.classList.remove('open');
+      modalImg.src = '';
+    }
+  });
+
   modalClose.addEventListener('click', () => {
     modal.classList.remove('open');
     modalImg.src = '';
@@ -159,13 +224,6 @@ window.addEventListener('DOMContentLoaded', function() {
   // Close modal on click outside image
   modal.addEventListener('mousedown', (e) => {
     if (e.target === modal) {
-      modal.classList.remove('open');
-      modalImg.src = '';
-    }
-  });
-  // Close modal on Escape
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.classList.contains('open')) {
       modal.classList.remove('open');
       modalImg.src = '';
     }
