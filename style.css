@@ -50,6 +50,35 @@ main > h2 {
 main > h2 + .project-section {
     margin-top: 1.2rem;
 }
+
+.project-links {
+    display: flex;
+    gap: 0.7rem;
+    margin-bottom: 1.1rem;
+    margin-top: 0.7rem;
+}
+.project-link-btn {
+    display: inline-block;
+    padding: 0.55em 1.3em;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(90deg, #00bfff 0%, #0077ff 100%);
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0,191,255,0.13);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    cursor: pointer;
+}
+.project-link-btn:hover, .project-link-btn:focus {
+    background: linear-gradient(90deg, #0077ff 0%, #00bfff 100%);
+    box-shadow: 0 4px 18px rgba(0,191,255,0.22);
+    transform: translateY(-2px) scale(1.03);
+    color: #fff;
+    outline: none;
+}
+
 .project-title {
     font-size: 1.4rem;
     font-weight: 600;

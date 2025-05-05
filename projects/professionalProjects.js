@@ -12,7 +12,12 @@ export const professionalProjects = [
       <li>Refactored and migrated a legacy Java codebase to Kotlin, improving maintainability and eliminating technical debt</li>
     </ul>`,
     tech: ['Kotlin', 'Java', 'XML', 'Jetpack Compose'],
-    screenshots: []
+    screenshots: [],
+    type: 'professional',
+    links: [
+      { label: 'Android', url: 'https://play.google.com/store/apps/details?id=com.nextcloud.client&hl=en_US' },
+      { label: 'iOS', url: 'https://apps.apple.com/us/app/nextcloud/id1125420102' }
+    ]
   },
   {
     name: 'LipaWallet',
@@ -26,18 +31,33 @@ export const professionalProjects = [
       <li>Automated development and release processes using Fastlane</li>
     </ul>`,
     tech: ['Swift', 'SwiftUI', 'Kotlin', 'Jetpack Compose'],
-    screenshots: []
+    screenshots: [],
+    type: 'professional',
+    links: [
+      { label: 'iOS', url: 'https://apps.apple.com/ch/app/lipa-wallet/id1658329527' },
+      { label: 'Android', url: 'https://play.google.com/store/apps/details?id=com.getlipa.wallet&amp%3Bhl=en' }
+    ]
   },
   {
     name: 'Emlakjet',
     description: 'Emlakjet is a real estate app for searching, posting, and managing property listings. Users can find apartments, houses, offices, and land for sale or rent, and contact real estate agencies directly. The app offers advanced search, saved searches, favorite listings, and market analysis tools.',
     tech: ['Java', 'XML', 'Objective-C', 'UIKit'],
-    screenshots: []
+    screenshots: [],
+    type: 'professional',
+    links: [
+      { label: 'Android', url: 'https://play.google.com/store/apps/details?id=com.emlakjet.kurumsal.sekizbit' },
+      { label: 'iOS', url: 'https://apps.apple.com/us/app/emlakjet-emlak-ara-i-lan-ver/id1194656334' }
+    ]
   },
   {
     name: 'DentalBulut',
     description: 'Designed for dental clinics, serving as a patient tracking and clinic management software. It allows dentists to manage patient information and clinic operations efficiently from mobile devices',
     tech: ['Java', 'XML', 'Swift', 'UIKit'],
-    screenshots: []
+    screenshots: [],
+    type: 'professional',
+    links: [
+      { label: 'Android', url: 'https://play.google.com/store/apps/details?id=com.dentalbulut.android&hl=en_US' },
+      { label: 'iOS', url: 'https://apps.apple.com/us/app/dentalbulut/id687279571' }
+    ]
   }
 ];

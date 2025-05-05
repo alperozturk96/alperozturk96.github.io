@@ -29,7 +29,6 @@ window.addEventListener('DOMContentLoaded', function() {
     heading.style.marginBottom = '1.2rem';
     main.appendChild(heading);
     projects.forEach(project => {
-      if (!project.screenshots.length) return;
       const section = document.createElement('section');
       section.className = 'project-section';
       // Title
@@ -53,28 +52,49 @@ window.addEventListener('DOMContentLoaded', function() {
         techDiv.appendChild(span);
       });
       section.appendChild(techDiv);
-      // Screenshots
-      const shotsDiv = document.createElement('div');
-      shotsDiv.className = 'screenshots';
-      project.screenshots.forEach(file => {
-        const img = document.createElement('img');
-        img.src = `projects/${encodeURIComponent(project.name)}/${file}`;
-        img.alt = `${project.name} screenshot`;
-        img.tabIndex = 0;
-        img.addEventListener('mouseover', () => img.classList.add('focused'));
-        img.addEventListener('mouseout', () => img.classList.remove('focused'));
-        img.addEventListener('focus', () => img.classList.add('focused'));
-        img.addEventListener('blur', () => img.classList.remove('focused'));
-        // Modal open on click
-        img.addEventListener('click', () => {
-          modalImg.src = img.src;
-          modalImg.alt = img.alt;
-          modal.classList.add('open');
-          modal.focus();
-        });
-        shotsDiv.appendChild(img);
-      });
-      section.appendChild(shotsDiv);
+
+      if (project.type === 'professional') {
+        // Show link only (if provided)
+        if (Array.isArray(project.links) && project.links.length) {
+          const linksDiv = document.createElement('div');
+          linksDiv.className = 'project-links';
+          project.links.forEach(linkObj => {
+            const btn = document.createElement('a');
+            btn.className = 'project-link-btn';
+            btn.href = linkObj.url;
+            btn.target = '_blank';
+            btn.rel = 'noopener';
+            btn.textContent = linkObj.label;
+            linksDiv.appendChild(btn);
+          });
+          section.appendChild(linksDiv);
+        }
+      } else if (project.type === 'personal') {
+        // Show screenshots only
+        if (project.screenshots && project.screenshots.length) {
+          const shotsDiv = document.createElement('div');
+          shotsDiv.className = 'screenshots';
+          project.screenshots.forEach(file => {
+            const img = document.createElement('img');
+            img.src = `projects/${encodeURIComponent(project.name)}/${file}`;
+            img.alt = `${project.name} screenshot`;
+            img.tabIndex = 0;
+            img.addEventListener('mouseover', () => img.classList.add('focused'));
+            img.addEventListener('mouseout', () => img.classList.remove('focused'));
+            img.addEventListener('focus', () => img.classList.add('focused'));
+            img.addEventListener('blur', () => img.classList.remove('focused'));
+            // Modal open on click
+            img.addEventListener('click', () => {
+              modalImg.src = img.src;
+              modalImg.alt = img.alt;
+              modal.classList.add('open');
+              modal.focus();
+            });
+            shotsDiv.appendChild(img);
+          });
+          section.appendChild(shotsDiv);
+        }
+      }
       main.appendChild(section);
     });
   }
