@@ -34,8 +34,25 @@ export const professionalProjects = [
     screenshots: [],
     type: 'professional',
     links: [
-      { label: 'iOS', url: 'https://apps.apple.com/ch/app/lipa-wallet/id1658329527' },
-      { label: 'Android', url: 'https://play.google.com/store/apps/details?id=com.getlipa.wallet&amp%3Bhl=en' }
+      { label: 'Android', url: 'https://play.google.com/store/apps/details?id=com.getlipa.wallet&amp%3Bhl=en' },
+      { label: 'iOS', url: 'https://apps.apple.com/ch/app/lipa-wallet/id1658329527' }
+    ]
+  },
+  {
+    name: 'Scan360',
+    description: `
+    <ul style="margin-top:0.7em; margin-bottom:1.2em; padding-left:1.3em; font-size:1em; color:#bdbdbd;">
+      <li>Developed a full-featured document scanner using <strong>UIKit</strong> and <strong>VisionKit</strong> for iOS, supporting high-quality scanning and automatic document detection</li>
+      <li>Integrated PDF generation, document editing (crop, rotate, filter), and multi-page scan support</li>
+      <li>Implemented features for signing, sharing, and exporting documents in various formats (PDF, JPEG)</li>
+      <li>Built a smooth user experience with real-time image processing and seamless camera integration</li>
+      <li>Integrated <strong>StoreKit</strong> to manage in-app purchases and trials for premium features such as unlimited scans, advanced editing tools</li>
+    </ul>`,
+    tech: ['Swift', 'UIKit'],
+    screenshots: [],
+    type: 'professional',
+    links: [
+      { label: 'iOS', url: 'https://apps.apple.com/us/app/scan360-pdf-scanner-sign/id1589134970' }
     ]
   },
   {

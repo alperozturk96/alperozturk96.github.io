@@ -53,13 +53,18 @@ main > h2 + .project-section {
 
 .project-links {
     display: flex;
-    gap: 0.7rem;
+    flex-wrap: wrap;
+    gap: 1.3rem 1.3rem;
     margin-bottom: 1.1rem;
     margin-top: 0.7rem;
 }
 .project-link-btn {
+    margin-bottom: 0.5rem;
+}
+
+.project-link-btn {
     display: inline-block;
-    padding: 0.55em 1.3em;
+    padding: 0.55em 1.7em;
     font-size: 1rem;
     font-weight: 600;
     color: #fff;
@@ -70,6 +75,11 @@ main > h2 + .project-section {
     box-shadow: 0 2px 8px rgba(0,191,255,0.13);
     transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
     cursor: pointer;
+    min-width: 110px;
+    margin-right: 0.7rem;
+}
+.project-link-btn:last-child {
+    margin-right: 0;
 }
 .project-link-btn:hover, .project-link-btn:focus {
     background: linear-gradient(90deg, #0077ff 0%, #00bfff 100%);
