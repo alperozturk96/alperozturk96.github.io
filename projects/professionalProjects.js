@@ -12,7 +12,7 @@ export const professionalProjects = [
       <li>Refactored and migrated a legacy Java codebase to Kotlin, improving maintainability and eliminating technical debt</li>
     </ul>`,
     tech: ['Kotlin', 'Java', 'XML', 'Jetpack Compose'],
-    screenshots: ['1.png','2.png','3.png','4.png','5.png']
+    screenshots: []
   },
   {
     name: 'LipaWallet',
@@ -26,18 +26,18 @@ export const professionalProjects = [
       <li>Automated development and release processes using Fastlane</li>
     </ul>`,
     tech: ['Swift', 'SwiftUI', 'Kotlin', 'Jetpack Compose'],
-    screenshots: ['1.webp','2.webp','3.webp','4.webp','5.webp','6.webp']
+    screenshots: []
   },
   {
     name: 'Emlakjet',
     description: 'Emlakjet is a real estate app for searching, posting, and managing property listings. Users can find apartments, houses, offices, and land for sale or rent, and contact real estate agencies directly. The app offers advanced search, saved searches, favorite listings, and market analysis tools.',
     tech: ['Java', 'XML', 'Objective-C', 'UIKit'],
-    screenshots: ['1.webp','2.webp','3.webp','4.webp']
+    screenshots: []
   },
   {
     name: 'DentalBulut',
     description: 'Designed for dental clinics, serving as a patient tracking and clinic management software. It allows dentists to manage patient information and clinic operations efficiently from mobile devices',
     tech: ['Java', 'XML', 'Swift', 'UIKit'],
-    screenshots: ['1.webp','2.webp','3.webp']
+    screenshots: []
   }
 ];
