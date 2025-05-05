@@ -3,13 +3,14 @@ export const professionalProjects = [
     name: 'Nextcloud',
     description: `
     <ul style="margin-top:0.7em; margin-bottom:1.2em; padding-left:1.3em; font-size:1em; color:#bdbdbd;">
-      <li>Developed and maintained Files & Notes mobile apps reaching 1M+ active users.</li>
-      <li>Implemented end-to-end encryption using Bouncy Castle and androidx.security, ensuring secure data transfer, certificate-signature verification.</li>
-      <li>Successfully implemented background tasks such as multi-file, folder synchronization, downloads, and uploads using WorkManager.</li>
-      <li>Applied the MVVM design pattern and modern Android best practices to maintain a clean, scalable, and testable codebase</li>
-      <li>Eliminated anti-patterns in the project by adopting modern Android development practices</li>
-      <li>Reduced memory usage by 20% and improved performance by up to 50% through efficient use of Kotlin Coroutines</li>
-      <li>Refactored and migrated a legacy Java codebase to Kotlin, improving maintainability and eliminating technical debt</li>
+      <li>Developed and maintained <strong>Files</strong> and <strong>Notes</strong> mobile apps with over <strong>1M+ active users</strong></li>
+      <li>Implemented <strong>end-to-end encryption</strong> using <strong>Bouncy Castle</strong> and <strong>androidx.security</strong>, ensuring secure data transfer and certificate-signature verification</li>
+      <li>Integrated <strong>open-source AI solutions</strong> into mobile applications to enhance the user experience with features like headline generation, document summarization, and on-device question answering.</li>
+      <li>Built and optimized background tasks (multi-file & folder sync, downloads, uploads) using <strong>WorkManager</strong></li>
+      <li>Applied the <strong>MVVM</strong> design pattern and modern <strong>Android</strong> best practices for scalable and testable code</li>
+      <li>Eliminated antipatterns by refactoring toward modern <strong>Android</strong> development practices</li>
+      <li>Improved app performance by up to <strong>50%</strong> and reduced memory usage by <strong>20%</strong> through efficient use of <strong>Kotlin Coroutines</strong></li>
+      <li>Migrated a large legacy <strong>Java</strong> codebase to <strong>Kotlin</strong>, reducing technical debt and improving maintainability</li>
     </ul>`,
     tech: ['Kotlin', 'Java', 'XML', 'Jetpack Compose'],
     screenshots: [],
@@ -21,14 +22,15 @@ export const professionalProjects = [
   },
   {
     name: 'LipaWallet',
-    description: `<ul style="margin-top:0.7em; margin-bottom:1.2em; padding-left:1.3em; font-size:1em; color:#bdbdbd;">
-      <li>Developed a Bitcoin Lightning wallet with native SwiftUI for iOS and Jetpack Compose for Android</li>
-      <li>Solved complex data transfer issues by integrating an internally developed Rust library into native Android and iOS apps using platform-specific bindings and an event-driven architecture</li>
-      <li>Built an efficient, memory-leak-free, and high-performance networking architecture by leveraging the latest approaches with the Apollo GraphQL client separately for Android and iOS</li>
-      <li>Maximized user security by implementing biometric authentication: Touch ID and Face ID on iOS, and biometric authentication on Android</li>
-      <li>Designed architecture for background data processing for both Android and iOS platforms</li>
-      <li>Created a modular architecture for Android and iOS separately to eliminate code duplication and improve maintainability and reusability used Swift Package Manager (SPM) for iOS and JitPack for Android</li>
-      <li>Automated development and release processes using Fastlane</li>
+    description: `
+    <ul style="margin-top:0.7em; margin-bottom:1.2em; padding-left:1.3em; font-size:1em; color:#bdbdbd;">
+      <li>Developed a <strong>Bitcoin Lightning</strong> wallet with native <strong>SwiftUI</strong> for iOS and <strong>Jetpack Compose</strong> for Android</li>
+      <li>Integrated an internally developed <strong>Rust</strong> library into Android and iOS using platform-specific bindings and an <strong>event-driven architecture</strong></li>
+      <li>Built a high-performance, memory-leak-free networking layer with the <strong>Apollo GraphQL</strong> client for both platforms</li>
+      <li>Implemented biometric security using <strong>Touch ID</strong>, <strong>Face ID</strong> (iOS), and <strong>BiometricPrompt</strong> (Android)</li>
+      <li>Designed efficient background data processing for real-time transaction and wallet state updates</li>
+      <li>Created a modular architecture with <strong>Swift Package Manager (SPM)</strong> for iOS and <strong>JitPack</strong> for Android, reducing code duplication</li>
+      <li>Automated development and release workflows using <strong>Fastlane</strong></li>
     </ul>`,
     tech: ['Swift', 'SwiftUI', 'Kotlin', 'Jetpack Compose'],
     screenshots: [],
@@ -57,7 +59,13 @@ export const professionalProjects = [
   },
   {
     name: 'Emlakjet',
-    description: 'Emlakjet is a real estate app for searching, posting, and managing property listings. Users can find apartments, houses, offices, and land for sale or rent, and contact real estate agencies directly. The app offers advanced search, saved searches, favorite listings, and market analysis tools.',
+    description: `
+    <ul style="margin-top:0.7em; margin-bottom:1.2em; padding-left:1.3em; font-size:1em; color:#bdbdbd;">
+      <li>Developed a full-featured real estate app for listing, searching, and managing properties using <strong>Java</strong> and <strong>Objective-C</strong></li>
+      <li>Implemented features such as <strong>advanced search filters</strong>, saved searches, favorite listings, and direct contact with real estate agents</li>
+      <li>Built a user-friendly experience with market analysis tools and real-time listing updates</li>
+      <li>Maintained codebase across Android and iOS using <strong>XML</strong> for Android UI and <strong>UIKit</strong> for iOS</li>
+    </ul>`,
     tech: ['Java', 'XML', 'Objective-C', 'UIKit'],
     screenshots: [],
     type: 'professional',
@@ -68,7 +76,13 @@ export const professionalProjects = [
   },
   {
     name: 'DentalBulut',
-    description: 'Designed for dental clinics, serving as a patient tracking and clinic management software. It allows dentists to manage patient information and clinic operations efficiently from mobile devices',
+    description: `
+    <ul style="margin-top:0.7em; margin-bottom:1.2em; padding-left:1.3em; font-size:1em; color:#bdbdbd;">
+      <li>Developed a mobile clinic management solution for dentists, supporting <strong>patient tracking</strong>, appointment scheduling, and clinic operations</li>
+      <li>Built native mobile apps using <strong>Java</strong> and <strong>Swift</strong>, tailored for Android and iOS respectively</li>
+      <li>Implemented user-friendly UI for mobile workflows using <strong>XML</strong> and <strong>UIKit</strong></li>
+      <li>Optimized app performance for use in offline scenarios and low-bandwidth environments</li>
+    </ul>`,
     tech: ['Java', 'XML', 'Swift', 'UIKit'],
     screenshots: [],
     type: 'professional',
