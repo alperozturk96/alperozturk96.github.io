@@ -9,6 +9,55 @@
     border: 1.5px solid #232326;
     font-size: 1.15rem;
 }
+
+.project-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.7rem;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+}
+
+.project-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #E3E3E5;
+    margin-bottom: 0;
+}
+
+.tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem 1.1rem;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.tech-icon {
+    width: 22px;
+    height: 22px;
+    vertical-align: middle;
+    object-fit: contain;
+    margin-right: 0.35em;
+}
+
+.tech-stack span {
+    font-size: 1rem;
+    color: #BEBEBF;
+    margin-right: 1.1em;
+}
+
+@media (max-width: 700px) {
+    .project-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    .tech-stack {
+        justify-content: flex-start;
+    }
+}
 .project-title {
     font-size: 1.4rem;
     font-weight: 600;

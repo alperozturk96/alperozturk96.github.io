@@ -25,14 +25,12 @@ window.addEventListener('DOMContentLoaded', function() {
     projects.forEach(project => {
       const section = document.createElement('section');
       section.className = 'project-section';
-      // Title
-      section.innerHTML = `<div class="project-title">${project.name}</div>`;
-      // Description
-      const desc = document.createElement('div');
-      desc.className = 'project-desc';
-      desc.innerHTML = project.description;
-      section.appendChild(desc);
-      // Tech stack
+      // Title + Tech Stack Row
+      const headerRow = document.createElement('div');
+      headerRow.className = 'project-header-row';
+      const titleDiv = document.createElement('div');
+      titleDiv.className = 'project-title';
+      titleDiv.textContent = project.name;
       const techDiv = document.createElement('div');
       techDiv.className = 'tech-stack';
       project.tech.forEach(tech => {
@@ -45,7 +43,14 @@ window.addEventListener('DOMContentLoaded', function() {
         span.textContent = tech;
         techDiv.appendChild(span);
       });
-      section.appendChild(techDiv);
+      headerRow.appendChild(titleDiv);
+      headerRow.appendChild(techDiv);
+      section.appendChild(headerRow);
+      // Description
+      const desc = document.createElement('div');
+      desc.className = 'project-desc';
+      desc.innerHTML = project.description;
+      section.appendChild(desc);
 
       if (project.type === 'professional') {
         // Show link only (if provided)

@@ -20,8 +20,6 @@
 }
 .navbar a:hover {
     color: #E3E3E5;
-    background: #232326;
-    border-radius: 8px;
 }
 .navbar li {
     float: none;
