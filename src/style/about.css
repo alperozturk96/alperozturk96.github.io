@@ -1,0 +1,29 @@
+main.about-page {
+    max-width: 70rem;
+    background: #18181A;
+    border-radius: 16px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+}
+
+.about-page p {
+    font-size: 1.19rem;
+    line-height: 2.1;
+    color: #D4D4D6;
+    margin-bottom: 2.1rem;
+    text-align: justify;
+}
+
+.about-page em {
+    color: #E3E3E5;
+}
+
+@media (max-width: 700px) {
+    main.about-page {
+        padding: 1.2rem 0.7rem 2rem 0.7rem;
+        margin: 1.5rem 0;
+    }
+    .about-page p {
+        font-size: 1.03rem;
+        line-height: 1.7;
+    }
+}
