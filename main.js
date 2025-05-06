@@ -22,9 +22,8 @@ import { personalProjects } from './projects/personalProjects.js';
 window.addEventListener('DOMContentLoaded', function() {
   const main = document.getElementById('portfolio');
 
-  function renderSection(title, projects) {
+  function renderSection(projects) {
     const heading = document.createElement('h2');
-    heading.textContent = title;
     heading.style.marginTop = '2.5rem';
     heading.style.marginBottom = '1.2rem';
     main.appendChild(heading);
@@ -99,8 +98,8 @@ window.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  renderSection('Professional Projects', professionalProjects);
-  renderSection('Personal Projects', personalProjects);
+  renderSection(professionalProjects);
+  renderSection(personalProjects);
 
   // Modal logic
   const modal = document.getElementById('img-modal');

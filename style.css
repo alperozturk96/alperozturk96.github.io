@@ -3,37 +3,37 @@
 }
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
-    background: #16181a;
+    background: #000000;
     margin: 0;
     padding: 0;
-    color: #e2e2e2;
+    color: #BEBEBF;
 }
 header {
-    background: #181a1b;
+    background: #18181A;
     color: #fff;
     padding: 2rem 1rem 1rem 1rem;
     text-align: center;
 }
 main {
-    max-width: 900px;
     margin: 2rem auto;
-    background: #202225;
+    background: #18181A;
     border-radius: 12px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.22);
     padding: 2rem;
+    max-width: 70rem;
 }
 h1, h2 {
     margin: 0 0 1rem 0;
 }
 .project-section {
-    background: #23272a;
+    background: #18181A;
     border-radius: 1.3rem;
     box-shadow: 0 4px 24px rgba(0,0,0,0.18);
     padding: 2.2rem 2.2rem 1.7rem 2.2rem;
     margin-bottom: 2.7rem;
     margin-top: 0.7rem;
     transition: box-shadow 0.2s;
-    border: 1.5px solid #31363c;
+    border: 1.5px solid #232326;
     font-size: 1.15rem;
 }
 
@@ -42,7 +42,7 @@ main > h2 {
     margin-top: 3.2rem;
     margin-bottom: 0.5rem;
     font-size: 1.45rem;
-    color: #fff;
+    color: #E3E3E5;
     letter-spacing: 0.01em;
 }
 
@@ -58,21 +58,19 @@ main > h2 + .project-section {
     margin-bottom: 1.1rem;
     margin-top: 0.7rem;
 }
-.project-link-btn {
-    margin-bottom: 0.5rem;
-}
 
 .project-link-btn {
+    margin-bottom: 0.5rem;
     display: inline-block;
     padding: 0.55em 1.7em;
     font-size: 1rem;
     font-weight: 600;
-    color: #fff;
-    background: linear-gradient(90deg, #00bfff 0%, #0077ff 100%);
-    border: none;
+    background: #232326;
+    box-shadow: 0 4px 18px rgba(30,34,40,0.22);
+    transform: translateY(-2px) scale(1.03);
+    color: #E3E3E5;
     border-radius: 6px;
     text-decoration: none;
-    box-shadow: 0 2px 8px rgba(0,191,255,0.13);
     transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
     cursor: pointer;
     min-width: 110px;
@@ -82,7 +80,7 @@ main > h2 + .project-section {
     margin-right: 0;
 }
 .project-link-btn:hover, .project-link-btn:focus {
-    background: linear-gradient(90deg, #0077ff 0%, #00bfff 100%);
+    background: #E3E3E5;
     box-shadow: 0 4px 18px rgba(0,191,255,0.22);
     transform: translateY(-2px) scale(1.03);
     color: #fff;
@@ -93,11 +91,11 @@ main > h2 + .project-section {
     font-size: 1.4rem;
     font-weight: 600;
     margin-bottom: 0.7rem;
-    color: #fff;
+    color: #E3E3E5;
 }
 .project-desc {
     font-size: 1rem;
-    color: #bdbdbd;
+    color: #BEBEBF;
     margin-bottom: 0.6rem;
     margin-top: 0.2rem;
 }
@@ -125,7 +123,7 @@ main > h2 + .project-section {
     max-height: 22px;
     vertical-align: middle;
     margin-right: 0.3rem;
-    background: #23272a;
+    background: #232326;
     border-radius: 4px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.14);
     object-fit: contain;
@@ -135,7 +133,7 @@ main > h2 + .project-section {
 .tech-stack span {
     margin-right: 1.1rem;
     font-size: 1rem;
-    color: #e2e2e2;
+    color: #BEBEBF;
 }
 .screenshots {
     display: flex;
@@ -149,16 +147,12 @@ main > h2 + .project-section {
     max-height: 260px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.26);
-    background: #23272a;
+    background: #18181A;
     object-fit: contain;
     outline: none;
     transition: box-shadow 0.2s, border 0.2s;
 }
-.screenshots img.focused {
-    box-shadow: 0 0 0 3px #00bfff, 0 2px 16px rgba(0,191,255,0.18);
-    border: 2px solid #00bfff;
-    z-index: 2;
-}
+
 .screenshots::-webkit-scrollbar {
     height: 10px;
 }
@@ -167,7 +161,7 @@ main > h2 + .project-section {
     border-radius: 6px;
 }
 .screenshots::-webkit-scrollbar-track {
-    background: #222;
+    background: #18181A;
 }
 @media (max-width: 700px) {
     main {
@@ -216,24 +210,35 @@ main > h2 + .project-section {
 }
 .navbar ul {
     list-style: none;
-    background: #1D1D1F;
+    background: #18181A;
     padding: 0;
-    margin: 0;
+    margin: 0 auto;
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 73.5rem;
 }
 .navbar a {
     color: #BEBEBF;
     text-decoration: none;
-    padding: 1rem;
+    padding: 1rem 1.6rem;
     display: block;
     text-align: center;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
 }
 .navbar a:hover {
     color: #E3E3E5;
+    background: #232326;
+    border-radius: 8px;
 }
 .navbar li {
-    float: left;
+    float: none;
+    display: inline-block;
 }
 .navbar a.active {
     color: #E3E3E5;
+    background: #232326;
+    border-radius: 8px;
 }
