@@ -1,23 +1,18 @@
-
 const techIcons = {
-  'Kotlin': 'techStacks/Kotlin.svg',
-  'Jetpack Compose': 'techStacks/JetpackCompose.png',
-  'Swift': 'techStacks/Swift.webp',
-  'SwiftUI': 'techStacks/SwiftUI.png',
-  'Java': 'techStacks/Java.svg',
-  'XML': 'techStacks/XML.svg',
-  'UIKit': 'techStacks/UIKit.jpeg',
-  'Dart': 'techStacks/Dart.svg',
-  'Flutter': 'techStacks/Flutter.png',
-  'Objective-C': 'techStacks/ObjectiveC.webp',
+  'Kotlin': '/assets/techStacks/Kotlin.svg',
+  'Jetpack Compose': '/assets/techStacks/JetpackCompose.png',
+  'Swift': '/assets/techStacks/Swift.webp',
+  'SwiftUI': '/assets/techStacks/SwiftUI.png',
+  'Java': '/assets/techStacks/Java.svg',
+  'XML': '/assets/techStacks/XML.svg',
+  'UIKit': '/assets/techStacks/UIKit.jpeg',
+  'Dart': '/assets/techStacks/Dart.svg',
+  'Flutter': '/assets/techStacks/Flutter.png',
+  'Objective-C': '/assets/techStacks/ObjectiveC.webp',
 };
 
-import { professionalProjects } from './projects/professionalProjects.js';
-import { personalProjects } from './projects/personalProjects.js';
-
-
-//
-
+import { professionalProjects } from '../projects/professionalProjects.js';
+import { personalProjects } from '../projects/personalProjects.js';
 
 window.addEventListener('DOMContentLoaded', function() {
   const main = document.getElementById('portfolio');
@@ -73,10 +68,11 @@ window.addEventListener('DOMContentLoaded', function() {
         if (project.screenshots && project.screenshots.length) {
           const shotsDiv = document.createElement('div');
           shotsDiv.className = 'screenshots';
-          project.screenshots.forEach(file => {
+          project.screenshots.forEach((screenshot, idx) => {
             const img = document.createElement('img');
-            img.src = `projects/${encodeURIComponent(project.name)}/${file}`;
-            img.alt = `${project.name} screenshot`;
+            img.className = 'screenshot-img';
+            img.src = `/assets/projects/${project.name}/${screenshot}`;
+            img.alt = `${project.name} screenshot ${idx+1}`;
             img.tabIndex = 0;
             img.addEventListener('mouseover', () => img.classList.add('focused'));
             img.addEventListener('mouseout', () => img.classList.remove('focused'));
