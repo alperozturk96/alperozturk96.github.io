@@ -1,0 +1,36 @@
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.85);
+    align-items: center;
+    justify-content: center;
+}
+.modal.open {
+    display: flex;
+}
+.modal-img {
+    max-width: 90vw;
+    max-height: 85vh;
+    border-radius: 10px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.45);
+}
+.modal:after {
+    content: '';
+    display: block;
+}
+.modal-close {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    font-size: 2.4rem;
+    color: #fff;
+    cursor: pointer;
+    z-index: 1001;
+    background: none;
+    border: none;
+}

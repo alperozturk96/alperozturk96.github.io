@@ -1,0 +1,86 @@
+.project-section {
+    background: #18181A;
+    border-radius: 1.3rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    padding: 2.2rem 2.2rem 1.7rem 2.2rem;
+    margin-bottom: 2.7rem;
+    margin-top: 0.7rem;
+    transition: box-shadow 0.2s;
+    border: 1.5px solid #232326;
+    font-size: 1.15rem;
+}
+.project-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 0.7rem;
+    color: #E3E3E5;
+}
+.project-desc {
+    font-size: 1rem;
+    color: #BEBEBF;
+    margin-bottom: 0.6rem;
+    margin-top: 0.2rem;
+}
+.project-desc ul {
+    margin-bottom: 1.2em;
+    margin-top: 0.7em;
+    padding-left: 1.3em;
+}
+.project-desc ul li {
+    margin-bottom: 0.7em;
+}
+.tech-stack {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.2rem;
+    margin-bottom: 1.2rem;
+}
+.tech-icon {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+    max-width: 22px;
+    max-height: 22px;
+    vertical-align: middle;
+    margin-right: 0.3rem;
+    background: #232326;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.14);
+    object-fit: contain;
+    padding: 0;
+    display: inline-block;
+}
+.tech-stack span {
+    margin-right: 1.1rem;
+    font-size: 1rem;
+    color: #BEBEBF;
+}
+.screenshots {
+    display: flex;
+    overflow-x: auto;
+    gap: 1.2rem;
+    padding-bottom: 0.7rem;
+    scrollbar-width: thin;
+    scrollbar-color: #444 #222;
+}
+.screenshots img {
+    max-height: 260px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.26);
+    background: #18181A;
+    object-fit: contain;
+    outline: none;
+    transition: box-shadow 0.2s, border 0.2s;
+}
+.screenshots::-webkit-scrollbar {
+    height: 10px;
+}
+.screenshots::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 6px;
+}
+.screenshots::-webkit-scrollbar-track {
+    background: #18181A;
+}

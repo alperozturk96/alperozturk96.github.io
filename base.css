@@ -1,0 +1,39 @@
+:root {
+    color-scheme: dark;
+}
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #000000;
+    margin: 0;
+    padding: 0;
+    color: #BEBEBF;
+}
+header {
+    background: #18181A;
+    color: #fff;
+    padding: 2rem 1rem 1rem 1rem;
+    text-align: center;
+}
+main {
+    margin: 2rem auto;
+    background: #18181A;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.22);
+    padding: 2rem;
+    max-width: 70rem;
+}
+h1, h2 {
+    margin: 0 0 1rem 0;
+}
+/* Section headings spacing */
+main > h2 {
+    margin-top: 3.2rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.45rem;
+    color: #E3E3E5;
+    letter-spacing: 0.01em;
+}
+/* Add more spacing between sections */
+main > h2 + .project-section {
+    margin-top: 1.2rem;
+}
