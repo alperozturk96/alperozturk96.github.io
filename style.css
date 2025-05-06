@@ -214,3 +214,26 @@ main > h2 + .project-section {
     background: none;
     border: none;
 }
+.navbar ul {
+    list-style: none;
+    background: #1D1D1F;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+.navbar a {
+    color: #BEBEBF;
+    text-decoration: none;
+    padding: 1rem;
+    display: block;
+    text-align: center;
+}
+.navbar a:hover {
+    color: #E3E3E5;
+}
+.navbar li {
+    float: left;
+}
+.navbar a.active {
+    color: #E3E3E5;
+}
