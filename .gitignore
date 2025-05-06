@@ -1,0 +1,37 @@
+# Node.js dependencies (if you ever use npm for tooling)
+node_modules/
+
+# macOS system files
+.DS_Store
+
+# JetBrains IDEs (WebStorm, IntelliJ, etc.)
+.idea/
+
+# VS Code settings
+.vscode/
+
+# npm logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files (if used for API keys or config)
+.env
+.env.local
+.env.*.local
+
+# Optional: build or dist directories (if you have a build process)
+dist/
+build/
+
+# Logs
+*.log
+
+# Thumbnails or user-specific system files
+Thumbs.db
+
+# Backup files
+*.bak
+*.swp
+*.swo
+*~
