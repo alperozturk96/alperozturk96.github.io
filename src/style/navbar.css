@@ -15,7 +15,6 @@
     padding: 1rem 1.6rem;
     display: block;
     text-align: center;
-    border-radius: 8px;
     transition: background 0.2s, color 0.2s;
 }
 .navbar a:hover {
@@ -27,6 +26,4 @@
 }
 .navbar a.active {
     color: #E3E3E5;
-    background: #232326;
-    border-radius: 8px;
 }
