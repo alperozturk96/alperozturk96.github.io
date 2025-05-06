@@ -29,34 +29,25 @@
 .project-desc ul li {
     margin-bottom: 0.7em;
 }
+
 .tech-stack {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.5rem 1.2rem;
-    margin-bottom: 1.2rem;
+    gap: 0.2rem 0.5rem;
+    margin-bottom: 1.5rem;
 }
 .tech-icon {
     width: 22px;
     height: 22px;
-    min-width: 22px;
-    min-height: 22px;
-    max-width: 22px;
-    max-height: 22px;
     vertical-align: middle;
-    margin-right: 0.3rem;
-    background: #232326;
-    border-radius: 4px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.14);
     object-fit: contain;
-    padding: 0;
-    display: inline-block;
 }
 .tech-stack span {
-    margin-right: 1.1rem;
     font-size: 1rem;
     color: #BEBEBF;
 }
+
 .screenshots {
     display: flex;
     overflow-x: auto;
