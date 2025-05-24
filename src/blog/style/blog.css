@@ -1,0 +1,44 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    background-color: #121212;
+    color: #E3E3E5;
+}
+
+.blog-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    width: 100%;
+    margin-top: 2rem;
+}
+
+.blog-card {
+    background-color: #2A2A2D;
+    padding: 1rem;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 700px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.blog-card a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.continue-link {
+    margin-top: auto;
+    text-align: right;
+}
+
+.continue-link a {
+    color: #2897FF;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.continue-link a:hover {
+    text-decoration: underline;
+}

@@ -1,15 +1,21 @@
-.navbar ul {
-    list-style: none;
+.nav-base.main {
     background: #18181A;
+}
+.nav-base.sub {
+    background: #202022;
+}
+.nav-base {
+    list-style: none;
     padding: 0;
     margin: 0 auto;
     overflow: hidden;
     display: flex;
     justify-content: center;
+    width: 100%;
     align-items: center;
-    max-width: 73.5rem;
 }
-.navbar a {
+
+.nav-base a {
     color: #BEBEBF;
     text-decoration: none;
     padding: 1rem 1.6rem;
@@ -17,13 +23,13 @@
     text-align: center;
     transition: background 0.2s, color 0.2s;
 }
-.navbar a:hover {
+
+.nav-base a:hover,
+.nav-base a.active {
     color: #E3E3E5;
 }
-.navbar li {
+
+.nav-base li {
     float: none;
     display: inline-block;
-}
-.navbar a.active {
-    color: #E3E3E5;
 }
