@@ -4,7 +4,6 @@ const params = new URLSearchParams(window.location.search);
 const path = params.get("path");
 const contentEl = document.getElementById("post-content");
 
-// Match the post based on path
 const post = blogData.find(p => p.path === path);
 
 if (!post) {
@@ -13,14 +12,15 @@ if (!post) {
     document.title = post.title;
 
     fetch(post.path)
-        .then(res => res.ok ? res.text() : Promise.reject("Fetch failed"))
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.text();
+        })
         .then(markdown => {
-            import('https://cdn.jsdelivr.net/npm/marked/marked.min.js').then(({ marked }) => {
-                contentEl.innerHTML = marked.parse(markdown);
-            });
+            contentEl.innerHTML = marked.parse(markdown);
         })
         .catch(err => {
             contentEl.textContent = "Failed to load post.";
-            console.error(err);
+            console.error("Error:", err);
         });
 }

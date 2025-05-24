@@ -57,7 +57,7 @@ function renderPosts(posts, container) {
                 <h2>${post.title}</h2>
                 <p>${post.summary}</p>
                 <div class="continue-link">
-                    <a href="posts/post.html?path=${encodeURIComponent(post.path)}">
+                    <a href="post/post.html?path=${encodeURIComponent(post.path)}">
                         Continue Reading
                     </a>
                 </div>
