@@ -1,3 +1,5 @@
+import {ProjectType} from "./project_type.js";
+
 export const professionalProjects = [
   {
     name: 'Nextcloud',
@@ -14,7 +16,7 @@ export const professionalProjects = [
     </ul>`,
     tech: ['Kotlin', 'Java', 'XML', 'Jetpack Compose'],
     screenshots: [],
-    type: 'professional',
+    type: ProjectType.Professional,
     links: [
       { label: 'Android', url: 'https://play.google.com/store/apps/details?id=com.nextcloud.client&hl=en_US' },
       { label: 'iOS', url: 'https://apps.apple.com/us/app/nextcloud/id1125420102' }
@@ -34,7 +36,7 @@ export const professionalProjects = [
     </ul>`,
     tech: ['Swift', 'SwiftUI', 'Kotlin', 'Jetpack Compose'],
     screenshots: [],
-    type: 'professional',
+    type: ProjectType.Professional,
     links: [
       { label: 'Android', url: 'https://play.google.com/store/apps/details?id=com.getlipa.wallet&amp%3Bhl=en' },
       { label: 'iOS', url: 'https://apps.apple.com/ch/app/lipa-wallet/id1658329527' }
@@ -52,7 +54,7 @@ export const professionalProjects = [
     </ul>`,
     tech: ['Swift', 'UIKit'],
     screenshots: [],
-    type: 'professional',
+    type: ProjectType.Professional,
     links: [
       { label: 'iOS', url: 'https://apps.apple.com/us/app/scan360-pdf-scanner-sign/id1589134970' }
     ]
@@ -68,7 +70,7 @@ export const professionalProjects = [
     </ul>`,
     tech: ['Java', 'XML', 'Objective-C', 'UIKit'],
     screenshots: [],
-    type: 'professional',
+    type: ProjectType.Professional,
     links: [
       { label: 'Android', url: 'https://play.google.com/store/apps/details?id=com.emlakjet.kurumsal.sekizbit' },
       { label: 'iOS', url: 'https://apps.apple.com/us/app/emlakjet-emlak-ara-i-lan-ver/id1194656334' }
@@ -85,7 +87,7 @@ export const professionalProjects = [
     </ul>`,
     tech: ['Java', 'XML', 'Swift', 'UIKit'],
     screenshots: [],
-    type: 'professional',
+    type: ProjectType.Professional,
     links: [
       { label: 'Android', url: 'https://play.google.com/store/apps/details?id=com.dentalbulut.android&hl=en_US' },
       { label: 'iOS', url: 'https://apps.apple.com/us/app/dentalbulut/id687279571' }

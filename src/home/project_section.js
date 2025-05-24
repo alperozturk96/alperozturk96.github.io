@@ -1,101 +1,143 @@
 import {techIcons} from "../projects/tech_icons.js";
 import {showModalImage} from "./modal.js";
+import {ProjectType} from "../projects/project_type.js";
 
 export function projectSection(projects, sectionTitle) {
-  const main = document.getElementById('portfolio');
-  const heading = document.createElement('h2');
-  heading.textContent = sectionTitle;
-  heading.style.marginTop = '2.5rem';
-  heading.style.marginBottom = '1.2rem';
-  main.appendChild(heading);
+  const portfolio = document.getElementById('portfolio');
+  appendHeading(portfolio, sectionTitle);
   
   projects.forEach(project => {
     const section = document.createElement('section');
     section.className = 'project-section';
 
-    let header = createHeaderRow(project)
+    let header = createHeaderRow(project.name, project.tech)
     section.appendChild(header);
 
-    let description = createDescription(project)
+    let description = createDescription(project.description)
     section.appendChild(description);
 
-    if (project.type === 'professional') {
-      const linksDiv = createLinks(project);
-      if (linksDiv) section.appendChild(linksDiv);
-    } else if (project.type === 'personal') {
-      const shotsDiv = createScreenshots(project);
-      if (shotsDiv) section.appendChild(shotsDiv);
-    }
-    
-    main.appendChild(section);
+    appendLinkOrScreenshot(section, project);
+
+    portfolio.appendChild(section);
   });
 }
 
-function createDescription(project) {
-  const desc = document.createElement('div');
-  desc.className = 'project-desc';
-  desc.innerHTML = project.description;
-  return desc;
+function appendHeading(parent, text) {
+  let element = document.createElement('h2');
+  const heading = Object.assign(element, {
+    textContent: text
+  });
+
+  Object.assign(heading.style, {
+    marginTop: '2.5rem',
+    marginBottom: '1.2rem'
+  });
+
+  parent.appendChild(heading);
 }
 
-function createHeaderRow(project) {
-  const headerRow = document.createElement('div');
-  headerRow.className = 'project-header-row';
-  const titleDiv = document.createElement('div');
-  titleDiv.className = 'project-title';
-  titleDiv.textContent = project.name;
-  const techDiv = document.createElement('div');
-  techDiv.className = 'tech-stack';
-  project.tech.forEach(tech => {
-    const icon = document.createElement('img');
-    icon.className = 'tech-icon';
-    icon.src = techIcons[tech] || '';
-    icon.alt = tech + ' icon';
-    techDiv.appendChild(icon);
-    const span = document.createElement('span');
-    span.textContent = tech;
-    techDiv.appendChild(span);
+function createDescription(description) {
+  let element = document.createElement('div');
+  return Object.assign(element, {
+    className: 'project-desc',
+    innerHTML: description
   });
-  headerRow.appendChild(titleDiv);
-  headerRow.appendChild(techDiv);
+}
+
+function createHeaderRow(name, tech) {
+  const headerRow = Object.assign(document.createElement('div'), {
+    className: 'project-header-row'
+  });
+
+  const titleDiv = Object.assign(document.createElement('div'), {
+    className: 'project-title',
+    textContent: name
+  });
+
+  const techDiv = Object.assign(document.createElement('div'), {
+    className: 'tech-stack'
+  });
+
+  tech.forEach(t => {
+    const icon = Object.assign(document.createElement('img'), {
+      className: 'tech-icon',
+      src: techIcons[t] || '',
+      alt: `${t} icon`
+    });
+
+    const label = document.createElement('span');
+    label.textContent = t;
+
+    techDiv.append(icon, label);
+  });
+
+  headerRow.append(titleDiv, techDiv);
   return headerRow;
 }
 
-function createLinks(project) {
-  if (!Array.isArray(project.links) || !project.links.length) return null;
-  const linksDiv = document.createElement('div');
-  linksDiv.className = 'project-links';
-  project.links.forEach(linkObj => {
-    const btn = document.createElement('a');
-    btn.className = 'project-link-btn';
-    btn.href = linkObj.url;
-    btn.target = '_blank';
-    btn.rel = 'noopener';
-    btn.textContent = linkObj.label;
+function createLinks(links) {
+  if (!Array.isArray(links) || links.length === 0) return null;
+
+  const linksDiv = Object.assign(document.createElement('div'), {
+    className: 'project-links'
+  });
+
+  links.forEach(({ url, label }) => {
+    const btn = Object.assign(document.createElement('a'), {
+      className: 'project-link-btn',
+      href: url,
+      target: '_blank',
+      rel: 'noopener',
+      textContent: label
+    });
     linksDiv.appendChild(btn);
   });
+
   return linksDiv;
 }
 
-function createScreenshots(project) {
-  if (!project.screenshots || !project.screenshots.length) return null;
-  const shotsDiv = document.createElement('div');
-  shotsDiv.className = 'screenshots';
-  project.screenshots.forEach((screenshot, idx) => {
-    const img = document.createElement('img');
-    img.className = 'screenshot-img';
-    img.src = `/assets/projects/${project.name}/${screenshot}`;
-    img.alt = `${project.name} screenshot ${idx+1}`;
-    img.tabIndex = 0;
-    img.addEventListener('mouseover', () => img.classList.add('focused'));
-    img.addEventListener('mouseout', () => img.classList.remove('focused'));
-    img.addEventListener('focus', () => img.classList.add('focused'));
-    img.addEventListener('blur', () => img.classList.remove('focused'));
-    // Modal open on click
-    img.addEventListener('click', () => {
-      showModalImage(project, idx, project.screenshots.map(s => `/assets/projects/${project.name}/${s}`));
+function createScreenshots(screenshots, name) {
+  if (!Array.isArray(screenshots) || !screenshots.length) return null;
+
+  const shotsDiv = Object.assign(document.createElement('div'), {
+    className: 'screenshots'
+  });
+
+  const imgPaths = screenshots.map(file => `/assets/projects/${name}/${file}`);
+
+  screenshots.forEach((_, idx) => {
+    const img = Object.assign(document.createElement('img'), {
+      className: 'screenshot-img',
+      src: imgPaths[idx],
+      alt: `${name} screenshot ${idx + 1}`,
+      tabIndex: 0
     });
+
+    ['mouseover', 'focus'].forEach(e => img.addEventListener(e, () => img.classList.add('focused')));
+    ['mouseout', 'blur'].forEach(e => img.addEventListener(e, () => img.classList.remove('focused')));
+
+    img.addEventListener('click', () => showModalImage({ name, screenshots }, idx, imgPaths));
+
     shotsDiv.appendChild(img);
   });
+
   return shotsDiv;
+}
+
+function appendLinkOrScreenshot(section, project) {
+  switch(project.type) {
+    case ProjectType.Professional :
+      const links = createLinks(project.links);
+      if (links) {
+        section.appendChild(links);
+      }
+      break;
+    case ProjectType.Personal:
+      const screenshots = createScreenshots(project.screenshots, project.name);
+      if (screenshots) {
+        section.appendChild(screenshots);
+      }
+      break;
+    default:
+  }
 }
