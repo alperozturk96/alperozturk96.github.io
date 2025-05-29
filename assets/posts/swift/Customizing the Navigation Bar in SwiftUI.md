@@ -1,14 +1,15 @@
 # Customizing the Navigation Bar in SwiftUI
-
+<br>
 This blog post explores how to customize the navigation bar's background and title color in SwiftUI. You might wonder why such a basic task requires a dedicated blog post. The reason is simple: SwiftUI, especially in its early iterations, does not offer a straightforward, out-of-the-box solution for this functionality.
-
----
+<br><br>
 
 ## Background
-
+<br>
 Prior to iOS 16, SwiftUI did not provide native modifiers for customizing navigation bar appearance. Developers frequently relied on UIKit to achieve this customization, leveraging SwiftUI's interoperability with UIKit.
+<br><br>
 
 ### Using `UINavigationBar, UINavigationBarAppearance`
+<br>
 
 A common method before iOS 16 involved modifying the`UINavigationBar` appearance within a view's initializer:
 
@@ -40,8 +41,7 @@ While functional, this approach applies the customization globally and is not re
 We could create another BaseView and add this logic there, using it as a parent view for all the other views we plan to use in our project.
 
 However, I don't want that behavior. I just want a modifier that changes the navigation bar color and title color.
-
----
+<br><br>
 
 ### NavigationBarViewModifier
 
@@ -142,8 +142,7 @@ private final class NavigationConfigurationViewController: UIViewController {
 ```
 
 This approach modifies the navigation bar after the view has been initialized. As a result, users might briefly observe the default navigation bar appearance before your customizations are applied, particularly if the view requires additional loading time.
-
----
+<br><br>
 
 ### Improvements in iOS 16+
 
@@ -164,5 +163,3 @@ However, this newer API has its own set of limitations:
 At the time of writing, there is no single, perfect solution for comprehensively styling the navigation bar across all iOS versions in SwiftUI. UIKit interoperability remains essential for achieving full customization capabilities.
 
 I’m genuinely curious why such a basic feature was missing from the initial version of SwiftUI. However, it’s not really surprising— the issue wasn’t just the lack of modifiers for the navigation bar; the navigation system itself was flawed and, in some ways, still is. I will explain this in more detail in a separate blog post.
-
----
