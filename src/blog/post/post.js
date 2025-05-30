@@ -12,15 +12,20 @@ if (!post) {
     document.title = post.title;
 
     fetch(post.path)
-        .then(res => {
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            return res.text();
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to load post content.");
+            }
+            return response.text();
         })
-        .then(markdown => {
-            contentEl.innerHTML = marked.parse(markdown);
+        .then(html => {
+            const postBody = document.createElement("div");
+            postBody.innerHTML = html;
+            contentEl.appendChild(postBody);
+
+            Prism.highlightAll();
         })
-        .catch(err => {
-            contentEl.textContent = "Failed to load post.";
-            console.error("Error:", err);
+        .catch(error => {
+            contentEl.textContent = "Error loading post: " + error.message;
         });
 }
