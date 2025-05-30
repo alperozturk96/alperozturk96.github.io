@@ -22,3 +22,31 @@
     width: 18px;
     height: 18px;
 }
+
+.toggle-code {
+    width: 100%;
+    background: #23272e;
+    color: #fff;
+    border: none;
+    padding: 0.75em 1em;
+    text-align: left;
+    font-size: 1em;
+    cursor: pointer;
+    outline: none;
+    border-bottom: 1px solid #222;
+    transition: background 0.2s;
+    border-radius: 8px 8px 0 0;
+}
+.toggle-code:hover {
+    background: #2d313a;
+}
+
+.code-content {
+    padding: 0.5em 1em 1em 1em;
+}
+
+/* Maintain Prism code styling inside collapsibles */
+.code-content pre {
+    margin: 0;
+    background: none;
+}

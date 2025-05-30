@@ -25,6 +25,41 @@ if (!post) {
 
             Prism.highlightAll();
             setCopyButtonEvents();
+
+            // Make all .code-container blocks collapsible/expandable for all articles
+            document.querySelectorAll(".code-container").forEach(container => {
+                // Avoid adding the toggle if it already exists
+                if (container.querySelector('.toggle-code')) return;
+                // Find the <pre> block inside the container
+                const pre = container.querySelector('pre');
+                if (!pre) return;
+                // Create the toggle button
+                const toggleBtn = document.createElement('button');
+                toggleBtn.className = 'toggle-code';
+                toggleBtn.type = 'button';
+                toggleBtn.textContent = 'Show Code';
+                // Create code content div
+                const codeContent = document.createElement('div');
+                codeContent.className = 'code-content';
+                codeContent.style.display = 'none';
+                // Move all children except the toggle button into codeContent
+                const children = Array.from(container.children);
+                children.forEach(child => {
+                    if (child !== toggleBtn) {
+                        codeContent.appendChild(child);
+                    }
+                });
+                // Clear container and append toggle and codeContent
+                container.innerHTML = '';
+                container.appendChild(toggleBtn);
+                container.appendChild(codeContent);
+                // Toggle logic
+                toggleBtn.addEventListener('click', () => {
+                    const isHidden = codeContent.style.display === 'none';
+                    codeContent.style.display = isHidden ? 'block' : 'none';
+                    toggleBtn.textContent = isHidden ? 'Hide Code' : 'Show Code';
+                });
+            });
         })
         .catch(error => {
             contentEl.textContent = "Error loading post: " + error.message;
