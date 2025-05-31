@@ -10,7 +10,7 @@
 <h2>Use Case</h2>
 <p>
   <br>
-  Before diving into the implementation details, let me explain the context. In my launcher app, users can customize their home screen with apps, organize them into folders, and tweak various settings such as background and content colors.
+  Before diving into the implementation details, let me explain the context. In my launcher app, users can add apps to the home screen or app list, organize them into folders, and also change settings such as background and content colors or show hidden apps.
   <br><br>
   Now imagine switching to a new Android device — would you want to recreate all your folders, place apps one by one, and reapply your settings from scratch? Definitely not. To solve this, I implemented an export/import feature that generates a JSON file representing the full configuration. This file can later be imported to restore everything.
   <br><br>
@@ -21,9 +21,9 @@
 <h2>Solution</h2>
 <p>
   <br>
-  The app makes use of several <code>data</code> classes, which are also used as Room entities. Many of these hold nested or complex data structures. To serialize and deserialize them using Gson, a custom <code>JsonSerializer</code> is needed.
+  The app makes use of several <code>data</code> classes, which are also used as Room entities. Many of these hold nested or a bit complex data structures. To serialize and deserialize them using Gson, a custom <code>JsonSerializer</code> is needed.
   <br><br>
-  Let's look at a real example.
+  Let's look at the code.
   <br><br>
 </p>
 
@@ -80,6 +80,11 @@ sealed class AppState {
   </code></pre>
 </div>
 
+<p>
+  <br>
+  Here is a quick example of direct conversion with Gson.
+  <br><br>
+</p>
 
 <h4>Object to JSON</h4>
 <div class="code-container">
@@ -92,7 +97,6 @@ val app = App(
     state = AppState.Favorite
 )
 val jsonString = gson.toJson(app)
-println(jsonString)
 
   </code></pre>
 </div>
@@ -111,7 +115,6 @@ val jsonInput = """
 }
 """
 val appObj = gson.fromJson(jsonInput, App::class.java)
-println(appObj)
   </code></pre>
 </div>
 
@@ -126,9 +129,6 @@ println(appObj)
   <button class="copy-button" title="Copy">Copy</button>
   <pre><code class="language-kotlin">
 import androidx.room.TypeConverter
-import com.coolnexttech.textlauncher.db.model.App
-import com.coolnexttech.textlauncher.db.model.AppState
-import com.coolnexttech.textlauncher.db.serializer.AppStateJsonSerializer
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 
@@ -150,7 +150,6 @@ class AppListConverter {
     }
 }
 
-import com.coolnexttech.textlauncher.db.model.AppState
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
@@ -223,7 +222,7 @@ class AppStateJsonSerializer : JsonSerializer&lt;AppState&gt;, JsonDeserializer&
   <br>
   First of all, Gson is primarily a Java-based solution. It's not optimized for modern Kotlin-based Android development.
   <br><br>
-  Gson uses a reflection-based approach, which means it inspects class structures at runtime to determine fields and types. This can lead to issues with tools like ProGuard or R8, which are often used during release builds to shrink, optimize, and obfuscate the app.
+  Gson uses a reflection-based approach and it has issues with tools like ProGuard or R8, which are often used during release builds to shrink, optimize, and obfuscate the app.
   <br><br>
 </p>
 
@@ -254,7 +253,6 @@ class AppStateJsonSerializer : JsonSerializer&lt;AppState&gt;, JsonDeserializer&
   <button class="copy-button" title="Copy">Copy</button>
   <pre><code class="language-kotlin">
 import androidx.room.TypeConverter
-import com.coolnexttech.textlauncher.db.model.App
 import kotlinx.serialization.json.Json
 
 class AppListConverter {
@@ -271,8 +269,6 @@ class AppListConverter {
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.coolnexttech.textlauncher.R
-import com.coolnexttech.textlauncher.ui.model.ActionBottomSheetData
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
