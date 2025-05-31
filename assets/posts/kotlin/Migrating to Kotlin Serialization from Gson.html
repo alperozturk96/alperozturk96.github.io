@@ -1,0 +1,334 @@
+<h1>Migrating to Kotlin Serialization from Gson</h1>
+<p>
+    <br>
+    Today I was updating my launcher app (Text Launcher). Updating dependencies, cleaning up the code etc.
+    I noticed that the logic I used for export and import launcher settings a bit too long and needed JsonSerializer.
+    <br><br>
+</p>
+
+<h2>Use Case</h2>
+<p>
+    <br>
+    Before sharing the implementation details I would like to explain what I'm doing in my project and why it's needed.
+    In my launcher app you can have home apps, folders and those folders may contain apps also you can have bunch of
+    user settings
+    such as content color, background color thus these datas needs to be importable. Imagine you have new Android device
+    what are you going to do
+    you will manually create all these folders and apps and settings again? So you can export one Json file and import
+    it later on.
+    Of course, we can use cloud storage solution such as Supabase or Firebase to hold user data and make this process
+    more automatic
+    but I want to keep things are simple. This launcher app should not have internet access only needed permissions and
+    simplicity
+    is the goal.
+    <br><br>
+</p>
+
+<h2>Solution</h2>
+<p>
+    <br>
+    I have bunch of data class and used as Room entity classes as well. These needs to be serializable and as you can
+    imagine
+    these data classes is not just holding primitive types thus JsonSerializer is needed for Gson. Let's take a look at
+    it the
+    data classes and the Gson related logics.
+    <br><br>
+</p>
+
+<h3>App</h3>
+<p>
+  <br>
+   This data class is responsible for holding value for application that installed in the phone and state of the app such as
+   InFolder, Home, Hidden, Favorite...
+  <br><br>
+</p>
+<div class="code-container">
+  <button class="copy-button" title="Copy">Copy</button>
+  <pre>
+        <code class="language-kotlin">
+@Entity(tableName = "apps")
+data class App(
+    val name: String,
+
+    @SerializedName("package_name")
+    @PrimaryKey
+    val packageName: String,
+
+    val state: AppState,
+) {
+    // helper methods ...
+}
+        </code>
+    </pre>
+</div>
+
+<h3>AppState</h3>
+<p>
+  <br>
+   As you can see this is a sealed class. So previous data class has child variable that holds sealed class.
+   Thus direct conversion json to data class and data class to json back will not work.
+  <br><br>
+</p>
+<div class="code-container">
+  <button class="copy-button" title="Copy">Copy</button>
+  <pre><code class="language-kotlin">
+sealed class AppState {
+    data object List : AppState()
+    data object Favorite : AppState()
+    data class Home(val order: Int) : AppState()
+    data object Hidden : AppState()
+    data object InFolder : AppState()
+
+    fun getTrailingImageVector(): ImageVector? {
+        return when (this) {
+            is Favorite -> Icons.Filled.Star
+            is Home -> null
+            else -> Icons.Filled.MoreVert
+        }
+    }
+}
+  </code></pre>
+</div>
+
+
+<h4>Object to JSON</h4>
+<div class="code-container">
+  <button class="copy-button" title="Copy">Copy</button>
+  <pre><code class="language-kotlin">
+val gson = Gson()
+val app = App(
+    name = "YouTube",
+    packageName = "com.google.android.youtube",
+    state = AppState.Favorite
+)
+val jsonString = gson.toJson(app)
+println(jsonString)
+
+  </code></pre>
+</div>
+
+<h4>Json to Object</h4>
+<div class="code-container">
+  <button class="copy-button" title="Copy">Copy</button>
+  <pre><code class="language-kotlin">
+val jsonInput = """
+{
+  "name": "YouTube",
+  "package_name": "com.google.android.youtube",
+  "state": {
+    "type": "Favorite"
+  }
+}
+"""
+val appObj = gson.fromJson(jsonInput, App::class.java)
+println(appObj)
+  </code></pre>
+</div>
+
+<p>
+  <br>
+  Direct conversion will not work because Gson basically don't know how to convert it.
+  To be able to achieve the conversion we have to write JsonSerializer. Don't forget that
+  I'm using these classes with Room DB thus it needs to be compatible with it as well. Which
+  means that I need TypeConverter for it.
+  <br><br>
+</p>
+
+<div class="code-container">
+  <button class="copy-button" title="Copy">Copy</button>
+  <pre><code class="language-kotlin">
+import androidx.room.TypeConverter
+import com.coolnexttech.textlauncher.db.model.App
+import com.coolnexttech.textlauncher.db.model.AppState
+import com.coolnexttech.textlauncher.db.serializer.AppStateJsonSerializer
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
+
+class AppListConverter {
+    private val gson = GsonBuilder()
+        .registerTypeAdapter(AppState::class.java, AppStateJsonSerializer())
+        .create()
+
+    @TypeConverter
+    fun fromAppList(apps: List< App>?): String? {
+        return gson.toJson(apps)
+    }
+
+    @TypeConverter
+    fun toAppList(appJson: String?): List< App>? {
+        if (appJson.isNullOrEmpty()) return emptyList()
+        val type = object : TypeToken&lt;List&lt;App&gt;&gt;() {}.type
+        return gson.fromJson(appJson, type)
+    }
+}
+
+import com.coolnexttech.textlauncher.db.model.AppState
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
+import com.google.gson.JsonSerializationContext
+import com.google.gson.JsonSerializer
+import java.lang.reflect.Type
+
+class AppStateJsonSerializer : JsonSerializer&lt;AppState&gt;, JsonDeserializer&lt;AppState&gt; {
+    override fun serialize(
+        src: AppState,
+        typeOfSrc: Type,
+        context: JsonSerializationContext
+    ): JsonElement {
+        val jsonObject = JsonObject()
+        when (src) {
+            is AppState.List -&gt; jsonObject.addProperty("type", "List")
+            is AppState.Favorite -&gt; jsonObject.addProperty("type", "Favorite")
+            is AppState.Home -&gt; {
+                jsonObject.addProperty("type", "Home")
+                jsonObject.addProperty("order", src.order)
+            }
+            is AppState.Hidden -&gt; jsonObject.addProperty("type", "Hidden")
+            is AppState.InFolder -&gt; jsonObject.addProperty("type", "InFolder")
+        }
+        return jsonObject
+    }
+
+    override fun deserialize(
+        json: JsonElement,
+        typeOfT: Type,
+        context: JsonDeserializationContext
+    ): AppState {
+        val jsonObject = json.asJsonObject
+        val typeElement = jsonObject.get("type")
+
+        if (typeElement == null || typeElement.isJsonNull) {
+            return AppState.List
+        }
+
+        return when (typeElement.asString) {
+            "List" -&gt; AppState.List
+            "Favorite" -&gt; AppState.Favorite
+            "Home" -&gt; {
+                val orderElement = jsonObject.get("order")
+                if (orderElement != null &amp;&amp; !orderElement.isJsonNull) {
+                    AppState.Home(orderElement.asInt)
+                } else {
+                    AppState.Home(0)
+                }
+            }
+            "Hidden" -&gt; AppState.Hidden
+            "InFolder" -&gt; AppState.InFolder
+            else -&gt; AppState.List
+        }
+    }
+}
+  </code></pre>
+</div>
+
+<h3>Ehhh I didn't like it...</h3>
+
+<br>
+<br>
+<br>
+
+<h2>So how can we achieve it more nice way? The answer is Kotlin serialization</h2>
+<p>
+  <br>
+    First of all Gson is more like for Java world not for Android world. As they indicated in their official
+    GitHub repo Gson is not a recommended library for interacting with JSON on Android because Gson is reflection-based approach and
+    Gson doesn't work well with code shrinking, optimization, or obfuscation tools (like ProGuard or R8), which are usually used when building Android apps for release.
+  <br><br>
+</p>
+
+<h2>What the heck is the reflection-based approach?</h2>
+<p>
+  <br>
+  Well it's basically Gson doesn't know ahead of time what fields your class has. So at runtime, inspect the class to find all its fields and methods, read the field names and types then convert them to JSON.
+  <br><br>
+</p>
+
+<h2>Why Kotlinx Serialization better?</h2>
+<p>
+  <br>
+   Kotlinx Serialization generates actual Kotlin code during compilation. It's direct field access with no reflection overhead.
+   The "inspection" of what fields exist happens once at compile time, not repeatedly at runtime.
+  <br><br>
+</p>
+
+<h2>New solution</h2>
+<p>
+  <br>
+  I still need TypeConverver but I don't need JsonSerializer class anymore all I need to add @Serializable annotation.
+  <br><br>
+</p>
+
+<div class="code-container">
+  <button class="copy-button" title="Copy">Copy</button>
+  <pre><code class="language-kotlin">
+import androidx.room.TypeConverter
+import com.coolnexttech.textlauncher.db.model.App
+import kotlinx.serialization.json.Json
+
+class AppListConverter {
+    @TypeConverter
+    fun fromAppList(apps: List&lt;App&gt;?): String? {
+        return apps?.let { Json.encodeToString(it) }
+    }
+
+    @TypeConverter
+    fun toAppList(appJson: String?): List&lt;App&gt;? {
+        return appJson?.let { Json.decodeFromString&lt;List&lt;App&gt;&gt;(it) } ?: emptyList()
+    }
+}
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.coolnexttech.textlauncher.R
+import com.coolnexttech.textlauncher.ui.model.ActionBottomSheetData
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+@Entity(tableName = "apps")
+data class App(
+    val name: String,
+
+    @SerialName("package_name")
+    @PrimaryKey
+    val packageName: String,
+
+    val state: AppState,
+) {
+    // Helper methods ...
+}
+
+@Serializable
+sealed class AppState {
+    @Serializable
+    @SerialName("List")
+    data object List : AppState()
+
+    @Serializable
+    @SerialName("Favorite")
+    data object Favorite : AppState()
+
+    @Serializable
+    @SerialName("Home")
+    data class Home(val order: Int) : AppState()
+
+    @Serializable
+    @SerialName("Hidden")
+    data object Hidden : AppState()
+
+    @Serializable
+    @SerialName("InFolder")
+    data object InFolder : AppState()
+
+    fun getTrailingImageVector(): ImageVector? {
+        return when (this) {
+            is Favorite -&gt; Icons.Filled.Star
+            is Home -&gt; null
+            else -&gt; Icons.Filled.MoreVert
+        }
+    }
+}
+  </code></pre>
+</div>
