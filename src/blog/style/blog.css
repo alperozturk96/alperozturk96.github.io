@@ -35,8 +35,9 @@ body {
 
 .date-label {
     position: absolute;
-    top: 0.4rem;
+    top: 0;
     right: 1rem;
+    transform: translateY(15%);
 }
 
 .continue-link a {
