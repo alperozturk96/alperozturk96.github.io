@@ -46,7 +46,7 @@ function addSubNavBar(filterNav, types) {
 
 function renderPosts(posts, container) {
     container.innerHTML = "";
-
+    posts.sort((a, b) => new Date(b.date) - new Date(a.date));
     posts.forEach(post => {
         const card = document.createElement("div");
         card.className = "blog-card";
