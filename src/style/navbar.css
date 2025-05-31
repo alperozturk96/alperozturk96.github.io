@@ -33,3 +33,20 @@
     float: none;
     display: inline-block;
 }
+
+@media (max-width: 600px) {
+    .nav-base {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .nav-base a {
+        padding: 1rem;
+        font-size: 1rem;
+    }
+
+    .nav-base li {
+        display: block;
+        width: 100%;
+    }
+}
