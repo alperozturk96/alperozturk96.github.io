@@ -18,9 +18,9 @@ body {
     background-color: #2A2A2D;
     padding: 1rem;
     border-radius: 8px;
-    width: 100%;
-    max-width: 700px;
+    width: 40%;
     transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
 }
 
 .blog-card a {
@@ -34,11 +34,9 @@ body {
 }
 
 .date-label {
-    top: 1rem;
+    position: absolute;
+    top: 0.4rem;
     right: 1rem;
-    text-align: right;
-    font-size: 0.85rem;
-    color: #B0B0B0;
 }
 
 .continue-link a {
