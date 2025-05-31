@@ -15,4 +15,11 @@ export const blogData = [
     "path": "/assets/posts/swift/Customizing the Navigation Bar in SwiftUI.html",
     "date": "30 May 2025"
   },
+  {
+    "title": "Migrating to Kotlin Serialization from Gson",
+    "summary": "Switch from Gson to Kotlin Serialization for easier and faster JSON handling in Android apps. Let’s dive into the story ...",
+    "type": PostType.Kotlin,
+    "path": "/assets/posts/kotlin/Migrating to Kotlin Serialization from Gson.html",
+    "date": "31 May 2025"
+  },
 ]
