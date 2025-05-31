@@ -33,6 +33,14 @@ body {
     text-align: right;
 }
 
+.date-label {
+    top: 1rem;
+    right: 1rem;
+    text-align: right;
+    font-size: 0.85rem;
+    color: #B0B0B0;
+}
+
 .continue-link a {
     color: #2897FF;
     text-decoration: none;
