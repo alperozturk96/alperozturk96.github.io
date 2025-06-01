@@ -1,4 +1,4 @@
-<h1>Migrating to Kotlin Serialization from Gson</h1>
+<h1>Migrating from Gson to Kotlinx Serialization</h1>
 
 <p>
   <br>
@@ -12,7 +12,7 @@
   <br>
   Before diving into the implementation details, let me explain the context. In my launcher app, users can add apps to the home screen or app list, organize them into folders, and also change settings such as background and content colors or show hidden apps.
   <br><br>
-  Now imagine switching to a new Android device — would you want to recreate all your folders, place apps one by one, and reapply your settings from scratch? Definitely not. To solve this, I implemented an export/import feature that generates a JSON file representing the full configuration. This file can later be imported to restore everything.
+  Now imagine switching to a new Android device would you want to recreate all your folders, place apps one by one, and reapply your settings from scratch? Definitely not. To solve this, I implemented an export/import feature that generates a JSON file representing the full configuration. This file can later be imported to restore everything.
   <br><br>
   Sure, cloud storage (like Firebase or Supabase) could make this process automatic. But in the interest of simplicity and privacy, I’ve designed this app to work entirely offline, using only the minimal required permissions.
   <br><br>
@@ -80,11 +80,9 @@ sealed class AppState {
   </code></pre>
 </div>
 
-<p>
-  <br>
-  Here is a quick example of direct conversion with Gson.
-  <br><br>
-</p>
+<h3>Direct conversion with Gson</h3>
+<br>
+<br>
 
 <h4>Object to JSON</h4>
 <div class="code-container">
@@ -121,7 +119,7 @@ val appObj = gson.fromJson(jsonInput, App::class.java)
 
 <p>
   <br>
-  Direct conversion like this won't work because Gson doesn’t inherently understand sealed classes or their structure. To resolve this, we must define a custom <code>JsonSerializer</code> and <code>JsonDeserializer</code>. Also, since these objects are stored in Room, we need to provide proper <code>TypeConverters</code>.
+   Gson doesn’t inherently understand sealed classes or their structure. To resolve this, we must define a custom <code>JsonSerializer</code> and <code>JsonDeserializer</code>. Also, since these objects are stored in Room, we need to provide proper <code>TypeConverters</code>.
   <br><br>
 </p>
 
@@ -210,43 +208,30 @@ class AppStateJsonSerializer : JsonSerializer&lt;AppState&gt;, JsonDeserializer&
   </code></pre>
 </div>
 
-<h3>Why I Wasn't Happy with This Approach</h3>
 <p>
   <br>
-  While this setup works, it introduces unnecessary complexity. Writing custom serializers/deserializers for every sealed class quickly becomes tedious and error-prone.
+  While this setup works, it introduces unnecessary complexity. Writing custom serializers/deserializers for every sealed class quickly becomes tedious and error-prone in my project.
   <br><br>
 </p>
 
-<h2>A Better Way: Kotlin Serialization</h2>
+<h2>A Better Way is Kotlin Serialization</h2>
 <p>
-  <br>
-  First of all, Gson is primarily a Java-based solution. It's not optimized for modern Kotlin-based Android development.
-  <br><br>
+  First of all, Gson is primarily a Java-based solution. It's not optimized for Android development.
   Gson uses a reflection-based approach and it has issues with tools like ProGuard or R8, which are often used during release builds to shrink, optimize, and obfuscate the app.
-  <br><br>
 </p>
 
-<h2>What the heck is the reflection-based approach?</h2>
 <p>
-  <br>
   Well, it's basically that Gson doesn't know ahead of time what fields your class has. So at runtime, it inspects the class to find all its fields and methods, reads the field names and types, then converts them to JSON.
-  <br><br>
 </p>
 
-<h2>Why Kotlinx Serialization is Better</h2>
 <p>
-  <br>
   Kotlinx Serialization solves these problems by generating serialization code at compile time. This eliminates the need for reflection entirely. It understands your data structures ahead of time and creates efficient, optimized code for both serialization and deserialization.
   <br><br>
   This approach is faster, safer, and works seamlessly with sealed classes.
-  <br><br>
 </p>
 
-<h2>New solution</h2>
 <p>
-  <br>
-  With Kotlinx Serialization, all I need to do is add the <code>@Serializable</code> annotation to my data classes — no more writing custom serializers!
-  <br><br>
+  With Kotlinx Serialization, all I need to do is add the <code>@Serializable</code> annotation to my data classes, no more writing custom serializers!
 </p>
 
 <div class="code-container">
@@ -318,3 +303,9 @@ sealed class AppState {
 }
   </code></pre>
 </div>
+
+<h3>Conclusion</h3>
+<p>
+    While Gson’s reflection based serialization works for simple use cases, it incurs runtime overhead, fragile obfuscation behavior, and requires custom adapters for Kotlin specific constructs.
+    You can use Kotlinx Serialization or Moshi instead of Gson, which would be a better approach for Android development.
+</p>

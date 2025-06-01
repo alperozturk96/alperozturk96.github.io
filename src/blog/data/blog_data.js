@@ -10,16 +10,16 @@ export const blogData = [
   },
   {
     "title": "Customizing the Navigation Bar in SwiftUI",
-    "summary": "Let’s take a quick look at why customizing SwiftUI’s navigation bar isn’t as simple as it should be—and how you can fix it with a clean, reusable solution that works across iOS versions. Despite improvements in iOS 16, full control still needs some UIKit magic.",
+    "summary": "Let’s take a quick look at why customizing SwiftUI’s navigation bar isn’t as simple as it should be and how you can fix it with a clean, reusable solution that works across iOS versions. Despite improvements in iOS 16, full control still needs some UIKit magic.",
     "type": PostType.Swift,
     "path": "/assets/posts/swift/Customizing the Navigation Bar in SwiftUI.html",
     "date": "30 May 2025"
   },
   {
-    "title": "Migrating to Kotlin Serialization from Gson",
-    "summary": "Switch from Gson to Kotlin Serialization for easier and faster JSON handling in Android apps. Let’s dive into the story ...",
+    "title": "Migrating from Gson to Kotlinx Serialization",
+    "summary": "Migrating from Gson to Kotlinx Serialization for easier and faster JSON handling in Android apps. Let’s dive into the story ...",
     "type": PostType.Kotlin,
-    "path": "/assets/posts/kotlin/Migrating to Kotlin Serialization from Gson.html",
-    "date": "31 May 2025"
+    "path": "/assets/posts/kotlin/Migrating from Gson to Kotlinx Serialization.html",
+    "date": "1 June 2025"
   },
 ]
