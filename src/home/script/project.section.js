@@ -1,6 +1,6 @@
-import {techIcons} from "../projects/tech_icons.js";
+import {techIcons} from "../projects/tech.icons.js";
 import {showModalImage} from "./modal.js";
-import {ProjectType} from "../projects/project_type.js";
+import {ProjectType} from "../projects/project.type.js";
 
 export function projectSection(projects, sectionTitle) {
   const portfolio = document.getElementById('portfolio');

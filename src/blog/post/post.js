@@ -1,4 +1,4 @@
-import { blogData } from "../data/blog_data.js";
+import { blogData } from "../data/blog.data.js";
 import {UnicodeIcons} from "../../../assets/icons/unicode.icons.js";
 
 const params = new URLSearchParams(window.location.search);

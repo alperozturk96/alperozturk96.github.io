@@ -1,4 +1,4 @@
-import {BlogType as PostType} from "./blog_type.js";
+import {BlogType as PostType} from "./blog.type.js";
 
 export const blogData = [
   {

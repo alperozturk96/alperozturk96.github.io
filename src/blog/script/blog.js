@@ -1,5 +1,5 @@
-import {blogData} from "../data/blog_data.js";
-import {BlogType} from "../data/blog_type.js";
+import {blogData} from "../data/blog.data.js";
+import {BlogType} from "../data/blog.type.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const container = document.getElementById("blog-container");

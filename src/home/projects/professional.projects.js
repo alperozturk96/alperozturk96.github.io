@@ -1,4 +1,4 @@
-import {ProjectType} from "./project_type.js";
+import {ProjectType} from "./project.type.js";
 import {ProjectLabel} from "./project.label.js";
 
 export const professionalProjects = [

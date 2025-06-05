@@ -1,6 +1,6 @@
-import { projectSection } from './project_section.js';
-import { professionalProjects } from '../projects/professional_projects.js';
-import { personalProjects } from '../projects/personal_projects.js';
+import { projectSection } from './project.section.js';
+import { professionalProjects } from '../projects/professional.projects.js';
+import { personalProjects } from '../projects/personal.projects.js';
 import { initModal } from './modal.js';
 
 window.addEventListener('DOMContentLoaded', function() {
