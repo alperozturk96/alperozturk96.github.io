@@ -3,142 +3,146 @@ import {showModalImage} from "./modal.js";
 import {ProjectType} from "../projects/project.type.js";
 
 export function projectSection(projects, sectionTitle) {
-  const portfolio = document.getElementById('portfolio');
-  appendHeading(portfolio, sectionTitle);
-  
-  projects.forEach(project => {
-    const section = document.createElement('section');
-    section.className = 'project-section';
+    const portfolio = document.getElementById('portfolio');
+    appendHeading(portfolio, sectionTitle);
 
-    let header = createHeaderRow(project.name, project.tech)
-    section.appendChild(header);
+    // Use DocumentFragment to batch DOM updates
+    const fragment = document.createDocumentFragment();
+    for (let i = 0; i < projects.length; i++) {
+        const project = projects[i];
+        const section = document.createElement('section');
+        section.className = 'project-section';
 
-    let description = createDescription(project.description)
-    section.appendChild(description);
+        let header = createHeaderRow(project.name, project.tech);
+        section.appendChild(header);
 
-    appendLinkOrScreenshot(section, project);
+        let description = createDescription(project.description);
+        section.appendChild(description);
 
-    portfolio.appendChild(section);
-  });
+        appendLinkOrScreenshot(section, project);
+
+        fragment.appendChild(section);
+    }
+    portfolio.appendChild(fragment);
 }
 
 function appendHeading(parent, text) {
-  let element = document.createElement('h2');
-  const heading = Object.assign(element, {
-    textContent: text
-  });
+    let element = document.createElement('h2');
+    const heading = Object.assign(element, {
+        textContent: text
+    });
 
-  Object.assign(heading.style, {
-    marginTop: '2.5rem',
-    marginBottom: '1.2rem'
-  });
+    Object.assign(heading.style, {
+        marginTop: '2.5rem',
+        marginBottom: '1.2rem'
+    });
 
-  parent.appendChild(heading);
+    parent.appendChild(heading);
 }
 
 function createDescription(description) {
-  let element = document.createElement('div');
-  return Object.assign(element, {
-    className: 'project-desc',
-    innerHTML: description
-  });
+    let element = document.createElement('div');
+    return Object.assign(element, {
+        className: 'project-desc',
+        innerHTML: description
+    });
 }
 
 function createHeaderRow(name, tech) {
-  const headerRow = Object.assign(document.createElement('div'), {
-    className: 'project-header-row'
-  });
-
-  const titleDiv = Object.assign(document.createElement('div'), {
-    className: 'project-title',
-    textContent: name
-  });
-
-  const techDiv = Object.assign(document.createElement('div'), {
-    className: 'tech-stack'
-  });
-
-  tech.forEach(t => {
-    const icon = Object.assign(document.createElement('img'), {
-      className: 'tech-icon',
-      src: techIcons[t] || '',
-      alt: `${t} icon`
+    const headerRow = Object.assign(document.createElement('div'), {
+        className: 'project-header-row'
     });
 
-    const label = document.createElement('span');
-    label.textContent = t;
+    const titleDiv = Object.assign(document.createElement('div'), {
+        className: 'project-title',
+        textContent: name
+    });
 
-    techDiv.append(icon, label);
-  });
+    const techDiv = Object.assign(document.createElement('div'), {
+        className: 'tech-stack'
+    });
 
-  headerRow.append(titleDiv, techDiv);
-  return headerRow;
+    tech.forEach(t => {
+        const icon = Object.assign(document.createElement('img'), {
+            className: 'tech-icon',
+            src: techIcons[t] || '',
+            alt: `${t} icon`
+        });
+
+        const label = document.createElement('span');
+        label.textContent = t;
+
+        techDiv.append(icon, label);
+    });
+
+    headerRow.append(titleDiv, techDiv);
+    return headerRow;
 }
 
 function createLinks(links) {
-  if (!Array.isArray(links) || links.length === 0) return null;
+    if (!Array.isArray(links) || links.length === 0) return null;
 
-  const linksDiv = Object.assign(document.createElement('div'), {
-    className: 'project-links'
-  });
-
-  links.forEach(({ url, label }) => {
-    let className = 'project-link-btn' + ' ' + label;
-    const btn = Object.assign(document.createElement('a'), {
-      className: className,
-      href: url,
-      target: '_blank',
-      rel: 'noopener',
-      textContent: label
+    const linksDiv = Object.assign(document.createElement('div'), {
+        className: 'project-links'
     });
-    linksDiv.appendChild(btn);
-  });
 
-  return linksDiv;
+    links.forEach(({url, label}) => {
+        let className = 'project-link-btn' + ' ' + label;
+        const btn = Object.assign(document.createElement('a'), {
+            className: className,
+            href: url,
+            target: '_blank',
+            rel: 'noopener',
+            textContent: label
+        });
+        linksDiv.appendChild(btn);
+    });
+
+    return linksDiv;
 }
 
 function createScreenshots(screenshots, name) {
-  if (!Array.isArray(screenshots) || !screenshots.length) return null;
+    if (!Array.isArray(screenshots) || !screenshots.length) return null;
 
-  const shotsDiv = Object.assign(document.createElement('div'), {
-    className: 'screenshots'
-  });
-
-  const imgPaths = screenshots.map(file => `/assets/projects/${name}/${file}`);
-
-  screenshots.forEach((_, idx) => {
-    const img = Object.assign(document.createElement('img'), {
-      className: 'screenshot-img',
-      src: imgPaths[idx],
-      alt: `${name} screenshot ${idx + 1}`,
-      tabIndex: 0
+    const shotsDiv = Object.assign(document.createElement('div'), {
+        className: 'screenshots'
     });
 
-    ['mouseover', 'focus'].forEach(e => img.addEventListener(e, () => img.classList.add('focused')));
-    ['mouseout', 'blur'].forEach(e => img.addEventListener(e, () => img.classList.remove('focused')));
+    const imgPaths = screenshots.map(file => `/assets/projects/${name}/${file}`);
 
-    img.addEventListener('click', () => showModalImage({ name, screenshots }, idx, imgPaths));
+    screenshots.forEach((_, idx) => {
+        const img = Object.assign(document.createElement('img'), {
+            className: 'screenshot-img',
+            src: imgPaths[idx],
+            alt: `${name} screenshot ${idx + 1}`,
+            tabIndex: 0
+        });
 
-    shotsDiv.appendChild(img);
-  });
+        ['mouseover', 'focus'].forEach(e => img.addEventListener(e, () => img.classList.add('focused')));
+        ['mouseout', 'blur'].forEach(e => img.addEventListener(e, () => img.classList.remove('focused')));
 
-  return shotsDiv;
+        img.addEventListener('click', () => showModalImage({name, screenshots}, idx, imgPaths));
+
+        shotsDiv.appendChild(img);
+    });
+
+    return shotsDiv;
 }
 
 function appendLinkOrScreenshot(section, project) {
-  switch(project.type) {
-    case ProjectType.Professional :
-      const links = createLinks(project.links);
-      if (links) {
-        section.appendChild(links);
-      }
-      break;
-    case ProjectType.Personal:
-      const screenshots = createScreenshots(project.screenshots, project.name);
-      if (screenshots) {
-        section.appendChild(screenshots);
-      }
-      break;
-    default:
-  }
+    switch (project.type) {
+        case ProjectType.Professional :
+            const links = createLinks(project.links);
+            if (links) {
+                section.appendChild(links);
+            }
+            break;
+        case ProjectType.Personal:
+            const screenshots = createScreenshots(project.screenshots, project.name);
+            if (screenshots) {
+                section.appendChild(screenshots);
+            }
+            break;
+        default:
+    }
 }
