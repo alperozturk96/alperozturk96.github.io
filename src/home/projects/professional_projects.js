@@ -1,4 +1,5 @@
 import {ProjectType} from "./project_type.js";
+import {ProjectLabel} from "./project.label.js";
 
 export const professionalProjects = [
   {
@@ -18,8 +19,8 @@ export const professionalProjects = [
     screenshots: [],
     type: ProjectType.Professional,
     links: [
-      { label: 'Android', url: 'https://play.google.com/store/apps/details?id=com.nextcloud.client&hl=en_US' },
-      { label: 'iOS', url: 'https://apps.apple.com/us/app/nextcloud/id1125420102' }
+      { label: ProjectLabel.Android, url: 'https://play.google.com/store/apps/details?id=com.nextcloud.client&hl=en_US' },
+      { label: ProjectLabel.iOS, url: 'https://apps.apple.com/us/app/nextcloud/id1125420102' }
     ]
   },
   {
@@ -38,8 +39,8 @@ export const professionalProjects = [
     screenshots: [],
     type: ProjectType.Professional,
     links: [
-      { label: 'Android', url: 'https://play.google.com/store/apps/details?id=com.getlipa.wallet&amp%3Bhl=en' },
-      { label: 'iOS', url: 'https://apps.apple.com/ch/app/lipa-wallet/id1658329527' }
+      { label: ProjectLabel.Android, url: 'https://play.google.com/store/apps/details?id=com.getlipa.wallet&amp%3Bhl=en' },
+      { label: ProjectLabel.iOS, url: 'https://apps.apple.com/ch/app/lipa-wallet/id1658329527' }
     ]
   },
   {
@@ -56,7 +57,7 @@ export const professionalProjects = [
     screenshots: [],
     type: ProjectType.Professional,
     links: [
-      { label: 'iOS', url: 'https://apps.apple.com/us/app/scan360-pdf-scanner-sign/id1589134970' }
+      { label: ProjectLabel.iOS, url: 'https://apps.apple.com/us/app/scan360-pdf-scanner-sign/id1589134970' }
     ]
   },
   {
@@ -72,8 +73,8 @@ export const professionalProjects = [
     screenshots: [],
     type: ProjectType.Professional,
     links: [
-      { label: 'Android', url: 'https://play.google.com/store/apps/details?id=com.emlakjet.kurumsal.sekizbit' },
-      { label: 'iOS', url: 'https://apps.apple.com/us/app/emlakjet-emlak-ara-i-lan-ver/id1194656334' }
+      { label: ProjectLabel.Android, url: 'https://play.google.com/store/apps/details?id=com.emlakjet.kurumsal.sekizbit' },
+      { label: ProjectLabel.iOS, url: 'https://apps.apple.com/us/app/emlakjet-emlak-ara-i-lan-ver/id1194656334' }
     ]
   },
   {
@@ -89,8 +90,8 @@ export const professionalProjects = [
     screenshots: [],
     type: ProjectType.Professional,
     links: [
-      { label: 'Android', url: 'https://play.google.com/store/apps/details?id=com.dentalbulut.android&hl=en_US' },
-      { label: 'iOS', url: 'https://apps.apple.com/us/app/dentalbulut/id687279571' }
+      { label: ProjectLabel.Android, url: 'https://play.google.com/store/apps/details?id=com.dentalbulut.android&hl=en_US' },
+      { label: ProjectLabel.iOS, url: 'https://apps.apple.com/us/app/dentalbulut/id687279571' }
     ]
   }
 ];

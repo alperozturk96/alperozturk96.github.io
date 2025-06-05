@@ -1,34 +1,17 @@
-.project-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.3rem 1.3rem;
-    margin-bottom: 1.1rem;
-    margin-top: 0.7rem;
-}
 .project-link-btn {
-    margin-bottom: 0.5rem;
-    display: inline-block;
-    padding: 0.55em 1.7em;
-    font-size: 1rem;
-    font-weight: 600;
-    background: #232326;
-    box-shadow: 0 4px 18px rgba(30,34,40,0.22);
-    transform: translateY(-2px) scale(1.03);
-    color: #E3E3E5;
-    border-radius: 6px;
     text-decoration: none;
-    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
-    cursor: pointer;
-    min-width: 110px;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    padding-left: 0.55rem;
+    font-size: 1rem;
     margin-right: 0.7rem;
 }
-.project-link-btn:last-child {
-    margin-right: 0;
+.project-link-btn.iOS {
+    color: #2897FF;
+}
+.project-link-btn.Android {
+    color: #3DDC84;
 }
 .project-link-btn:hover, .project-link-btn:focus {
-    background: #E3E3E5;
-    box-shadow: 0 4px 18px rgba(0,191,255,0.22);
-    transform: translateY(-2px) scale(1.03);
-    color: #fff;
-    outline: none;
+    text-decoration: underline;
 }

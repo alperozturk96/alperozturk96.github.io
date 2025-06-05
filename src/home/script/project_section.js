@@ -83,8 +83,9 @@ function createLinks(links) {
   });
 
   links.forEach(({ url, label }) => {
+    let className = 'project-link-btn' + ' ' + label;
     const btn = Object.assign(document.createElement('a'), {
-      className: 'project-link-btn',
+      className: className,
       href: url,
       target: '_blank',
       rel: 'noopener',
