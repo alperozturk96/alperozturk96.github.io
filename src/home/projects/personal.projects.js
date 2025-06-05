@@ -9,7 +9,7 @@ export const personalProjects = [
         type: ProjectType.Personal
     },
     {
-        name: 'FirePlayer MacOS',
+        name: 'FirePlayer macOS',
         description: 'Developed a macOS music player application using Swift, SwiftUI, and AVFoundation. Native APIs are used to deliver responsive performance and smooth user experience. I use it every day.',
         tech: ['Swift', 'SwiftUI'],
         screenshots: ['1.png', '2.png', '3.png', '4.png'],

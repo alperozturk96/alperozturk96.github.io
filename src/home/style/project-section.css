@@ -136,7 +136,7 @@
 
 .screenshots img:hover, .screenshots img:focus {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
-    border: 1.5px solid #2897FF;
+    border: 2px solid #2897FF;
     transition: box-shadow 0.2s, border 0.2s;
 }
 
