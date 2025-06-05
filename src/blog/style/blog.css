@@ -22,12 +22,6 @@ body {
     position: relative;
 }
 
-.blog-card:hover, .blog-card:focus {
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
-    transform: translateY(-2px) scale(1.01);
-    transition: box-shadow 0.2s, transform 0.2s;
-}
-
 @media (max-width: 600px) {
     .blog-card {
         width: 80%;
