@@ -22,4 +22,11 @@ export const blogData = [
     "path": "/assets/posts/kotlin/Migrating from Gson to Kotlinx Serialization.html",
     "date": "1 June 2025"
   },
+  {
+    "title": "Concurrency",
+    "summary": "You've probably heard this hundreds of times before, but let me explain also ...",
+    "type": PostType.ComputerScience,
+    "path": "/assets/posts/computerScience/Concurrency.html",
+    "date": "9 June 2025"
+  },
 ]

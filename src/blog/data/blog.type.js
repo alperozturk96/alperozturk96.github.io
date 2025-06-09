@@ -3,4 +3,5 @@ export const BlogType = {
     Tech: "Tech",
     Swift: "Swift",
     Kotlin: "Kotlin",
+    ComputerScience: "Computer Science",
 };

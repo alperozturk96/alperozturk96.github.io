@@ -1,0 +1,253 @@
+<div class="post">
+    <h1>Words That Often Get Lost Along the Way</h1>
+    <p>
+        <br>
+        Many engineers recognize terms like “concurrency” or “deadlock,” but few can articulate their precise meanings.
+        <br><br>
+        I hear a lot:
+        <ul>
+          <li>“We shouldn’t block the main thread.”</li>
+          <li>“This belongs in an I/O thread.”</li>
+          <li>“The app will crash otherwise.”</li>
+          <li>“Why is there a mutex here?”</li>
+          <li>“How did this code introduce a race condition?”</li>
+          <li>Set the rotation speed</li>
+          <li>And so on...</li>
+        </ul>
+        <br><br>
+        Before reusing these keywords, it’s worth understanding why they matter, not just repeating memorized answers.
+        <br><br>
+    </p>
+
+    <h1>Knowing What You’re Saying, Not Memorizing</h1>
+    <p>
+        <br>
+        I have always been curious. I constantly ask “why” and “how.” I don’t accept claims at face value. Skepticism
+        drives me.
+
+        <br><br>
+        Whenever I hear or read something, I double-check it before accepting it as truth. I’ll summarize my findings on
+        concurrency, please verify them, and if you spot any errors or have clearer explanations, feel free to contact
+        me.
+        <br><br>
+    </p>
+
+    <h1>Instruction Hierarchy</h1>
+    <p>
+        <br>
+        Computers only understand 0s and 1s. Over time, great engineers have helped us develop ways to write code that
+        is more understandable to humans.
+        Eventually, that code gets translated down to the computer's level into 0s and 1s.
+        <br><br>
+        If we were to put this into a hierarchy, it might look like this:
+        <ol>
+            <li>0s and 1s (machine code)</li>
+            <li>Assembly</li>
+            <li>C</li>
+            <li>...</li>
+        </ol>
+        Yes, we can replace C with other languages, but you get the idea.
+        <br><br>
+    </p>
+
+    <h1>What is a Program?</h1>
+    <p>
+        <br>
+        A program is the set of instructions stored on disk.
+        <br><br>
+    </p>
+
+    <h1>What Is a Process?</h1>
+    <p>
+        <br>
+        When you launch a program, the operating system creates a process. It's an instance of program.
+        <br><br>
+    </p>
+
+    <h1>Example Program</h1>
+    <p>
+      <br>
+      Sometimes, analogies can make things harder to understand, so I’m not going to give you an irrelevant one here.
+      Imagine we wrote some code in the C programming language, and that code draws a blue rectangle on the screen.
+      Our code is essentially a program a set of instructions.
+      <br><br>
+      <ul>
+          <li>Get the window size</li>
+          <li>Set the frame size</li>
+          <li>Draw rectangle</li>
+          <li>Set the rectangle color to blue</li>
+          <li>Rotate the rectangle</li>
+          <li>Set the rotation speed</li>
+          <li>And so on...</li>
+      </ul>
+
+      As you can see, these are all instructions. Now, imagine we run this program. At this point, it’s no longer just
+      a program, it becomes a process.
+      <br><br>
+      We’ve actually created a process, which now has a process ID. It's using our computer’s resources such as the
+      CPU, GPU, memory, and so on.
+      <br><br>
+      Of course, the way these resources are used depends on the specific instructions.
+      <br><br>
+    </p>
+
+    <h1>What is a Thread?</h1>
+    <p>
+        <br>
+        Finally, here we are. "Oh, I created a thread," or "This thread runs on a background thread" let's clarify what
+        that means.
+        A thread is a subsequence of instructions within a program. We can call them lightweight process. Each thread has its own thread control block,
+        which includes things like the thread ID, program counter, CPU registers, and its own stack.
+        <br><br>
+        If we go back to our fictional C code.
+        Now imagine we create two threads: one is doing the exact job described earlier, and the other is logging the
+        system utilization of the computer.
+        <br><br>
+        First thread → Drawing and displaying the rectangle
+        <br><br>
+        Second thread → Logging the utilization of system resources
+        <br><br>
+    </p>
+
+    <h1>Concurrency</h1>
+    <p>
+      <br>
+      Concurrency is the ability to manage multiple tasks (processes or threads).
+      If we go back in time, we had applications like Winamp music player and Internet Explorer running at the same
+      time on an old single core Pentium III CPU.
+      Yes, the CPU usage might have been around 60%, but it worked not just for those two processes, but the operating
+      system was running many processes simultaneously.
+      So how can an OS run many processes at the same time with only one core?
+      <br><br>
+      This is actually quite fascinating.
+      Imagine you're waiting in a coffee queue, scrolling on your phone, and thinking about something in your head.
+      Now I’m using an analogy haha. You’re doing three things at the same time, but the key point is:
+      you’re not doing all three actively at the same moment.
+      <br><br>
+
+      <ul>
+          <li>Waiting in the coffee queue → Process 1 → Waiting</li>
+          <li>Scrolling → Process 2 → Active</li>
+          <li>Thinking → Process 3 → Waiting</li>
+      </ul>
+
+      <br><br>
+      Then, a second (or maybe three seconds) later, you stop scrolling and start thinking.
+      Fifteen seconds later, the queue moves, and you stop thinking and scrolling to move forward.
+      Just like us, the operating system does the same thing.
+      <br>
+      That’s context switching.
+      A context switch is when the system pauses a process or thread, saves its current state, and later restores it so it can continue running from where it left off.
+      <br><br>
+    </p>
+
+    <h1>Parallelism</h1>
+    <p>
+        <br>
+        After hardware improvements, dual core processors became available to consumers.
+        This meant that we could now run two tasks actively at the same time. However, doing so is not always easy and
+        comes with some challenges.
+        <br><br>
+        First, not everything can be parallelized. Some tasks depend on one another, meaning you cannot start the
+        next task before the previous one is completed.
+        <br><br>
+        Programs need to be written and designed specifically for parallel execution.
+        Let’s go back to our earlier example.
+        <br><br>
+        We can start logging the utilization of our system resources without waiting for the rectangle drawing logic to
+        finish.
+        The logging logic is not dependent on the drawing logic.
+        Even if something goes wrong with the drawing logic, the logging logic can still continue to work.
+        Sure, it might log 0% usage, but it doesn't rely on the drawing task to function.
+        <br><br>
+        Thus, these two threads can run in parallel. If we have multicore hardware,
+        one core can handle the CPU intensive task, while the other manages the I/O operation to the disk.
+        <br><br>
+        Now, let me give you an example of a dependent task.
+        Imagine we have a user in our database, and that user has some purchase history.
+        We can't fetch the purchase history and the user information in parallel.
+        First, we have to retrieve the user; only then can we fetch their related purchase history.
+        If the first task fails, the second one will fail too.
+        <br><br>
+        Designing systems for parallelism can be challenging, and in some scenarios, implementing a parallel execution
+        approach may not provide a huge performance boost.
+        It's not linear your system will only be as fast as its slowest part.
+        Parallelism also introduces complexity for engineers because it brings its own set of problems.
+        <br><br>
+    </p>
+
+    <h1>Race Condition</h1>
+    <p>
+        <br>
+        Imagine we have multiple threads in our program, and those threads are running in parallel but maybe they all
+        need to access the same resource.
+        Now, think beyond just drawing a rectangle: we’re also drawing triangles, squares, and many other shapes.
+        Suppose we start 100 tasks, each responsible for drawing a different shape.
+        Every drawing task first needs to access user data, which contains the drawing items.
+        After each drawing task is completed, it updates the user's drawing items.
+        <br><br>
+        Just imagine 100 tasks are started, and all of them will write data to the same user.
+        How can the result be accurate?
+        <br><br>
+        - First operation: drawing a rectangle. At this moment, the user has 2 drawing items → operation started
+        <br><br>
+        - Second operation: drawing a triangle. At this moment, the user also has 2 drawing items → operation started
+        <br><br>
+        ...
+        <br><br>
+        ...
+        <br><br>
+        Let’s say the second operation finishes first and writes that the user has 3 drawing items.
+        But then the first operation completes and also writes 3 because it didn’t know the second operation had already
+        added one.
+        Since both are running in parallel, the last operation didn’t get the latest value and updated it incorrectly.
+        <br><br>
+        Now we have 100 operations like this, and we don’t know which one will complete first or which one will get the
+        correct value.
+        <br><br>
+        This situation is called a race condition.
+        <br><br>
+    </p>
+
+    <h1>Deadlock</h1>
+    <p>
+        <br>
+        Deadlock is another problem that can happen when multiple threads or processes are trying to access shared
+        resources.
+        Imagine two threads, and both need access to two different resources let’s call them Resource A and Resource B.
+        <br><br>
+        - Thread 1 locks Resource A and waits for Resource B
+        <br><br>
+        - Thread 2 locks Resource B and waits for Resource A
+        <br><br>
+        Now both threads are stuck, each waiting for the other to release the resource. But that never happens.
+        <br><br>
+        They can completely freeze your program, and the issue won’t fix itself unless handled properly.
+        <br><br>
+    </p>
+
+    <h1>Starvation</h1>
+    <p>
+        <br>
+        Starvation is a different kind of problem. This happens when one thread or process waits for a resource,
+        but it keeps getting ignored because other threads are always prioritized.
+        <br><br>
+        Imagine a scenario where we have one thread that needs access to a shared resource,
+        but higher priority threads keep getting access again and again.
+        The lower priority thread waits... and waits... and waits.
+        <br><br>
+        It never gets its turn not because it’s doing something wrong,
+        but because the system never gives it a chance. That’s starvation.
+        <br><br>
+        This can happen due to bad scheduling, priority systems, or poor resource management in the program.
+        <br><br>
+    </p>
+
+    <h1>Conclusion</h1>
+    <p>
+        <br>
+        We’ve talked about the problems. Next, I will write a blog post about the solutions,
+        and later on, we can explore the implementation details together maybe even in other programming languages.
+        <br><br>
+    </p>
+</div>
