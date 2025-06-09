@@ -5,7 +5,7 @@ export const professionalProjects = [
   {
     name: 'Nextcloud',
     description: `
-    <ul style="margin-top:0.7em; margin-bottom:1.2em; padding-left:1.3em; font-size:1em; color:#bdbdbd;">
+    <ul>
       <li>Developed and maintained <strong>Files</strong> and <strong>Notes</strong> mobile apps with over <strong>1M+ active users</strong></li>
       <li>Implemented <strong>end-to-end encryption</strong> using <strong>Bouncy Castle</strong> and <strong>androidx.security</strong>, ensuring secure data transfer and certificate-signature verification</li>
       <li>Integrated <strong>open-source AI solutions</strong> into mobile applications to enhance the user experience with features like headline generation, document summarization, and on-device question answering.</li>
@@ -26,7 +26,7 @@ export const professionalProjects = [
   {
     name: 'LipaWallet',
     description: `
-    <ul style="margin-top:0.7em; margin-bottom:1.2em; padding-left:1.3em; font-size:1em; color:#bdbdbd;">
+    <ul>
       <li>Developed a <strong>Bitcoin Lightning</strong> wallet with native <strong>SwiftUI</strong> for iOS and <strong>Jetpack Compose</strong> for Android</li>
       <li>Integrated an internally developed <strong>Rust</strong> library into Android and iOS using platform-specific bindings and an <strong>event-driven architecture</strong></li>
       <li>Built a high-performance, memory-leak-free networking layer with the <strong>Apollo GraphQL</strong> client for both platforms</li>
@@ -46,7 +46,7 @@ export const professionalProjects = [
   {
     name: 'Scan360',
     description: `
-    <ul style="margin-top:0.7em; margin-bottom:1.2em; padding-left:1.3em; font-size:1em; color:#bdbdbd;">
+    <ul>
       <li>Developed a full-featured document scanner using <strong>UIKit</strong> and <strong>VisionKit</strong> for iOS, supporting high-quality scanning and automatic document detection</li>
       <li>Integrated PDF generation, document editing (crop, rotate, filter), and multi-page scan support</li>
       <li>Implemented features for signing, sharing, and exporting documents in various formats (PDF, JPEG)</li>
@@ -63,7 +63,7 @@ export const professionalProjects = [
   {
     name: 'Emlakjet',
     description: `
-    <ul style="margin-top:0.7em; margin-bottom:1.2em; padding-left:1.3em; font-size:1em; color:#bdbdbd;">
+    <ul>
       <li>Developed a full-featured real estate app for listing, searching, and managing properties using <strong>Java</strong> and <strong>Objective-C</strong></li>
       <li>Implemented features such as <strong>advanced search filters</strong>, saved searches, favorite listings, and direct contact with real estate agents</li>
       <li>Built a user-friendly experience with market analysis tools and real-time listing updates</li>
@@ -80,7 +80,7 @@ export const professionalProjects = [
   {
     name: 'DentalBulut',
     description: `
-    <ul style="margin-top:0.7em; margin-bottom:1.2em; padding-left:1.3em; font-size:1em; color:#bdbdbd;">
+    <ul>
       <li>Developed a mobile clinic management solution for dentists, supporting <strong>patient tracking</strong>, appointment scheduling, and clinic operations</li>
       <li>Built native mobile apps using <strong>Java</strong> and <strong>Swift</strong>, tailored for Android and iOS respectively</li>
       <li>Implemented user-friendly UI for mobile workflows using <strong>XML</strong> and <strong>UIKit</strong></li>
