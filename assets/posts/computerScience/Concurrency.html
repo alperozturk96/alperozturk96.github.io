@@ -1,23 +1,21 @@
 <div class="post">
     <h1>Words That Often Get Lost Along the Way</h1>
-    <p>
+    <div>
         <br>
         Many engineers recognize terms like “concurrency” or “deadlock,” but few can articulate their precise meanings.
         <br><br>
         I hear a lot:
         <ul>
-          <li>“We shouldn’t block the main thread.”</li>
           <li>“This belongs in an I/O thread.”</li>
           <li>“The app will crash otherwise.”</li>
           <li>“Why is there a mutex here?”</li>
+          <li>“Shall we use semaphore?”</li>
           <li>“How did this code introduce a race condition?”</li>
-          <li>Set the rotation speed</li>
-          <li>And so on...</li>
+          <li>“Can synchronized block solve this?”</li>
         </ul>
+        Before writing memorized code or giving memorized answers. We must know what we are talking about.
         <br><br>
-        Before reusing these keywords, it’s worth understanding why they matter, not just repeating memorized answers.
-        <br><br>
-    </p>
+    </div>
 
     <h1>Knowing What You’re Saying, Not Memorizing</h1>
     <p>
@@ -26,14 +24,14 @@
         drives me.
 
         <br><br>
-        Whenever I hear or read something, I double-check it before accepting it as truth. I’ll summarize my findings on
-        concurrency, please verify them, and if you spot any errors or have clearer explanations, feel free to contact
+        Whenever I hear or read something, I have to check it, understand it before accepting it as truth. I’ll try to summarize concurrency,
+        please try to understand don't just accept it. If you spot any errors or have clearer explanations, feel free to contact
         me.
         <br><br>
     </p>
 
     <h1>Instruction Hierarchy</h1>
-    <p>
+    <div>
         <br>
         Computers only understand 0s and 1s. Over time, great engineers have helped us develop ways to write code that
         is more understandable to humans.
@@ -48,7 +46,7 @@
         </ol>
         Yes, we can replace C with other languages, but you get the idea.
         <br><br>
-    </p>
+    </div>
 
     <h1>What is a Program?</h1>
     <p>
@@ -64,8 +62,8 @@
         <br><br>
     </p>
 
-    <h1>Example Program</h1>
-    <p>
+    <h1>So?</h1>
+    <div>
       <br>
       Sometimes, analogies can make things harder to understand, so I’m not going to give you an irrelevant one here.
       Imagine we wrote some code in the C programming language, and that code draws a blue rectangle on the screen.
@@ -89,7 +87,7 @@
       <br><br>
       Of course, the way these resources are used depends on the specific instructions.
       <br><br>
-    </p>
+    </div>
 
     <h1>What is a Thread?</h1>
     <p>
@@ -110,7 +108,7 @@
     </p>
 
     <h1>Concurrency</h1>
-    <p>
+    <div>
       <br>
       Concurrency is the ability to manage multiple tasks (processes or threads).
       If we go back in time, we had applications like Winamp music player and Internet Explorer running at the same
@@ -139,7 +137,7 @@
       That’s context switching.
       A context switch is when the system pauses a process or thread, saves its current state, and later restores it so it can continue running from where it left off.
       <br><br>
-    </p>
+    </div>
 
     <h1>Parallelism</h1>
     <p>
