@@ -6,31 +6,74 @@ const path = params.get("path");
 const contentEl = document.getElementById("post-content");
 const post = blogData.find(p => p.path === path);
 
-if (!post) {
-    contentEl.textContent = "Post not found.";
-} else {
-    document.title = post.title;
+init();
 
-    fetch(post.path)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Failed to load post content.");
-            }
-            return response.text();
-        })
-        .then(html => {
-            const postBody = document.createElement("div");
-            postBody.innerHTML = html;
-            contentEl.appendChild(postBody);
+function init() {
+    if (!post) {
+        contentEl.textContent = "Post not found.";
+    } else {
+        document.title = post.title;
 
-            Prism.highlightAll();
-            setCopyButtonEvents();
-            makeAllCodeContainersCollapsibleAndExpandable();
-        })
-        .catch(error => {
-            contentEl.textContent = "Error loading post: " + error.message;
-        });
+        fetch(post.path)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to load post content.");
+                }
+                return response.text();
+            })
+            .then(html => {
+                const postBody = document.createElement("div");
+                postBody.innerHTML = html;
+                contentEl.appendChild(postBody);
+
+                Prism.highlightAll();
+                setCopyButtonEvents();
+                makeAllCodeContainersCollapsibleAndExpandable();
+                makeExpandableImages();
+            })
+            .catch(error => {
+                contentEl.textContent = "Error loading post: " + error.message;
+            });
+    }
 }
+
+function makeExpandableImages() {
+    const images = document.querySelectorAll('.post-img');
+    if (images.length === 0) return;
+
+    if (!document.getElementById('modal-div')) {
+        const modalHtml = `
+        <div id="modal-div" class="modal">
+            <span class="close">&times;</span>
+            <img class="modal-content" id="img01" alt="">
+        </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+
+    const modal = document.getElementById("modal-div");
+    const modalImg = document.getElementById("img01");
+    const span = document.getElementsByClassName("close")[0];
+
+    images.forEach(img => {
+        img.style.cursor = 'pointer';
+        img.onclick = function() {
+            modal.style.display = "flex";
+            modalImg.src = this.src;
+        };
+    });
+
+    span.onclick = function() {
+        modal.style.display = "none";
+    };
+
+    modal.onclick = function(event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    };
+}
+
 
 function setCopyButtonEvents() {
     document.querySelectorAll(".copy-button").forEach(button => {
