@@ -1,8 +1,8 @@
 <div class="post">
-    <h2>Words That Often Get Lost Along the Way</h2>
+    <h2>Words That Often Get Overlooked</h2>
     <div>
         <br>
-        Many engineers recognize terms like “concurrency” or “deadlock,” but few can articulate their precise meanings.
+        Many engineers are familiar with terms like “concurrency”, “deadlock”, “thread” but sometimes the precise meanings can be a bit unclear.
         <br><br>
         I hear a lot:
         <ul>
@@ -13,20 +13,20 @@
           <li>“How did this code introduce a race condition?”</li>
           <li>“Can synchronized block solve this?”</li>
         </ul>
-        Before writing memorized code or giving memorized answers. We must know what we are talking about.
+        Before relying on memorized code or common answers, it’s valuable to truly understand what these concepts mean and why they matter.
         <br><br>
     </div>
 
-    <h2>Knowing What You’re Saying, Not Memorizing</h2>
+    <h2>Being Skeptic</h2>
     <p>
         <br>
-        I have always been curious. I constantly ask “why” and “how.” I don’t accept claims at face value.
+        I have always been curious. I constantly ask “why” and “how.”  I find that questioning and seeking clarity leads to deeper understanding.
         Being skeptical about technical matters has always helped me.
 
         <br><br>
-        Whenever I hear or read something, I have to check it, understand it before accepting it as truth. I’ll try to summarize concurrency,
-        please try to understand don't just accept it. If you spot any errors or have clearer explanations, feel free to contact
-        me.
+        When I come across new ideas or claims, I take the time to explore and verify them before accepting them as truth.
+        <br><br>
+        I’ll try to summarize concurrency. If you spot any errors or have clearer explanations, feel free to contact me.
         <br><br>
     </p>
 
@@ -41,17 +41,15 @@
         <ol>
             <li>0s and 1s (machine code)</li>
             <li>Assembly</li>
-            <li>C</li>
-            <li>...</li>
+            <li>Programming Languages (C, Java, Swift, ...)</li>
         </ol>
-        Yes, we can replace C with other languages, but you get the idea.
         <br><br>
     </div>
 
     <h2>What is a Program?</h2>
     <p>
         <br>
-        A program is the set of instructions stored on disk.
+        A program is the set of instructions stored on disk or in memory.
         <br><br>
     </p>
 
@@ -71,7 +69,7 @@
       <br><br>
       <ul>
           <li>Get the window size</li>
-          <li>Set the frame size to 25 percent of the window size</li>
+          <li>Set the frame size to 25% of the window size.</li>
           <li>Draw rectangle</li>
           <li>Set the rectangle color to blue</li>
           <li>Rotate the rectangle</li>
@@ -110,7 +108,7 @@
     <p>
         <br>
         This screenshot was taken from my MacBook. In the bottom-right corner, you can observe the thread and process counts.
-        As expected, the number of threads is significantly higher than the number of processes, which is a normal occurrence.
+        As expected, the number of threads is significantly higher than the number of processes.
         <br><br>
     </p>
 
@@ -129,7 +127,7 @@
     <h3>FirePlayer Threads</h3>
     <p>
         <br>
-        Let’s explore further. When we click <b>Sample</b> from the process details in Activity Monitor, macOS captures a snapshot of the process, revealing individual thread information.
+        Let’s explore further. When we click <b>Sample</b> from the process details in Activity Monitor, you can see the individual thread information.
         <br><br>
     </p>
     <img class="post-img" src="/assets/posts/computerScience/concurrency/thread_details_1.png" alt="FirePlayer Thread Details 1 Screenshot">
@@ -137,13 +135,9 @@
     <p>
         <br>
         This application was written using SwiftUI with modern concurrency features like <code>async</code>, <code>await</code>, and <code>Task</code>.
-        I did not use AppKit directly, yet you can observe that <code>App.main</code> eventually calls <code>[NSApplication run]</code> from AppKit. What's happening here?
-        <br><br>
-    </p>
-
-    <p>
-        <br>
-        I didn’t explicitly create most of these threads. So where did they originate? And how can we identify the threads we did create?
+        I did not use AppKit directly, yet you can observe that <code>App.main</code> eventually calls <code>[NSApplication run]</code> from AppKit.
+        <br> <br>
+        Also, I didn’t explicitly create most of these threads. So where did they originate? And how can we identify the threads we did create?
         <br><br>
     </p>
     <img class="post-img" src="/assets/posts/computerScience/concurrency/thread_details_2.png" alt="FirePlayer Thread Details 2 Screenshot">
@@ -151,15 +145,11 @@
 
     <p>
         <br>
-        SwiftUI is not a completely standalone framework it is built on top of AppKit.
-        The macOS application lifecycle still flows through <code>NSApplication</code>, and many threads are managed internally by AppKit and the system.
+        SwiftUI is a modern framework that runs on top of AppKit on macOS and UIKit on iOS.
         <br><br>
-    </p>
-
-    <p>
-        <br>
+        While SwiftUI abstracts away much of the underlying complexity, the macOS application lifecycle still goes through NSApplication, and many threads are created and managed internally by AppKit and the system.
+        <br><br>
         To identify a custom created thread in the sample, I assigned a name to it. Here's the relevant code:
-        <br><br>
     </p>
 
     <div class="code-container">
@@ -172,18 +162,14 @@ myQueue.async {
     </div>
 
     <p>
-        <br>
          Now it is visible.
-        <br><br>
     </p>
     <img class="post-img" src="/assets/posts/computerScience/concurrency/thread_details_3.png" alt="FirePlayer Thread Details 3 Screenshot">
     <br><br>
 
     <p>
-        <br>
-        I think we’ve summarized threads or at least now we understand what we’re doing and how they live within the OS.
+        I think we’ve summarized threads, or at least gained a better understanding of how they exist within the OS.
         Of course, we could dive deeper into the details we saw in Activity Monitor and the thread samples, but let’s save that for another day.
-        <br><br>
     </p>
 
     <h2>Concurrency</h2>

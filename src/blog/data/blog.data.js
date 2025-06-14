@@ -27,6 +27,6 @@ export const blogData = [
     "summary": "You've probably heard this hundreds of times before, but let me explain also ...",
     "type": PostType.ComputerScience,
     "path": "/assets/posts/computerScience/concurrency/Concurrency.html",
-    "date": "9 June 2025"
+    "date": "14 June 2025"
   },
 ]
