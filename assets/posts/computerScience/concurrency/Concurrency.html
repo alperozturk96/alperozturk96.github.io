@@ -93,8 +93,8 @@
     <p>
         <br>
         Finally, here we are. "Oh, I created a thread," or "This thread runs on a background thread" let's clarify what that means.
-        A thread is a subsequence of instructions within a program. We can call them lightweight process. Each thread has its own thread control block,
-        which includes things like the thread ID, program counter, CPU registers, and its own stack.
+        A thread is an execution context within a process that can run independently. We can call them lightweight processes. Each thread has its own thread control block,
+        which includes things like the thread ID, program counter, CPU registers, and its own stack. Threads within the same process share memory space and other resources.
         <br><br>
         If we go back to our fictional C code.
         Now imagine we create two threads: one is doing the exact job described earlier, and the other is logging the
@@ -189,12 +189,11 @@ myQueue.async {
     <h2>Concurrency</h2>
     <div>
       <br>
-      Concurrency is the ability to manage multiple tasks (processes or threads).
-      If we go back in time, we had applications like Winamp music player and Internet Explorer running at the same
-      time on an old single core Pentium II CPU.
-      Yes, the CPU usage might have been around 40–50%, but it worked not just for those two processes, but the operating
-      system was running many processes simultaneously.
-      So how can an OS run many processes at the same time with only one core or are all these processes really working at the same time?
+      Concurrency is the ability to deal with multiple tasks at once, but not necessarily executing them simultaneously.
+      If we go back in time, we had applications like Winamp music player and Internet Explorer running at the same time on
+      an old single core Pentium II CPU. Yes, the CPU usage might have been around 40–50%, but it worked not just for those two processes, but the operating
+      system was running many processes concurrently through rapid switching between them.
+      So how can an OS run many processes at the same time with only one core? The processes aren't really working simultaneously - they're being managed concurrently.
       <br><br>
       This is actually quite fascinating.
       Imagine you're waiting in a coffee queue, scrolling on your phone, and thinking about something in your head.
@@ -259,29 +258,27 @@ myQueue.async {
         need to access the same resource.
         Now, think beyond just drawing a rectangle: we’re also drawing triangles, squares, and many other shapes.
         Suppose we start 100 tasks, each responsible for drawing a different shape.
-        Every drawing task first needs to access user data, which contains the drawing items.
-        After each drawing task is completed, it updates the user's drawing items.
+        Every drawing task first needs to access user data, which contains the drawing items count.
+        After each drawing task is completed, it increments the user's drawing items count.
         <br><br>
-        Just imagine 100 tasks are started, and all of them will write data to the same user.
+        Just imagine 100 tasks are started, and all of them will read and write to the same counter.
         How can the result be accurate?
         <br><br>
-        - First operation: drawing a rectangle. At this moment, the user has 2 drawing items → operation started
+        - First operation: drawing a rectangle. Reads current count: 2 → operation in progress
         <br><br>
-        - Second operation: drawing a triangle. At this moment, the user also has 2 drawing items → operation started
-        <br><br>
-        ...
+        - Second operation: drawing a triangle. Also reads current count: 2 → operation in progress
         <br><br>
         ...
         <br><br>
-        Let’s say the second operation finishes first and writes that the user has 3 drawing items.
-        But then the first operation completes and also writes 3 because it didn’t know the second operation had already
-        added one.
-        Since both are running in parallel, the last operation didn’t get the latest value and updated it incorrectly.
+        ...
         <br><br>
-        Now we have 100 operations like this, and we don’t know which one will complete first or which one will get the
-        correct value.
+        Let's say the second operation finishes first and writes 3 (2+1).
+        But then the first operation completes and also writes 3 (2+1) because it read the original value of 2 before the second operation updated it.
+        Since both operations read the same initial value and incremented it independently, we lost one increment.
         <br><br>
-        This situation is called a race condition.
+        With 100 operations like this running concurrently, the final count will probably be incorrect, the count value will change depending on the timing of reads and writes.
+        <br><br>
+        This situation is called a race condition - the final result depends on the unpredictable timing (or "race") between operations.
         <br><br>
     </p>
 
