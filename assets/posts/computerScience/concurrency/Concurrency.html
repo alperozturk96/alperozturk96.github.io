@@ -1,7 +1,4 @@
 <div class="post">
-    <h1>Concurrency</h1>
-    <h3>You've probably heard this hundreds of times before, but let me explain also ...</h3>
-    <br><br>
     <h2>Words That Often Get Lost Along the Way</h2>
     <div>
         <br>
@@ -9,7 +6,7 @@
         <br><br>
         I hear a lot:
         <ul>
-          <li>“This belongs in an I/O thread.”</li>
+          <li>“This should belong to the I/O thread.”</li>
           <li>“The app will crash otherwise.”</li>
           <li>“Why is there a mutex here?”</li>
           <li>“Shall we use semaphore?”</li>
@@ -23,8 +20,8 @@
     <h2>Knowing What You’re Saying, Not Memorizing</h2>
     <p>
         <br>
-        I have always been curious. I constantly ask “why” and “how.” I don’t accept claims at face value. Skepticism
-        drives me.
+        I have always been curious. I constantly ask “why” and “how.” I don’t accept claims at face value.
+        Being skeptical about technical matters has always helped me.
 
         <br><br>
         Whenever I hear or read something, I have to check it, understand it before accepting it as truth. I’ll try to summarize concurrency,
@@ -74,7 +71,7 @@
       <br><br>
       <ul>
           <li>Get the window size</li>
-          <li>Set the frame size</li>
+          <li>Set the frame size to 25 percent of the window size</li>
           <li>Draw rectangle</li>
           <li>Set the rectangle color to blue</li>
           <li>Rotate the rectangle</li>
@@ -132,7 +129,7 @@
     <h3>FirePlayer Threads</h3>
     <p>
         <br>
-        Let’s explore further. When we click <b>Sample Process</b> from the process details in Activity Monitor, macOS captures a snapshot of the process, revealing individual thread information.
+        Let’s explore further. When we click <b>Sample</b> from the process details in Activity Monitor, macOS captures a snapshot of the process, revealing individual thread information.
         <br><br>
     </p>
     <img class="post-img" src="/assets/posts/computerScience/concurrency/thread_details_1.png" alt="FirePlayer Thread Details 1 Screenshot">
@@ -140,13 +137,13 @@
     <p>
         <br>
         This application was written using SwiftUI with modern concurrency features like <code>async</code>, <code>await</code>, and <code>Task</code>.
-        I did not use AppKit directly, yet you can observe that <code>App.main()</code> (SwiftUI) eventually calls <code>[NSApplication run]</code> from AppKit. What's happening here?
+        I did not use AppKit directly, yet you can observe that <code>App.main</code> eventually calls <code>[NSApplication run]</code> from AppKit. What's happening here?
         <br><br>
     </p>
 
     <p>
         <br>
-        Additionally, I didn’t explicitly create most of these threads. So where did they originate? And how can we identify the threads we did create?
+        I didn’t explicitly create most of these threads. So where did they originate? And how can we identify the threads we did create?
         <br><br>
     </p>
     <img class="post-img" src="/assets/posts/computerScience/concurrency/thread_details_2.png" alt="FirePlayer Thread Details 2 Screenshot">
@@ -154,14 +151,14 @@
 
     <p>
         <br>
-        SwiftUI is not a completely standalone framework—it is built on top of AppKit.
+        SwiftUI is not a completely standalone framework it is built on top of AppKit.
         The macOS application lifecycle still flows through <code>NSApplication</code>, and many threads are managed internally by AppKit and the system.
         <br><br>
     </p>
 
     <p>
         <br>
-        To identify a custom-created thread in the system sample, I assigned a name to it. Here's the relevant code:
+        To identify a custom created thread in the sample, I assigned a name to it. Here's the relevant code:
         <br><br>
     </p>
 
@@ -176,7 +173,7 @@ myQueue.async {
 
     <p>
         <br>
-        Here's the thread I created, now visible and named in the system thread sample:
+         Now it is visible.
         <br><br>
     </p>
     <img class="post-img" src="/assets/posts/computerScience/concurrency/thread_details_3.png" alt="FirePlayer Thread Details 3 Screenshot">
@@ -184,7 +181,7 @@ myQueue.async {
 
     <p>
         <br>
-        I think we’ve summarized threads—or at least now we understand what we’re doing and how they live within the OS.
+        I think we’ve summarized threads or at least now we understand what we’re doing and how they live within the OS.
         Of course, we could dive deeper into the details we saw in Activity Monitor and the thread samples, but let’s save that for another day.
         <br><br>
     </p>
@@ -194,15 +191,14 @@ myQueue.async {
       <br>
       Concurrency is the ability to manage multiple tasks (processes or threads).
       If we go back in time, we had applications like Winamp music player and Internet Explorer running at the same
-      time on an old single core Pentium III CPU.
-      Yes, the CPU usage might have been around 60%, but it worked not just for those two processes, but the operating
+      time on an old single core Pentium II CPU.
+      Yes, the CPU usage might have been around 40–50%, but it worked not just for those two processes, but the operating
       system was running many processes simultaneously.
-      So how can an OS run many processes at the same time with only one core?
+      So how can an OS run many processes at the same time with only one core or are all these processes really working at the same time?
       <br><br>
       This is actually quite fascinating.
       Imagine you're waiting in a coffee queue, scrolling on your phone, and thinking about something in your head.
-      Now I’m using an analogy haha. You’re doing three things at the same time, but the key point is:
-      you’re not doing all three actively at the same moment.
+      Now I’m using an analogy haha. You’re multitasking with three things, but the key is: you’re not actively doing all three simultaneously.
       <br><br>
 
       <ul>
@@ -215,7 +211,7 @@ myQueue.async {
       Then, a second (or maybe three seconds) later, you stop scrolling and start thinking.
       Fifteen seconds later, the queue moves, and you stop thinking and scrolling to move forward.
       Just like us, the operating system does the same thing.
-      <br>
+        <br><br>
       That’s context switching.
       A context switch is when the system pauses a process or thread, saves its current state, and later restores it so it can continue running from where it left off.
       <br><br>
@@ -245,7 +241,7 @@ myQueue.async {
         <br><br>
         Now, let me give you an example of a dependent task.
         Imagine we have a user in our database, and that user has some purchase history.
-        We can't fetch the purchase history and the user information in parallel.
+        We can't fetch the purchase history of the user and the user information in parallel.
         First, we have to retrieve the user; only then can we fetch their related purchase history.
         If the first task fails, the second one will fail too.
         <br><br>
@@ -259,7 +255,7 @@ myQueue.async {
     <h2>Race Condition</h2>
     <p>
         <br>
-        Imagine we have multiple threads in our program, and those threads are running in parallel but maybe they all
+        Imagine we have multiple threads in our program, and those threads are running in parallel but maybe some of them
         need to access the same resource.
         Now, think beyond just drawing a rectangle: we’re also drawing triangles, squares, and many other shapes.
         Suppose we start 100 tasks, each responsible for drawing a different shape.
