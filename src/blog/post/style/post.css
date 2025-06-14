@@ -77,6 +77,7 @@
 .modal-content {
     display: block;
     margin: auto;
+    width:  50%;
 }
 
 .close {
@@ -95,4 +96,10 @@
 .close:focus {
     text-decoration: none;
     cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .modal-content {
+        width: 90%;
+    }
 }

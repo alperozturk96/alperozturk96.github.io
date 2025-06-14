@@ -1,5 +1,8 @@
 <div class="post">
-    <h1>Words That Often Get Lost Along the Way</h1>
+    <h1>Concurrency</h1>
+    <h3>You've probably heard this hundreds of times before, but let me explain also ...</h3>
+    <br><br>
+    <h2>Words That Often Get Lost Along the Way</h2>
     <div>
         <br>
         Many engineers recognize terms like “concurrency” or “deadlock,” but few can articulate their precise meanings.
@@ -17,7 +20,7 @@
         <br><br>
     </div>
 
-    <h1>Knowing What You’re Saying, Not Memorizing</h1>
+    <h2>Knowing What You’re Saying, Not Memorizing</h2>
     <p>
         <br>
         I have always been curious. I constantly ask “why” and “how.” I don’t accept claims at face value. Skepticism
@@ -30,7 +33,7 @@
         <br><br>
     </p>
 
-    <h1>Instruction Hierarchy</h1>
+    <h2>Instruction Hierarchy</h2>
     <div>
         <br>
         Computers only understand 0s and 1s. Over time, great engineers have helped us develop ways to write code that
@@ -48,21 +51,21 @@
         <br><br>
     </div>
 
-    <h1>What is a Program?</h1>
+    <h2>What is a Program?</h2>
     <p>
         <br>
         A program is the set of instructions stored on disk.
         <br><br>
     </p>
 
-    <h1>What Is a Process?</h1>
+    <h2>What Is a Process?</h2>
     <p>
         <br>
         When you launch a program, the operating system creates a process. It's an instance of program.
         <br><br>
     </p>
 
-    <h1>So?</h1>
+    <h2>So?</h2>
     <div>
       <br>
       Sometimes, analogies can make things harder to understand. I’m not going to give you an irrelevant one here.
@@ -89,11 +92,10 @@
       <br><br>
     </div>
 
-    <h1>What is a Thread?</h1>
+    <h2>What is a Thread?</h2>
     <p>
         <br>
-        Finally, here we are. "Oh, I created a thread," or "This thread runs on a background thread" let's clarify what
-        that means.
+        Finally, here we are. "Oh, I created a thread," or "This thread runs on a background thread" let's clarify what that means.
         A thread is a subsequence of instructions within a program. We can call them lightweight process. Each thread has its own thread control block,
         which includes things like the thread ID, program counter, CPU registers, and its own stack.
         <br><br>
@@ -107,6 +109,7 @@
         <br><br>
     </p>
 
+    <h3>Activity Monitor</h3>
     <p>
         <br>
         This screenshot was taken from my MacBook. In the bottom-right corner, you can observe the thread and process counts.
@@ -114,9 +117,79 @@
         <br><br>
     </p>
 
-    <img class="post-img" src="/assets/posts/computerScience/concurrency/activity_monitor_1.png" alt="activity_monitor_1">
+    <img class="post-img" src="/assets/posts/computerScience/concurrency/activity_monitor_1.png" alt="Activity Monitor Screenshot">
+    <br><br>
 
-    <h1>Concurrency</h1>
+    <h3>FirePlayer Process</h3>
+    <p>
+        <br>
+        In this screenshot, you can see the details of the FirePlayer process, including the number of threads in use, CPU time, parent process, and other relevant metrics.
+        <br><br>
+    </p>
+    <img class="post-img" src="/assets/posts/computerScience/concurrency/activity_monitor_2.png" alt="FirePlayer Process Details Screenshot">
+    <br><br>
+
+    <h3>FirePlayer Threads</h3>
+    <p>
+        <br>
+        Let’s explore further. When we click <b>Sample Process</b> from the process details in Activity Monitor, macOS captures a snapshot of the process, revealing individual thread information.
+        <br><br>
+    </p>
+    <img class="post-img" src="/assets/posts/computerScience/concurrency/thread_details_1.png" alt="FirePlayer Thread Details 1 Screenshot">
+    <br><br>
+    <p>
+        <br>
+        This application was written using SwiftUI with modern concurrency features like <code>async</code>, <code>await</code>, and <code>Task</code>.
+        I did not use AppKit directly, yet you can observe that <code>App.main()</code> (SwiftUI) eventually calls <code>[NSApplication run]</code> from AppKit. What's happening here?
+        <br><br>
+    </p>
+
+    <p>
+        <br>
+        Additionally, I didn’t explicitly create most of these threads. So where did they originate? And how can we identify the threads we did create?
+        <br><br>
+    </p>
+    <img class="post-img" src="/assets/posts/computerScience/concurrency/thread_details_2.png" alt="FirePlayer Thread Details 2 Screenshot">
+    <br><br>
+
+    <p>
+        <br>
+        SwiftUI is not a completely standalone framework—it is built on top of AppKit.
+        The macOS application lifecycle still flows through <code>NSApplication</code>, and many threads are managed internally by AppKit and the system.
+        <br><br>
+    </p>
+
+    <p>
+        <br>
+        To identify a custom-created thread in the system sample, I assigned a name to it. Here's the relevant code:
+        <br><br>
+    </p>
+
+    <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="lang-swift">let myQueue = DispatchQueue(label: "HEY_THIS_IS_THREAD")
+myQueue.async {
+    print("Hello from my thread, isMainThread:", Thread.isMainThread)
+}
+</code></pre>
+    </div>
+
+    <p>
+        <br>
+        Here's the thread I created, now visible and named in the system thread sample:
+        <br><br>
+    </p>
+    <img class="post-img" src="/assets/posts/computerScience/concurrency/thread_details_3.png" alt="FirePlayer Thread Details 3 Screenshot">
+    <br><br>
+
+    <p>
+        <br>
+        I think we’ve summarized threads—or at least now we understand what we’re doing and how they live within the OS.
+        Of course, we could dive deeper into the details we saw in Activity Monitor and the thread samples, but let’s save that for another day.
+        <br><br>
+    </p>
+
+    <h2>Concurrency</h2>
     <div>
       <br>
       Concurrency is the ability to manage multiple tasks (processes or threads).
@@ -148,7 +221,7 @@
       <br><br>
     </div>
 
-    <h1>Parallelism</h1>
+    <h2>Parallelism</h2>
     <p>
         <br>
         After hardware improvements, dual core processors became available to consumers.
@@ -183,7 +256,7 @@
         <br><br>
     </p>
 
-    <h1>Race Condition</h1>
+    <h2>Race Condition</h2>
     <p>
         <br>
         Imagine we have multiple threads in our program, and those threads are running in parallel but maybe they all
@@ -216,7 +289,7 @@
         <br><br>
     </p>
 
-    <h1>Deadlock</h1>
+    <h2>Deadlock</h2>
     <p>
         <br>
         Deadlock is another problem that can happen when multiple threads or processes are trying to access shared
@@ -233,7 +306,7 @@
         <br><br>
     </p>
 
-    <h1>Starvation</h1>
+    <h2>Starvation</h2>
     <p>
         <br>
         Starvation is a different kind of problem. This happens when one thread or process waits for a resource,
@@ -250,7 +323,7 @@
         <br><br>
     </p>
 
-    <h1>Conclusion</h1>
+    <h2>Conclusion</h2>
     <p>
         <br>
         We’ve talked about the problems. Next, I will write a blog post about the solutions,
