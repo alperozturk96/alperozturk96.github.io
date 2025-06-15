@@ -98,8 +98,25 @@
     cursor: pointer;
 }
 
+.video {
+    width: 60%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
 @media (max-width: 600px) {
     .modal-content {
         width: 90%;
     }
+}
+
+.external-link a {
+    color: #2897FF;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.external-link a:hover {
+    text-decoration: underline;
 }
