@@ -29,4 +29,11 @@ export const blogData = [
     "path": "/assets/posts/computerScience/concurrency/Concurrency.html",
     "date": "14 June 2025"
   },
+  {
+    "title": "UIKit Dynamics",
+    "summary": "Hidden gem of UIKit.",
+    "type": PostType.Swift,
+    "path": "/assets/posts/swift/UIKit Dynamics.html",
+    "date": "15 June 2025"
+  },
 ]

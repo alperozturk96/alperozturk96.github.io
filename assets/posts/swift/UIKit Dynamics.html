@@ -1,0 +1,202 @@
+<div class="post">
+    <h1>UIKit Dynamics</h1>
+    <p>
+        <br>
+        I love to listen podcast about programming, APIs, computer science. A few months ago while I was listening podcast
+        about iOS development one of the great engineer talked about the UIKit Dynamics and mentioned about that API you can
+        add a collision behaviour on UIView class. I didn't know that and I was surprised and wanted to play with that API.
+        <br><br>
+        This API kinda hidden gem for me and I really like Apple's API especially when it comes to animation.
+    </p>
+
+
+    <h2>UIDynamicItem Protocol</h2>
+    <p>
+        <br>
+         Since iOS 7 UIView and UICollectionViewLayoutAttributes implements this protocol. Thus our UIView can be dynamic item.
+        <br><br>
+    </p>
+
+    <h2>How to implement?</h2>
+    <p>
+        <br>
+         We can create our animator which is UIDynamicAnimator then define bunch of behaviours such as UIGravityBehavior, UICollisionBehavior
+         and apply to the our UIView objects afterwards we can get something like following output:
+        <br><br>
+    </p>
+
+
+    ... VIDEO ...
+
+
+    <h2>Lets investigate the code</h2>
+    <p>
+        <br>
+         I am defining the contants that will be used for the labels. Such as text of the label, color of the label and my animator
+         behaviours.
+        <br><br>
+    </p>
+
+    <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="lang-swift">
+            private var animator: UIDynamicAnimator?
+            private let labelTexts = Array("UIKITDYNAMICS").map { String($0) }
+            private let colors: [UIColor] = [.red, .green, .blue, .white, .yellow, .systemRed, .systemCyan, .orange, .magenta]
+            private let gravityBehavior = UIGravityBehavior()
+            private let collisionBehavior = UICollisionBehavior()
+        </code></pre>
+    </div>
+
+    <h2>Creating UILabel</h2>
+    <p>
+        <br>
+         These two functions helps me to create UILabels. getXPosition() basically determines the X position of the UILabel.
+         I try to make it random thus when I add to the parent view they are not going to fall from same x position.
+        <br><br>
+    </p>
+
+    <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="lang-swift">
+            private func getXPosition() -> CGFloat {
+                let xPositionDividers: [CGFloat] = [2, 4, 6, 8, 10, 12]
+                let xPositionDivider: CGFloat = xPositionDividers.randomElement() ?? 2.0
+                return view.frame.width / xPositionDivider
+            }
+
+            private func createLabel(text: String, color: UIColor) -> UILabel? {
+                let xPosition = getXPosition()
+                let size: CGFloat = 100
+
+                let label = UILabel(frame: .init(x: xPosition, y: 0, width: size, height: 70))
+                label.text = text
+                label.textColor = color
+                label.translatesAutoresizingMaskIntoConstraints = false
+                label.font = .systemFont(ofSize: size, weight: .bold)
+
+                return label
+            }
+        </code></pre>
+    </div>
+
+    <h2>Adding UIDynamicItems</h2>
+    <p>
+        <br>
+         After creating label, I'm adding to the parent view and adding to the UIDynamic behaviours.
+        <br><br>
+    </p>
+
+    <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="lang-swift">
+           override func viewDidLoad() {
+            super.viewDidLoad()
+
+            view.backgroundColor = .black
+
+            animator = UIDynamicAnimator(referenceView: view)
+            addBehaviours()
+
+            for (index, text) in labelTexts.enumerated() {
+                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(index)) { [weak self] in
+                    guard let self else { return }
+                    self.createAndAddLabelToUIDynamicBehaviors(text)
+                }
+            }
+        }
+
+        private func addBehaviours() {
+            collisionBehavior.translatesReferenceBoundsIntoBoundary = true
+            animator?.addBehavior(gravityBehavior)
+            animator?.addBehavior(collisionBehavior)
+        }
+
+        private func createAndAddLabelToUIDynamicBehaviors(_ text: String) {
+            let color = colors.randomElement() ?? .white
+            guard let label = createLabel(text: text, color: color) else { return }
+
+            view.addSubview(label)
+            gravityBehavior.addItem(label)
+            collisionBehavior.addItem(label)
+        }
+        </code></pre>
+    </div>
+
+    <h2>Conclusion</h2>
+    <p>
+        <br>
+        And that's all now we have a gravitiy and collision on UILabels. We can also add drag and drop to the UILabel and
+        play with our labels but anyways its enough for this post.
+        <br><br>
+    </p>
+
+
+    <h2>All Code</h2>
+    <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="lang-swift">
+            import UIKit
+
+            final class ViewController: UIViewController {
+
+                private var animator: UIDynamicAnimator?
+                private let labelTexts = Array("UIKITDYNAMICS").map { String($0) }
+                private let colors: [UIColor] = [.red, .green, .blue, .white, .yellow, .systemRed, .systemCyan, .orange, .magenta]
+                private let gravityBehavior = UIGravityBehavior()
+                private let collisionBehavior = UICollisionBehavior()
+
+                override func viewDidLoad() {
+                    super.viewDidLoad()
+
+                    view.backgroundColor = .black
+
+                    animator = UIDynamicAnimator(referenceView: view)
+                    addBehaviours()
+
+                    for (index, text) in labelTexts.enumerated() {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(index)) { [weak self] in
+                            guard let self else { return }
+                            self.createAndAddLabelToUIDynamicBehaviors(text)
+                        }
+                    }
+                }
+
+                private func addBehaviours() {
+                    collisionBehavior.translatesReferenceBoundsIntoBoundary = true
+                    animator?.addBehavior(gravityBehavior)
+                    animator?.addBehavior(collisionBehavior)
+                }
+
+                private func createAndAddLabelToUIDynamicBehaviors(_ text: String) {
+                    let color = colors.randomElement() ?? .white
+                    guard let label = createLabel(text: text, color: color) else { return }
+
+                    view.addSubview(label)
+                    gravityBehavior.addItem(label)
+                    collisionBehavior.addItem(label)
+                }
+
+                private func getXPosition() -> CGFloat {
+                    let xPositionDividers: [CGFloat] = [2, 4, 6, 8, 10, 12]
+                    let xPositionDivider: CGFloat = xPositionDividers.randomElement() ?? 2.0
+                    return view.frame.width / xPositionDivider
+                }
+
+                private func createLabel(text: String, color: UIColor) -> UILabel? {
+                    let xPosition = getXPosition()
+                    let size: CGFloat = 100
+
+                    let label = UILabel(frame: .init(x: xPosition, y: 0, width: size, height: 70))
+                    label.text = text
+                    label.textColor = color
+                    label.translatesAutoresizingMaskIntoConstraints = false
+                    label.font = .systemFont(ofSize: size, weight: .bold)
+
+                    return label
+                }
+            }
+        </code></pre>
+    </div>
+
+</div>
