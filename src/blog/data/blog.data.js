@@ -31,7 +31,7 @@ export const blogData = [
   },
   {
     "title": "UIKit Dynamics",
-    "summary": "Hidden gem of UIKit.",
+    "summary": "Hidden gem of UIKit since iOS 7.",
     "type": PostType.Swift,
     "path": "/assets/posts/swift/uiKitDynamics/UIKit Dynamics.html",
     "date": "15 June 2025"
