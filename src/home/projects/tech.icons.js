@@ -1,12 +1,12 @@
 export const techIcons = {
     'Kotlin': '/assets/techStacks/Kotlin.svg',
-    'Jetpack Compose': '/assets/techStacks/JetpackCompose.png',
-    'Swift': '/assets/techStacks/Swift.webp',
-    'SwiftUI': '/assets/techStacks/SwiftUI.png',
+    'Jetpack Compose': '/assets/techStacks/JetpackCompose.svg',
+    'Swift': '/assets/techStacks/Swift.svg',
+    'SwiftUI': '/assets/techStacks/SwiftUI.svg',
     'Java': '/assets/techStacks/Java.svg',
     'XML': '/assets/techStacks/XML.svg',
-    'UIKit': '/assets/techStacks/UIKit.jpeg',
+    'UIKit': '/assets/techStacks/UIKit.svg',
     'Dart': '/assets/techStacks/Dart.svg',
-    'Flutter': '/assets/techStacks/Flutter.png',
-    'Objective-C': '/assets/techStacks/ObjectiveC.webp',
+    'Flutter': '/assets/techStacks/Flutter.svg',
+    'Objective-C': '/assets/techStacks/ObjectiveC.svg',
 };

@@ -47,10 +47,8 @@
 }
 
 .tech-icon {
-    width: auto;
-    height: 22px;
-    display: inline-block;
-    vertical-align: middle;
+    width: 1rem;
+    height: auto;
 }
 
 @media (max-width: 600px) {
