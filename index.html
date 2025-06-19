@@ -115,6 +115,32 @@
 
       <section class="project-section">
         <header class="project-header-row">
+          <h2>MRC</h2>
+          <div class="tech-stack">
+            <img class="tech-icon" src="/assets/techStacks/Kotlin.svg" alt="Kotlin icon"><span>Kotlin</span>
+            <img class="tech-icon" src="/assets/techStacks/XML.svg" alt="XML icon"><span>XML</span>
+          </div>
+        </header>
+        <ul>
+          <li>Built an <strong>offline-first architecture</strong> to support field workers operating in remote areas without internet connectivity, ensuring full app functionality in fully disconnected environments</li>
+          <li>Implemented a seamless drawing experience using the
+                <span class="external-link">
+                    <a href="https://developer.android.com/reference/android/graphics/Path">android.graphics.Path</a>
+                </span>
+            API for precise and responsive annotations on sheets
+          </li>
+          <li>Structured the data as follows: users manage <strong>multiple projects</strong> → each project contains <strong>multiple sheets</strong> → each sheet includes <strong>multiple drawings</strong> → each drawing can hold <strong>notes, videos, images, and a structured form</strong></li>
+          <li>Each form is divided into <strong>7 predefined categories</strong> → each category contains <strong>multiple dynamic questions</strong> → each question supports <strong>multiple answers</strong> and allows attaching <strong>notes, images, and other media</strong></li>
+          <li>Handled complex offline data creation, storage, and <strong>conflict-free synchronization</strong> with the central server, using
+              <span class="external-link">
+                    <a href="https://objectbox.io/">ObjectBox</a>
+                </span>
+            as the local database and implementing <strong>locking mechanisms</strong> and <strong>sync retries</strong> when internet access is restored</li>
+        </ul>
+      </section>
+
+      <section class="project-section">
+        <header class="project-header-row">
           <h2>Scan360</h2>
           <div class="tech-stack">
             <img class="tech-icon" src="/assets/techStacks/Swift.svg" alt="Swift icon"><span>Swift</span>
@@ -153,6 +179,23 @@
           <a class="project-link-btn Android" href="https://play.google.com/store/apps/details?id=com.emlakjet.kurumsal.sekizbit" target="_blank" rel="noopener">Android</a>
           <a class="project-link-btn iOS" href="https://apps.apple.com/us/app/emlakjet-emlak-ara-i-lan-ver/id1194656334" target="_blank" rel="noopener">iOS</a>
         </div>
+      </section>
+
+      <section class="project-section">
+        <header class="project-header-row">
+          <h2>Çekpara</h2>
+          <div class="tech-stack">
+            <img class="tech-icon" src="/assets/techStacks/Javascript.svg" alt="Javascript icon"><span>Javascript</span>
+            <img class="tech-icon" src="/assets/techStacks/React Native.svg" alt="React Native icon"><span>React Native</span>
+          </div>
+        </header>
+        <ul>
+          <li>Developed a digital factoring app for cashing checks using <strong>JavaScript</strong> and <strong>React Native</strong></li>
+          <li>Enabling users to convert checks into cash in minutes—without visiting a branch</li>
+          <li>Integrated tools such as <strong>Adjust</strong>, <strong>Mixpanel</strong>, <strong>UXCam</strong>, and <strong>Firebase</strong> for user behavior analytics, performance monitoring, attribution tracking, and crash reporting</li>
+          <li>Implemented courier tracking, secure document upload, and real-time status updates within the app</li>
+          <li>Built a transparent and intuitive user interface showcasing dynamic pricing, flexible limits, and instant transaction approvals</li>
+        </ul>
       </section>
 
       <section class="project-section">
@@ -208,7 +251,7 @@
           </div>
         </header>
         <p>
-          Developed a macOS music player application using Swift, SwiftUI, and AVFoundation. Native APIs are used to
+          Developed a music player application using Swift, SwiftUI, and AVFoundation for macOS. Native APIs are used to
           deliver responsive performance and smooth user experience. I use it every day.
         </p>
         <div class="screenshots">
@@ -216,6 +259,25 @@
           <img class="screenshot-img" src="/assets/projects/FirePlayer macOS/2.png" alt="FirePlayer macOS screenshot 2" tabindex="0">
           <img class="screenshot-img" src="/assets/projects/FirePlayer macOS/3.png" alt="FirePlayer macOS screenshot 3" tabindex="0">
           <img class="screenshot-img" src="/assets/projects/FirePlayer macOS/4.png" alt="FirePlayer macOS screenshot 4" tabindex="0">
+        </div>
+      </section>
+
+      <section class="project-section">
+        <header class="project-header-row">
+          <h2>FirePlayer Windows</h2>
+          <div class="tech-stack">
+            <img class="tech-icon" src="/assets/techStacks/C#.svg" alt="C# icon"><span>C#</span>
+          </div>
+        </header>
+        <p>
+          Developed a music player application using C# for Windows. I use a Windows laptop for gaming, a Macbook with
+          macOS for work, and an Android phone for personal use—so I ended up building three different native
+          music apps for each platform. It was a fun and rewarding experience that allowed me to explore the strengths
+          of each ecosystem. It only uses 30 MB of RAM :)
+        </p>
+        <div class="screenshots">
+          <img class="screenshot-img" src="/assets/projects/FirePlayer Windows/1.jpeg" alt="FirePlayer Windows screenshot 1" tabindex="0">
+          <img class="screenshot-img" src="/assets/projects/FirePlayer Windows/2.jpeg" alt="FirePlayer Windows screenshot 2" tabindex="0">
         </div>
       </section>
 
