@@ -18,8 +18,13 @@ body {
     background-color: #202022;
     padding: 1rem;
     border-radius: 0.7rem;
-    width: 40%;
+    width: 30%;
     position: relative;
+    height: auto;
+}
+
+h2 {
+    margin-top: 0;
 }
 
 @media (max-width: 600px) {
@@ -35,7 +40,7 @@ body {
 
 .date-label {
     position: absolute;
-    top: 2rem;
+    top: 1rem;
     right: 1rem;
     transform: translateY(15%);
 }
