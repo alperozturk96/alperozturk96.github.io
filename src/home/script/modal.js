@@ -19,6 +19,21 @@ export function initModal() {
   document.addEventListener('keydown', handleKeydown);
   modalClose.addEventListener('click', closeModal);
   modal.addEventListener('mousedown', handleClickOutside);
+
+  // Attach modal logic to static HTML screenshots
+  document.querySelectorAll('.screenshots').forEach(section => {
+    const imgs = Array.from(section.querySelectorAll('.screenshot-img'));
+    if (imgs.length === 0) return;
+    imgs.forEach((img, idx) => {
+      img.addEventListener('click', () => {
+        // Try to get project name from closest .project-title
+        let projectTitle = '';
+        const header = section.closest('.project-section')?.querySelector('.project-title');
+        if (header) projectTitle = header.textContent.trim();
+        showModalImage({ name: projectTitle }, idx, imgs.map(i => i.src));
+      });
+    });
+  });
 }
 
 export function showModalImage(project, index, images) {
