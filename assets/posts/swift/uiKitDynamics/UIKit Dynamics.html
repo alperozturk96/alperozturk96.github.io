@@ -1,92 +1,94 @@
-<div class="post">
-    <h1>UIKit Dynamics</h1>
-    <p>
-        <br>
-        I love listening to podcasts about programming and computer science. A few months ago, while listening to a
-        podcast about iOS development, one of the engineers mentioned
+<article class="post">
+    <header class="post-header">
+        <h1>UIKit Dynamics</h1>
+        <time datetime="2025-06-15">June 15, 2025</time>
+    </header>
 
-        <span class="external-link">
-            <a href="https://developer.apple.com/documentation/uikit/uikit-dynamics">UIKit Dynamics</a>
-        </span>
+    <main class="post-content">
+        <section class="post-section">
+            <p>
+                I love listening to podcasts about programming and computer science. A few months ago, while listening to a
+                podcast about iOS development, one of the engineers mentioned
+            </p>
 
-        and pointed out
-        that you can add collision behaviors to <strong>UIView</strong> using this API. I didn’t know that at the time, and
-        I was surprised. I immediately wanted to explore it.
-        <br><br>
-        This API felt like a hidden gem to me. I like Apple’s APIs, especially when it comes to animations, and UIKit Dynamics is no exception.
-        <br><br>
-        <br><br>
-    </p>
+            <p>
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/uikit/uikit-dynamics">UIKit Dynamics</a>
+                </span>
 
-    <h2>UIDynamicItem Protocol</h2>
-    <p>
-        <br>
-        Since iOS 7, both
+                and pointed out
+                that you can add collision behaviors to <strong>UIView</strong> using this API. I didn’t know that at the time, and
+                I was surprised. I immediately wanted to explore it.
+            </p>
 
-        <span class="external-link">
-            <a href="https://developer.apple.com/documentation/uikit/uiview">UIView</a>
-        </span>
+            <p>
+                This API felt like a hidden gem to me. I like Apple’s APIs, especially when it comes to animations,
+                and UIKit Dynamics is no exception.
+            </p>
+        </section>
 
-        and
+        <section class="post-section">
+            <h2>UIDynamicItem Protocol</h2>
+            <p>
+                Since iOS 7, both
 
-        <span class="external-link">
-            <a href="https://developer.apple.com/documentation/uikit/uicollectionviewlayoutattributes">UICollectionViewLayoutAttributes</a>
-        </span>
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/uikit/uiview">UIView</a>
+                </span>
 
-        conform to the
+                and
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/uikit/uicollectionviewlayoutattributes">UICollectionViewLayoutAttributes</a>
+                </span>
 
-        <span class="external-link">
-            <a href="https://developer.apple.com/documentation/uikit/uidynamicitem">UIDynamicItem</a>
-        </span> protocol.
+                conform to the
 
-        That means we can treat our views as dynamic items and apply physics-based behaviors to them.
-        <br><br>
-    </p>
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/uikit/uidynamicitem">UIDynamicItem</a>
+                </span> protocol.
+            </p>
 
-    <h2>How to implement?</h2>
-    <p>
-        <br>
-        First, we create an instance of <strong>UIDynamicAnimator</strong>. Then we define a set of behaviors such as <strong>UIGravityBehavior</strong>
-        and <strong>UICollisionBehavior</strong>, and apply them to our <strong>UIView</strong> instances.
-        <br><br>
-        The result looks something like this:
-        <br><br>
-    </p>
+            <p>That means we can treat our views as dynamic items and apply physics-based behaviors to them.</p>
+        </section>
 
-    <video class="video" controls>
-        <source src="/assets/posts/swift/uiKitDynamics/UIKitDynamicsDemo.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
+        <section class="post-section">
+            <h2>How to implement?</h2>
+            <p>
+                First, we create an instance of <strong>UIDynamicAnimator</strong>. Then we define a set of behaviors such as <strong>UIGravityBehavior</strong>
+                and <strong>UICollisionBehavior</strong>, and apply them to our <strong>UIView</strong> instances.
+                The result looks something like this:
+            </p>
 
-    <br><br>
-    <br><br>
+            <video class="video" controls>
+                <source src="/assets/posts/swift/uiKitDynamics/UIKitDynamicsDemo.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </section>
 
-    <h2>Let’s walk through the implementation. </h2>
-    <p>
-        <br>
-         First, I define some constants for the labels: their text, color options, and dynamic behaviors.
-        <br><br>
-    </p>
+        <section class="post-section">
+            <h2>Let’s walk through the implementation. </h2>
+            <p>First, I define some constants for the labels: their text, color options, and dynamic behaviors.</p>
 
-    <div class="code-container">
-        <button class="copy-button" title="Copy">Copy</button>
-        <pre><code class="lang-swift">private var animator: UIDynamicAnimator?
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="lang-swift">private var animator: UIDynamicAnimator?
 private let labelTexts = Array("UIKITDYNAMICS").map { String($0) }
 private let colors: [UIColor] = [.red, .green, .blue, .white, .yellow, .systemRed, .systemCyan, .orange, .magenta]
 private let gravityBehavior = UIGravityBehavior()
 private let collisionBehavior = UICollisionBehavior()</code></pre>
-    </div>
+            </div>
+        </section>
 
-    <h2>Creating UILabels</h2>
-    <p>
-        <br>
-         These helper functions generate labels with a randomized X-position so that the letters fall from different horizontal locations.
-        <br><br>
-    </p>
+        <section class="post-section">
+            <h2>Creating UILabels</h2>
+            <p>
+                These helper functions generate labels with a randomized X-position so that the letters fall from
+                different horizontal locations.
+            </p>
 
-    <div class="code-container">
-        <button class="copy-button" title="Copy">Copy</button>
-        <pre><code class="lang-swift">private func getXPosition() -> CGFloat {
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="lang-swift">private func getXPosition() -> CGFloat {
     let xPositionDividers: [CGFloat] = [2, 4, 6, 8, 10, 12]
     let xPositionDivider: CGFloat = xPositionDividers.randomElement() ?? 2.0
     return view.frame.width / xPositionDivider
@@ -104,18 +106,17 @@ private func createLabel(text: String, color: UIColor) -> UILabel? {
 
     return label
 }</code></pre>
-    </div>
+            </div>
+        </section>
 
-    <h2>Adding UIDynamicItems</h2>
-    <p>
-        <br>
-         After creating a label, I add it to the view hierarchy and apply the dynamic behaviors.
-        <br><br>
-    </p>
+        <section class="post-section">
+            <h2>Adding UIDynamicItems</h2>
+            <p>After creating a label, I add it to the view hierarchy and apply the dynamic behaviors.</p>
 
-    <div class="code-container">
-        <button class="copy-button" title="Copy">Copy</button>
-        <pre><code class="lang-swift">override func viewDidLoad() {
+
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="lang-swift">override func viewDidLoad() {
     super.viewDidLoad()
 
     view.backgroundColor = .black
@@ -145,22 +146,23 @@ private func createAndAddLabelToUIDynamicBehaviors(_ text: String) {
     gravityBehavior.addItem(label)
     collisionBehavior.addItem(label)
 }</code></pre>
-    </div>
+            </div>
+        </section>
 
-    <br><br>
+        <section class="post-section">
+            <h2>Conclusion</h2>
+            <p>
+                And that’s it! With just a few lines of code, we have UILabels affected by gravity and collision. Of course,
+                there’s much more we can do. For example, we can add drag-and-drop support. But that’s a topic for another post!
+            </p>
+        </section>
 
-    <h2>Conclusion</h2>
-    <p>
-        <br>
-        And that’s it! With just a few lines of code, we have UILabels affected by gravity and collision. Of course,
-        there’s much more we can do. For example, we can add drag-and-drop support. But that’s a topic for another post!
-        <br><br>
-    </p>
+        <section class="post-section">
+            <h2>Source Code</h2>
 
-    <h2>Source Code</h2>
-    <div class="code-container">
-        <button class="copy-button" title="Copy">Copy</button>
-        <pre><code class="lang-swift">import UIKit
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="lang-swift">import UIKit
 
 final class ViewController: UIViewController {
 
@@ -220,5 +222,7 @@ final class ViewController: UIViewController {
         return label
     }
 }</code></pre>
-    </div>
-</div>
+            </div>
+        </section>
+    </main>
+</article>

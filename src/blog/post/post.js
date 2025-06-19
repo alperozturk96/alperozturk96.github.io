@@ -3,7 +3,7 @@ import {UnicodeIcons} from "../../../assets/icons/unicode.icons.js";
 
 const params = new URLSearchParams(window.location.search);
 const path = params.get("path");
-const contentEl = document.getElementById("post-content");
+const contentEl = document.getElementById("post-element");
 const post = blogData.find(p => p.path === path);
 
 init();

@@ -1,31 +1,42 @@
-<div class="post">
-<h1>Customizing the Navigation Bar in SwiftUI</h1>
-<p><br>
-    This blog post explores how to customize the navigation bar&#39;s background and title color in SwiftUI. You might
-    wonder why such a basic task requires a dedicated blog post. The reason is simple: SwiftUI, especially in its early
-    iterations, does not offer a straightforward, out-of-the-box solution for this functionality.
-    <br><br></p>
-<h2>Background</h2>
-<p><br>
-    Prior to iOS 16, SwiftUI did not provide native modifiers for customizing navigation bar appearance. Developers
-    frequently relied on UIKit to achieve this customization, leveraging SwiftUI&#39;s interoperability with UIKit.
-    <br><br></p>
-<h3>Using <code>UINavigationBar, UINavigationBarAppearance</code>
-</h3>
-<p><br></p>
-<p>A common method before iOS 16 involved modifying the<code>UINavigationBar</code> appearance within a view&#39;s
-    initializer:</p>
+<article class="post">
+    <header class="post-header">
+        <h1>Customizing the Navigation Bar in SwiftUI</h1>
+        <time datetime="2025-05-30">May 30, 2025</time>
+    </header>
 
-<div class="code-container">
-    <button class="copy-button" title="Copy">Copy</button>
-    <pre><code class="lang-swift">struct ContentView: View {
+    <main class="post-content">
+        <section class="post-section">
+            <p>
+                This blog post explores how to customize the navigation bar&#39;s background and title color in SwiftUI. You might
+                wonder why such a basic task requires a dedicated blog post. The reason is simple: SwiftUI, especially in its early
+                iterations, does not offer a straightforward, out-of-the-box solution for this functionality.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Background</h2>
+            <p>
+                Prior to iOS 16, SwiftUI did not provide native modifiers for customizing navigation bar appearance. Developers
+                frequently relied on UIKit to achieve this customization, leveraging SwiftUI&#39;s interoperability with UIKit.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Using <code>UINavigationBar, UINavigationBarAppearance</code></h2>
+            <p>A common method before iOS 16 involved modifying the<code>UINavigationBar</code> appearance within a view&#39;s
+                initializer:</p>
+
+
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="lang-swift">struct ContentView: View {
     init() {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance<span class="hljs-selector-class">.backgroundColor</span> = UIColor<span class="hljs-selector-class">.systemBlue</span>
         appearance<span class="hljs-selector-class">.titleTextAttributes</span> = [<span class="hljs-selector-class">.foregroundColor</span>: UIColor.white]
         appearance<span class="hljs-selector-class">.largeTitleTextAttributes</span> = [<span
-                class="hljs-selector-class">.foregroundColor</span>: UIColor.white]
+                            class="hljs-selector-class">.foregroundColor</span>: UIColor.white]
 
         UINavigationBar.appearance()<span class="hljs-selector-class">.standardAppearance</span> = appearance
         UINavigationBar.appearance()<span class="hljs-selector-class">.compactAppearance</span> = appearance
@@ -40,22 +51,33 @@
     }
 }
 </code></pre>
-</div>
+            </div>
 
-<p>While functional, this approach applies the customization globally and is not reusable across individual views
-    without code repetition. Attempting to wrap this configuration within a<code>ViewModifier</code> directly does not
-    yield the desired results.</p>
-<p>We could create another BaseView and add this logic there, using it as a parent view for all the other views we plan
-    to use in our project.</p>
-<p>However, I don&#39;t want that behavior. I just want a modifier that changes the navigation bar color and title
-    color.
-    <br><br></p>
-<h3 id="navigationbarviewmodifier">NavigationBarViewModifier</h3>
-<p>Here&#39;s a more flexible and reusable solution that works on iOS 13 and above:</p>
+            <p>
+                While functional, this approach applies the customization globally and is not reusable across individual views
+                without code repetition. Attempting to wrap this configuration within a<code>ViewModifier</code> directly does not
+                yield the desired results.
+            </p>
 
-<div class="code-container">
-    <button class="copy-button" title="Copy">Copy</button>
-    <pre><code class="lang-swift"><span class="hljs-keyword">import</span> SwiftUI
+            <p>
+                We could create another BaseView and add this logic there, using it as a parent view for all the other
+                views we plan to use in our project.
+            </p>
+
+            <p>
+                However, I don&#39;t want that behavior. I just want a modifier that changes the navigation bar color and title
+                color.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>NavigationBarViewModifier</h2>
+            <p>Here&#39;s a more flexible and reusable solution that works on iOS 13 and above:</p>
+
+
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="lang-swift"><span class="hljs-keyword">import</span> SwiftUI
 <span class="hljs-keyword">import</span> UIKit
 
 <span class="hljs-class"><span class="hljs-keyword">struct</span> <span
@@ -64,7 +86,7 @@
     <span class="hljs-keyword">let</span> foregroundColor: <span class="hljs-type">Color</span>
     <span class="hljs-keyword">let</span> backgroundColor: <span class="hljs-type">Color</span>
     <span class="hljs-keyword">let</span> displayMode: <span class="hljs-type">NavigationBarItem</span>.<span
-                class="hljs-type">TitleDisplayMode</span>
+                            class="hljs-type">TitleDisplayMode</span>
 
     <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">body</span><span
             class="hljs-params">(content: Content)</span></span> -&gt; some <span class="hljs-type">View</span> {
@@ -72,7 +94,7 @@
             .navigationBarTitle(title, displayMode: displayMode)
             .configureNavigationBar {
                 <span class="hljs-keyword">let</span> appearance = <span
-                class="hljs-type">UINavigationBarAppearance</span>()
+                            class="hljs-type">UINavigationBarAppearance</span>()
                 appearance.shadowColor = .clear
                 appearance.configureWithOpaqueBackground()
                 appearance.titleTextAttributes = [.foregroundColor: <span class="hljs-type">UIColor</span>(foregroundColor)]
@@ -86,11 +108,11 @@
 }
 
 <span class="hljs-keyword">private</span> <span class="hljs-class"><span class="hljs-keyword">extension</span> <span
-                class="hljs-title">View</span> </span>{
+                            class="hljs-title">View</span> </span>{
     <span class="hljs-function"><span class="hljs-keyword">func</span> <span
             class="hljs-title">configureNavigationBar</span><span class="hljs-params">(configure: @escaping <span
             class="hljs-params">(UINavigationController)</span></span></span> -&gt; <span class="hljs-type">Void</span>) -&gt; some <span
-                class="hljs-type">View</span> {
+                            class="hljs-type">View</span> {
         modifier(<span class="hljs-type">NavigationConfigurationViewModifier</span>(configure: configure))
     }
 }
@@ -115,7 +137,7 @@
 <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">NavigationConfigurationViewModifier</span>: <span
         class="hljs-title">ViewModifier</span> </span>{
     <span class="hljs-keyword">let</span> configure: (<span class="hljs-type">UINavigationController</span>) -&gt; <span
-                class="hljs-type">Void</span>
+                            class="hljs-type">Void</span>
 
     <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">body</span><span
             class="hljs-params">(content: Content)</span></span> -&gt; some <span class="hljs-type">View</span> {
@@ -124,10 +146,10 @@
 }
 
 <span class="hljs-keyword">private</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span
-                class="hljs-title">NavigationConfigurator</span>: <span
-                class="hljs-title">UIViewControllerRepresentable</span> </span>{
+                            class="hljs-title">NavigationConfigurator</span>: <span
+                            class="hljs-title">UIViewControllerRepresentable</span> </span>{
     <span class="hljs-keyword">let</span> configure: (<span class="hljs-type">UINavigationController</span>) -&gt; <span
-                class="hljs-type">Void</span>
+                            class="hljs-type">Void</span>
 
     <span class="hljs-function"><span class="hljs-keyword">func</span> <span
             class="hljs-title">makeUIViewController</span><span class="hljs-params">(
@@ -144,26 +166,26 @@
 }
 
 <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-class"><span
-                class="hljs-keyword">class</span> <span
-                class="hljs-title">NavigationConfigurationViewController</span>: <span
-                class="hljs-title">UIViewController</span> </span>{
+                            class="hljs-keyword">class</span> <span
+                            class="hljs-title">NavigationConfigurationViewController</span>: <span
+                            class="hljs-title">UIViewController</span> </span>{
     <span class="hljs-keyword">let</span> configure: (<span class="hljs-type">UINavigationController</span>) -&gt; <span
-                class="hljs-type">Void</span>
+                            class="hljs-type">Void</span>
 
     <span class="hljs-keyword">init</span>(configure: @escaping (<span class="hljs-type">UINavigationController</span>) -&gt; <span
-                class="hljs-type">Void</span>) {
+                            class="hljs-type">Void</span>) {
         <span class="hljs-keyword">self</span>.configure = configure
         <span class="hljs-keyword">super</span>.<span class="hljs-keyword">init</span>(nibName: <span
-                class="hljs-literal">nil</span>, bundle: <span class="hljs-literal">nil</span>)
+                            class="hljs-literal">nil</span>, bundle: <span class="hljs-literal">nil</span>)
     }
 
     <span class="hljs-keyword">required</span> <span class="hljs-keyword">init</span>?(coder: <span class="hljs-type">NSCoder</span>) {
         <span class="hljs-built_in">fatalError</span>(<span
-                class="hljs-string">"init(coder:) has not been implemented"</span>)
+                            class="hljs-string">"init(coder:) has not been implemented"</span>)
     }
 
     <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span
-                class="hljs-title">viewDidLayoutSubviews</span><span class="hljs-params">()</span></span> {
+                            class="hljs-title">viewDidLayoutSubviews</span><span class="hljs-params">()</span></span> {
         <span class="hljs-keyword">super</span>.viewDidLayoutSubviews()
 
         <span class="hljs-keyword">if</span> <span class="hljs-keyword">let</span> navigationController = navigationController {
@@ -172,39 +194,53 @@
     }
 }
 </code></pre>
-</div>
+            </div>
 
-<p>This approach modifies the navigation bar after the view has been initialized. As a result, users might briefly
-    observe the default navigation bar appearance before your customizations are applied, particularly if the view
-    requires additional loading time.
-    <br><br></p>
-<h3>Improvements in iOS 16+</h3>
-<p>Starting with iOS 16, SwiftUI introduced a more native way to style navigation bars:</p>
+            <p>
+                This approach modifies the navigation bar after the view has been initialized. As a result, users might briefly
+                observe the default navigation bar appearance before your customizations are applied, particularly if the view
+                requires additional loading time.
+            </p>
+        </section>
 
-<div class="code-container">
-    <button class="copy-button" title="Copy">Copy</button>
-    <pre><code class="lang-swift"><span class="hljs-selector-class">.navigationTitle</span>("<span
-            class="hljs-selector-tag">My</span> <span class="hljs-selector-tag">App</span>")
+        <section class="post-section">
+            <h2>Improvements in iOS 16+</h2>
+            <p>Starting with iOS 16, SwiftUI introduced a more native way to style navigation bars:</p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="lang-swift"><span class="hljs-selector-class">.navigationTitle</span>("<span
+                        class="hljs-selector-tag">My</span> <span class="hljs-selector-tag">App</span>")
 <span class="hljs-selector-class">.toolbarBackground</span>(<span class="hljs-selector-tag">Color</span><span
-                class="hljs-selector-class">.blue</span>, <span class="hljs-selector-tag">for</span>: <span
-                class="hljs-selector-class">.navigationBar</span>)
+                            class="hljs-selector-class">.blue</span>, <span class="hljs-selector-tag">for</span>: <span
+                            class="hljs-selector-class">.navigationBar</span>)
 <span class="hljs-selector-class">.toolbarBackground</span>(<span class="hljs-selector-class">.visible</span>, <span
-                class="hljs-selector-tag">for</span>: <span class="hljs-selector-class">.navigationBar</span>)
+                            class="hljs-selector-tag">for</span>: <span class="hljs-selector-class">.navigationBar</span>)
 </code></pre>
-</div>
+            </div>
 
-<p>However, this newer API has its own set of limitations:</p>
-<ul>
-    <li>It is only available on iOS 16 and later.</li>
-    <li>It offers limited styling options; properties like title color, font, and size cannot be changed directly using
-        this method.
-    </li>
-    <li>The <code>toolbarBackground</code> modifier expects a <code>ColorScheme</code>, not a <code>Color</code>.</li>
-</ul>
-<p>At the time of writing, there is no single, perfect solution for comprehensively styling the navigation bar across
-    all iOS versions in SwiftUI. UIKit interoperability remains essential for achieving full customization
-    capabilities.</p>
-<p>I’m genuinely curious why such a basic feature was missing from the initial version of SwiftUI. However, it’s not
-    really surprising, the issue wasn’t just the lack of modifiers for the navigation bar; the navigation system itself
-    was flawed and, in some ways, still is. I will explain this in more detail in a separate blog post.</p>
-</div>
+            <p>However, this newer API has its own set of limitations:</p>
+
+            <ul>
+                <li>It is only available on iOS 16 and later.</li>
+                <li>It offers limited styling options; properties like title color, font, and size cannot be changed directly using
+                    this method.
+                </li>
+                <li>The <code>toolbarBackground</code> modifier expects a <code>ColorScheme</code>, not a <code>Color</code>.</li>
+            </ul>
+        </section>
+
+        <section class="post-section">
+            <h2>Conclusion</h2>
+            <p>
+                At the time of writing, there is no single, perfect solution for comprehensively styling the navigation bar across
+                all iOS versions in SwiftUI. UIKit interoperability remains essential for achieving full customization
+                capabilities.
+            </p>
+            <p>
+                I’m genuinely curious why such a basic feature was missing from the initial version of SwiftUI. However, it’s not
+                really surprising, the issue wasn’t just the lack of modifiers for the navigation bar; the navigation system itself
+                was flawed and, in some ways, still is. I will explain this in more detail in a separate blog post.
+            </p>
+        </section>
+    </main>
+</article>
