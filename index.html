@@ -49,7 +49,7 @@
 </head>
 
 <body>
-    <nav class="navbar">
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
         <ul class="nav-base main">
             <li><a href="index.html" class="active">Projects</a></li>
             <li><a href="src/blog/blog.html">Blog</a></li>
@@ -265,7 +265,7 @@
         </div>
       </section>
 
-        <div class="modal" id="img-modal" tabindex="-1">
+        <div class="modal" id="img-modal" tabindex="-1" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
             <button class="modal-close" id="modal-close">⨉</button>
             <button class="modal-arrow" id="modal-prev">‹</button>
             <img class="modal-img" id="modal-img" src="" alt="Screenshot enlarged">

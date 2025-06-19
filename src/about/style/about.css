@@ -26,3 +26,19 @@ body, p {
         max-width: 20rem;
     }
 }
+
+.tech-stack {
+    color: #F5F5F7;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem 0.7rem;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 1.3rem;
+    margin-top: 2rem;
+}
+
+.tech-icon {
+    width: 2rem;
+    height: auto;
+}
