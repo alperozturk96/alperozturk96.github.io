@@ -58,28 +58,32 @@
     </nav>
 
     <main id="portfolio">
-      <header>
-        <h1>Software engineering is a craft</h1>
-      </header>
-
       <section class="project-section">
         <header class="project-header-row">
           <h2>Nextcloud</h2>
           <div class="tech-stack">
-            <img class="tech-icon" src="/assets/techStacks/Kotlin.svg" alt="Kotlin icon"><span>Kotlin</span>
-            <img class="tech-icon" src="/assets/techStacks/Java.svg" alt="Java icon"><span>Java</span>
-            <img class="tech-icon" src="/assets/techStacks/XML.svg" alt="XML icon"><span>XML</span>
-            <img class="tech-icon" src="/assets/techStacks/JetpackCompose.svg" alt="Jetpack Compose icon"><span>Jetpack Compose</span>
+            <img class="tech-icon" src="/assets/techStacks/Kotlin.svg" alt="Kotlin icon">
+            <img class="tech-icon" src="/assets/techStacks/Java.svg" alt="Java icon">
+            <img class="tech-icon" src="/assets/techStacks/XML.svg" alt="XML icon">
+            <img class="tech-icon" src="/assets/techStacks/JetpackCompose.svg" alt="Jetpack Compose icon">
           </div>
         </header>
         <ul>
           <li>Developed and maintained <strong>Files</strong> and <strong>Notes</strong> mobile apps with over <strong>1M+ active users</strong></li>
-          <li>Implemented <strong>end-to-end encryption</strong> using <strong>Bouncy Castle</strong> and <strong>androidx.security</strong>, ensuring secure data transfer and certificate-signature verification</li>
+          <li>Implemented <strong>end-to-end encryption</strong> using
+                <span class="external-link">
+                    <a href="https://www.bouncycastle.org/">Bouncy Castle</a>
+                </span>
+            ensuring secure data transfer and certificate-signature verification</li>
           <li>Integrated <strong>open-source AI solutions</strong> into mobile applications to enhance the user experience with features like headline generation, document summarization, and on-device question answering.</li>
           <li>Built and optimized background tasks (multi-file & folder sync, downloads, uploads) using <strong>WorkManager</strong></li>
           <li>Applied the <strong>MVVM</strong> design pattern and modern <strong>Android</strong> best practices for scalable and testable code</li>
           <li>Eliminated antipatterns by refactoring toward modern <strong>Android</strong> development practices</li>
-          <li>Improved app performance by up to <strong>50%</strong> and reduced memory usage by <strong>20%</strong> through efficient use of <strong>Kotlin Coroutines</strong></li>
+          <li>Improved app performance by up to <strong>50%</strong> and reduced memory usage by <strong>20%</strong> through efficient use of
+                <span class="external-link">
+                    <a href="https://kotlinlang.org/docs/coroutines-overview.html">Kotlin Coroutines</a>
+                </span>
+          </li>
           <li>Migrated a large legacy <strong>Java</strong> codebase to <strong>Kotlin</strong>, reducing technical debt and improving maintainability</li>
         </ul>
         <div class="project-links" role="group" aria-label="Download links">
@@ -92,20 +96,49 @@
         <header class="project-header-row">
           <h2>LipaWallet</h2>
           <div class="tech-stack">
-            <img class="tech-icon" src="/assets/techStacks/Swift.svg" alt="Swift icon"><span>Swift</span>
-            <img class="tech-icon" src="/assets/techStacks/SwiftUI.svg" alt="SwiftUI icon"><span>SwiftUI</span>
-            <img class="tech-icon" src="/assets/techStacks/Kotlin.svg" alt="Kotlin icon"><span>Kotlin</span>
-            <img class="tech-icon" src="/assets/techStacks/JetpackCompose.svg" alt="Jetpack Compose icon"><span>Jetpack Compose</span>
+            <img class="tech-icon" src="/assets/techStacks/Swift.svg" alt="Swift icon">
+            <img class="tech-icon" src="/assets/techStacks/SwiftUI.svg" alt="SwiftUI icon">
+            <img class="tech-icon" src="/assets/techStacks/Kotlin.svg" alt="Kotlin icon">
+            <img class="tech-icon" src="/assets/techStacks/JetpackCompose.svg" alt="Jetpack Compose icon">
           </div>
         </header>
         <ul>
-          <li>Developed a <strong>Bitcoin Lightning</strong> wallet with native <strong>SwiftUI</strong> for iOS and <strong>Jetpack Compose</strong> for Android</li>
+          <li>Developed a <strong>Bitcoin Lightning</strong> wallet with native
+                <span class="external-link">
+                    <a href="https://developer.apple.com/tutorials/swiftui/">SwiftUI</a>
+                </span>
+            for iOS and
+                <span class="external-link">
+                    <a href="https://developer.android.com/compose">Jetpack Compose</a>
+                </span>
+            for Android</li>
           <li>Integrated an internally developed <strong>Rust</strong> library into Android and iOS using platform-specific bindings and an <strong>event-driven architecture</strong></li>
-          <li>Built a high-performance, memory-leak-free networking layer with the <strong>Apollo GraphQL</strong> client for both platforms</li>
-          <li>Implemented biometric security using <strong>Touch ID</strong>, <strong>Face ID</strong> (iOS), and <strong>BiometricPrompt</strong> (Android)</li>
+          <li>
+            Built a high-performance, memory-leak-free networking layer with the
+                <span class="external-link">
+                    <a href="https://www.apollographql.com/">Apollo GraphQL</a>
+                </span>
+            client for both platforms
+          </li>
+          <li>
+            Implemented biometric security using
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/localauthentication">Touch ID, Face ID</a>
+                </span>
+            (iOS), and
+                <span class="external-link">
+                    <a href="https://developer.android.com/reference/android/hardware/biometrics/BiometricPrompt">BiometricPrompt</a>
+                </span>
+            (Android)
+          </li>
           <li>Designed efficient background data processing for real-time transaction and wallet state updates</li>
           <li>Created a modular architecture with <strong>Swift Package Manager (SPM)</strong> for iOS and <strong>JitPack</strong> for Android, reducing code duplication</li>
-          <li>Automated development and release workflows using <strong>Fastlane</strong></li>
+          <li>
+              Automated development and release workflows using
+                <span class="external-link">
+                    <a href="https://fastlane.tools/">Fastlane</a>
+                </span>
+          </li>
         </ul>
         <div class="project-links" role="group" aria-label="Download links">
           <a class="project-link-btn Android" href="https://play.google.com/store/apps/details?id=com.getlipa.wallet&amp%3Bhl=en" target="_blank" rel="noopener">Android</a>
@@ -117,8 +150,8 @@
         <header class="project-header-row">
           <h2>MRC</h2>
           <div class="tech-stack">
-            <img class="tech-icon" src="/assets/techStacks/Kotlin.svg" alt="Kotlin icon"><span>Kotlin</span>
-            <img class="tech-icon" src="/assets/techStacks/XML.svg" alt="XML icon"><span>XML</span>
+            <img class="tech-icon" src="/assets/techStacks/Kotlin.svg" alt="Kotlin icon">
+            <img class="tech-icon" src="/assets/techStacks/XML.svg" alt="XML icon">
           </div>
         </header>
         <ul>
@@ -143,16 +176,28 @@
         <header class="project-header-row">
           <h2>Scan360</h2>
           <div class="tech-stack">
-            <img class="tech-icon" src="/assets/techStacks/Swift.svg" alt="Swift icon"><span>Swift</span>
-            <img class="tech-icon" src="/assets/techStacks/UIKit.svg" alt="UIKit icon"><span>UIKit</span>
+            <img class="tech-icon" src="/assets/techStacks/Swift.svg" alt="Swift icon">
+            <img class="tech-icon" src="/assets/techStacks/UIKit.svg" alt="UIKit icon">
           </div>
         </header>
         <ul>
-          <li>Developed a full-featured document scanner using <strong>UIKit</strong> and <strong>VisionKit</strong> for iOS, supporting high-quality scanning and automatic document detection</li>
+          <li>Developed a full-featured document scanner using
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/uikit">UIKit</a>
+                </span>
+            and
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/visionkit">VisionKit</a>
+                </span>
+            for iOS, supporting high-quality scanning and automatic document detection</li>
           <li>Integrated PDF generation, document editing (crop, rotate, filter), and multi-page scan support</li>
           <li>Implemented features for signing, sharing, and exporting documents in various formats (PDF, JPEG)</li>
           <li>Built a smooth user experience with real-time image processing and seamless camera integration</li>
-          <li>Integrated <strong>StoreKit</strong> to manage in-app purchases and trials for premium features such as unlimited scans, advanced editing tools</li>
+          <li>Integrated
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/storekit">StoreKit</a>
+                </span>
+            to manage in-app purchases and trials for premium features such as unlimited scans, advanced editing tools</li>
         </ul>
         <div class="project-links" role="group" aria-label="Download links">
           <a class="project-link-btn iOS" href="https://apps.apple.com/us/app/scan360-pdf-scanner-sign/id1589134970" target="_blank" rel="noopener">iOS</a>
@@ -163,10 +208,10 @@
         <header class="project-header-row">
           <h2>Emlakjet</h2>
           <div class="tech-stack">
-            <img class="tech-icon" src="/assets/techStacks/Java.svg" alt="Java icon"><span>Java</span>
-            <img class="tech-icon" src="/assets/techStacks/XML.svg" alt="XML icon"><span>XML</span>
-            <img class="tech-icon" src="/assets/techStacks/ObjectiveC.svg" alt="Objective-C icon"><span>Objective-C</span>
-            <img class="tech-icon" src="/assets/techStacks/UIKit.svg" alt="UIKit icon"><span>UIKit</span>
+            <img class="tech-icon" src="/assets/techStacks/Java.svg" alt="Java icon">
+            <img class="tech-icon" src="/assets/techStacks/XML.svg" alt="XML icon">
+            <img class="tech-icon" src="/assets/techStacks/ObjectiveC.svg" alt="Objective-C icon">
+            <img class="tech-icon" src="/assets/techStacks/UIKit.svg" alt="UIKit icon">
           </div>
         </header>
         <ul>
@@ -185,14 +230,34 @@
         <header class="project-header-row">
           <h2>Çekpara</h2>
           <div class="tech-stack">
-            <img class="tech-icon" src="/assets/techStacks/Javascript.svg" alt="Javascript icon"><span>Javascript</span>
-            <img class="tech-icon" src="/assets/techStacks/React Native.svg" alt="React Native icon"><span>React Native</span>
+            <img class="tech-icon" src="/assets/techStacks/Javascript.svg" alt="Javascript icon">
+            <img class="tech-icon" src="/assets/techStacks/React Native.svg" alt="React Native icon">
           </div>
         </header>
         <ul>
-          <li>Developed a digital factoring app for cashing checks using <strong>JavaScript</strong> and <strong>React Native</strong></li>
+          <li>Developed a digital factoring app for cashing checks using <strong>JavaScript</strong> and
+                <span class="external-link">
+                    <a href="https://reactnative.dev/">React Native</a>
+                </span>
+          </li>
           <li>Enabling users to convert checks into cash in minutes—without visiting a branch</li>
-          <li>Integrated tools such as <strong>Adjust</strong>, <strong>Mixpanel</strong>, <strong>UXCam</strong>, and <strong>Firebase</strong> for user behavior analytics, performance monitoring, attribution tracking, and crash reporting</li>
+          <li>Integrated tools such as
+            <span class="external-link">
+                    <a href="https://www.adjust.com/">Adjust</a>
+                </span>
+            ,
+            <span class="external-link">
+                    <a href="https://mixpanel.com/">Mixpanel</a>
+                </span>
+            ,
+            <span class="external-link">
+                    <a href="https://uxcam.com/">UXCam</a>
+                </span>
+            ,
+            <span class="external-link">
+                    <a href="https://firebase.google.com/">Firebase</a>
+                </span>
+            and for user behavior analytics, performance monitoring, attribution tracking, and crash reporting</li>
           <li>Implemented courier tracking, secure document upload, and real-time status updates within the app</li>
           <li>Built a transparent and intuitive user interface showcasing dynamic pricing, flexible limits, and instant transaction approvals</li>
         </ul>
@@ -202,10 +267,10 @@
         <header class="project-header-row">
           <h2>DentalBulut</h2>
           <div class="tech-stack">
-            <img class="tech-icon" src="/assets/techStacks/Java.svg" alt="Java icon"><span>Java</span>
-            <img class="tech-icon" src="/assets/techStacks/XML.svg" alt="XML icon"><span>XML</span>
-            <img class="tech-icon" src="/assets/techStacks/Swift.svg" alt="Swift icon"><span>Swift</span>
-            <img class="tech-icon" src="/assets/techStacks/UIKit.svg" alt="UIKit icon"><span>UIKit</span>
+            <img class="tech-icon" src="/assets/techStacks/Java.svg" alt="Java icon">
+            <img class="tech-icon" src="/assets/techStacks/XML.svg" alt="XML icon">
+            <img class="tech-icon" src="/assets/techStacks/Swift.svg" alt="Swift icon">
+            <img class="tech-icon" src="/assets/techStacks/UIKit.svg" alt="UIKit icon">
           </div>
         </header>
         <ul>
@@ -224,14 +289,22 @@
         <header class="project-header-row">
           <h2>FirePlayer Android</h2>
           <div class="tech-stack">
-            <img class="tech-icon" src="/assets/techStacks/Kotlin.svg" alt="Kotlin icon"><span>Kotlin</span>
-            <img class="tech-icon" src="/assets/techStacks/JetpackCompose.svg" alt="Jetpack Compose icon"><span>Jetpack Compose</span>
+            <img class="tech-icon" src="/assets/techStacks/Kotlin.svg" alt="Kotlin icon">
+            <img class="tech-icon" src="/assets/techStacks/JetpackCompose.svg" alt="Jetpack Compose icon">
           </div>
         </header>
         <p>
-          Developed a music player application using the Media3 library in combination with Kotlin coroutines and the
+          Developed a music player application using the
+                <span class="external-link">
+                    <a href="https://developer.android.com/jetpack/androidx/releases/media3">Media3</a>
+                </span>
+          library in combination with Kotlin coroutines and the
           MVVM architecture. Designed a user-friendly and intuitive interface that offers a more practical experience
-          compared to typical music player apps. Room Database used for local data storage.
+          compared to typical music player apps.
+                <span class="external-link">
+                    <a href="https://developer.android.com/jetpack/androidx/releases/room">Room</a>
+                </span>
+          used for local data storage.
         </p>
         <div class="screenshots">
           <img class="screenshot-img" src="/assets/projects/FirePlayer Android/1.png" alt="FirePlayer Android screenshot 1" tabindex="0">
@@ -246,12 +319,16 @@
         <header class="project-header-row">
           <h2>FirePlayer macOS</h2>
           <div class="tech-stack">
-            <img class="tech-icon" src="/assets/techStacks/Swift.svg" alt="Swift icon"><span>Swift</span>
-            <img class="tech-icon" src="/assets/techStacks/SwiftUI.svg" alt="SwiftUI icon"><span>SwiftUI</span>
+            <img class="tech-icon" src="/assets/techStacks/Swift.svg" alt="Swift icon">
+            <img class="tech-icon" src="/assets/techStacks/SwiftUI.svg" alt="SwiftUI icon">
           </div>
         </header>
         <p>
-          Developed a music player application using Swift, SwiftUI, and AVFoundation for macOS. Native APIs are used to
+          Developed a music player application using Swift, SwiftUI, and
+                <span class="external-link">
+                    <a href="https://developer.apple.com/av-foundation/">AVFoundation</a>
+                </span>
+          for macOS. Native APIs are used to
           deliver responsive performance and smooth user experience. I use it every day.
         </p>
         <div class="screenshots">
@@ -266,12 +343,12 @@
         <header class="project-header-row">
           <h2>FirePlayer Windows</h2>
           <div class="tech-stack">
-            <img class="tech-icon" src="/assets/techStacks/C#.svg" alt="C# icon"><span>C#</span>
+            <img class="tech-icon" src="/assets/techStacks/CSharp.svg" alt="C# icon">
           </div>
         </header>
         <p>
           Developed a music player application using C# for Windows. I use a Windows laptop for gaming, a Macbook with
-          macOS for work, and an Android phone for personal use—so I ended up building three different native
+          macOS for work, and an Android phone for personal use, so I ended up building three different native
           music apps for each platform. It was a fun and rewarding experience that allowed me to explore the strengths
           of each ecosystem. It only uses 30 MB of RAM :)
         </p>
@@ -285,8 +362,8 @@
         <header class="project-header-row">
           <h2>TextLauncher</h2>
           <div class="tech-stack">
-            <img class="tech-icon" src="/assets/techStacks/Kotlin.svg" alt="Kotlin icon"><span>Kotlin</span>
-            <img class="tech-icon" src="/assets/techStacks/JetpackCompose.svg" alt="Jetpack Compose icon"><span>Jetpack Compose</span>
+            <img class="tech-icon" src="/assets/techStacks/Kotlin.svg" alt="Kotlin icon">
+            <img class="tech-icon" src="/assets/techStacks/JetpackCompose.svg" alt="Jetpack Compose icon">
           </div>
         </header>
         <p>
@@ -310,12 +387,16 @@
         <header class="project-header-row">
           <h2>MyLocker</h2>
           <div class="tech-stack">
-            <img class="tech-icon" src="/assets/techStacks/Kotlin.svg" alt="Kotlin icon"><span>Kotlin</span>
-            <img class="tech-icon" src="/assets/techStacks/JetpackCompose.svg" alt="Jetpack Compose icon"><span>Jetpack Compose</span>
+            <img class="tech-icon" src="/assets/techStacks/Kotlin.svg" alt="Kotlin icon">
+            <img class="tech-icon" src="/assets/techStacks/JetpackCompose.svg" alt="Jetpack Compose icon">
           </div>
         </header>
         <p>
-          This project uses androidx.security:security-crypto along with Jetpack libraries. Users can export their
+          This project uses
+                <span class="external-link">
+                    <a href="https://developer.android.com/jetpack/androidx/releases/security">androidx.security:security-crypto</a>
+                </span>
+          along with Jetpack libraries. Users can export their
           encrypted passwords, which can only be decrypted using their own private key. The private key is never
           transmitted to any server and remains solely under the user's control, placing full responsibility for key
           management on the user.

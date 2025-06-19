@@ -70,9 +70,6 @@ function renderPosts(posts, container) {
             <div class="card-content">
                 <h2>${post.title}</h2>
                 <p>${post.summary}</p>
-                 <div class="date-label">
-                    <p>${post.date}</p>
-                </div>
                 <div class="external-link">
                     <a href="post/post.html?path=${encodeURIComponent(post.path)}">
                         Continue Reading
