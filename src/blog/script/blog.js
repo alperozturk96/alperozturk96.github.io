@@ -73,7 +73,7 @@ function renderPosts(posts, container) {
                  <div class="date-label">
                     <p>${post.date}</p>
                 </div>
-                <div class="continue-link">
+                <div class="external-link">
                     <a href="post/post.html?path=${encodeURIComponent(post.path)}">
                         Continue Reading
                     </a>

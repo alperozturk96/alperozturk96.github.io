@@ -12,30 +12,6 @@
     align-items: flex-start;
 }
 
-.project-title {
-    font-size: 1.4rem;
-    font-weight: 600;
-    margin-bottom: 1.3rem;
-    color: #F5F5F7;
-}
-
-.project-desc {
-    font-size: 1rem;
-    color: #F5F5F7;
-    margin-bottom: 2.0rem;
-    margin-top: 0.2rem;
-}
-
-.project-desc ul {
-    margin-bottom: 1.2em;
-    margin-top: 0.7em;
-    padding-left: 1.3em;
-}
-
-.project-desc ul li {
-    margin-bottom: 0.7em;
-}
-
 .tech-stack {
     color: #F5F5F7;
     display: flex;
@@ -68,6 +44,7 @@
     overflow-x: auto;
     gap: 1.2rem;
     padding-bottom: 0.7rem;
+    margin-top: 2rem;
     scrollbar-color: #6B6B6B #2D2D2D;
 }
 
@@ -103,4 +80,8 @@
     .screenshots img {
         max-height: 160px;
     }
+}
+
+h2 {
+    margin-bottom: 2rem;
 }

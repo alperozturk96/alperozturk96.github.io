@@ -33,14 +33,9 @@ body {
     text-decoration: none;
 }
 
-.continue-link {
-    margin-top: auto;
-    text-align: right;
-}
-
 .date-label {
     position: absolute;
-    top: 0;
+    top: 2rem;
     right: 1rem;
     transform: translateY(15%);
 }
@@ -53,14 +48,4 @@ body {
         left: 1rem;
         transform: translateY(0%);
     }
-}
-
-.continue-link a {
-    color: #2897FF;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.continue-link a:hover {
-    text-decoration: underline;
 }

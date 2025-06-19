@@ -3,7 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projects</title>
+
+    <title>Alper Öztürk</title>
+    <meta name="description" content="Professional mobile app developer specializing in iOS and Android applications. View my portfolio featuring Nextcloud, LipaWallet, Scan360, and other successful mobile apps with millions of users.">
+    <meta name="keywords" content="mobile app developer, iOS developer, Android developer, Swift, Kotlin, mobile applications, app development portfolio">
+    <meta name="author" content="Alper Öztürk">
+
+    <meta property="og:title" content="Mobile App Developer Portfolio | iOS & Android Projects">
+    <meta property="og:description" content="Professional mobile app developer specializing in iOS and Android applications. View my portfolio featuring Nextcloud, LipaWallet, Scan360, and other successful mobile apps with millions of users.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://alperozturk.me">
+
+    <link rel="canonical" href="https://alperozturk.me">
 
     <link rel="icon" href="site.icon.svg" type="image/svg+xml">
 
@@ -12,6 +23,29 @@
     <link rel="stylesheet" href="src/home/style/project-section.css">
     <link rel="stylesheet" href="src/home/style/project-link.css">
     <link rel="stylesheet" href="src/style/modal.css">
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Alper Öztürk",
+      "jobTitle": "Mobile App Developer",
+      "description": "Professional mobile app developer specializing in iOS and Android applications",
+      "url": "https://alperozturk.me",
+      "sameAs": [
+        "https://linkedin.com/in/alper-ozturk-1696581b1",
+        "https://github.com/alperozturk96"
+      ],
+      "knowsAbout": ["iOS Development", "Android Development", "Swift", "Objective-C", "Kotlin", "Mobile Applications", "Computer Science", "Java", "Dart", "Javascript", "React Native", "Flutter", "KMP", "Kotlin Multiplatform"],
+      "hasCredential": [
+        {
+          "@type": "EducationalOccupationalCredential",
+          "name": "Mobile App Development Experience",
+          "description": "Professional mobile app developer specializing in iOS and Android applications. View my portfolio featuring Nextcloud, LipaWallet, Scan360, and other successful mobile apps with millions of users."
+        }
+      ]
+    }
+  </script>
 </head>
 
 <body>
@@ -24,142 +58,139 @@
     </nav>
 
     <main id="portfolio">
+      <header>
+        <h1>Alper Öztürk</h1>
+        <h2>Software engineering is a craft</h2>
+      </header>
+
       <section class="project-section">
-        <div class="project-header-row">
-          <div class="project-title">Nextcloud</div>
+        <header class="project-header-row">
+          <h2>Nextcloud</h2>
           <div class="tech-stack">
             <img class="tech-icon" src="/assets/techStacks/Kotlin.svg" alt="Kotlin icon"><span>Kotlin</span>
             <img class="tech-icon" src="/assets/techStacks/Java.svg" alt="Java icon"><span>Java</span>
             <img class="tech-icon" src="/assets/techStacks/XML.svg" alt="XML icon"><span>XML</span>
             <img class="tech-icon" src="/assets/techStacks/JetpackCompose.svg" alt="Jetpack Compose icon"><span>Jetpack Compose</span>
           </div>
-        </div>
-        <div class="project-desc">
-          <ul>
-            <li>Developed and maintained <strong>Files</strong> and <strong>Notes</strong> mobile apps with over <strong>1M+ active users</strong></li>
-            <li>Implemented <strong>end-to-end encryption</strong> using <strong>Bouncy Castle</strong> and <strong>androidx.security</strong>, ensuring secure data transfer and certificate-signature verification</li>
-            <li>Integrated <strong>open-source AI solutions</strong> into mobile applications to enhance the user experience with features like headline generation, document summarization, and on-device question answering.</li>
-            <li>Built and optimized background tasks (multi-file & folder sync, downloads, uploads) using <strong>WorkManager</strong></li>
-            <li>Applied the <strong>MVVM</strong> design pattern and modern <strong>Android</strong> best practices for scalable and testable code</li>
-            <li>Eliminated antipatterns by refactoring toward modern <strong>Android</strong> development practices</li>
-            <li>Improved app performance by up to <strong>50%</strong> and reduced memory usage by <strong>20%</strong> through efficient use of <strong>Kotlin Coroutines</strong></li>
-            <li>Migrated a large legacy <strong>Java</strong> codebase to <strong>Kotlin</strong>, reducing technical debt and improving maintainability</li>
-          </ul>
-        </div>
-        <div class="project-links">
+        </header>
+        <ul>
+          <li>Developed and maintained <strong>Files</strong> and <strong>Notes</strong> mobile apps with over <strong>1M+ active users</strong></li>
+          <li>Implemented <strong>end-to-end encryption</strong> using <strong>Bouncy Castle</strong> and <strong>androidx.security</strong>, ensuring secure data transfer and certificate-signature verification</li>
+          <li>Integrated <strong>open-source AI solutions</strong> into mobile applications to enhance the user experience with features like headline generation, document summarization, and on-device question answering.</li>
+          <li>Built and optimized background tasks (multi-file & folder sync, downloads, uploads) using <strong>WorkManager</strong></li>
+          <li>Applied the <strong>MVVM</strong> design pattern and modern <strong>Android</strong> best practices for scalable and testable code</li>
+          <li>Eliminated antipatterns by refactoring toward modern <strong>Android</strong> development practices</li>
+          <li>Improved app performance by up to <strong>50%</strong> and reduced memory usage by <strong>20%</strong> through efficient use of <strong>Kotlin Coroutines</strong></li>
+          <li>Migrated a large legacy <strong>Java</strong> codebase to <strong>Kotlin</strong>, reducing technical debt and improving maintainability</li>
+        </ul>
+        <div class="project-links" role="group" aria-label="Download links">
           <a class="project-link-btn Android" href="https://play.google.com/store/apps/details?id=com.nextcloud.client&hl=en_US" target="_blank" rel="noopener">Android</a>
           <a class="project-link-btn iOS" href="https://apps.apple.com/us/app/nextcloud/id1125420102" target="_blank" rel="noopener">iOS</a>
         </div>
       </section>
 
       <section class="project-section">
-        <div class="project-header-row">
-          <div class="project-title">LipaWallet</div>
+        <header class="project-header-row">
+          <h2>LipaWallet</h2>
           <div class="tech-stack">
             <img class="tech-icon" src="/assets/techStacks/Swift.svg" alt="Swift icon"><span>Swift</span>
             <img class="tech-icon" src="/assets/techStacks/SwiftUI.svg" alt="SwiftUI icon"><span>SwiftUI</span>
             <img class="tech-icon" src="/assets/techStacks/Kotlin.svg" alt="Kotlin icon"><span>Kotlin</span>
             <img class="tech-icon" src="/assets/techStacks/JetpackCompose.svg" alt="Jetpack Compose icon"><span>Jetpack Compose</span>
           </div>
-        </div>
-        <div class="project-desc">
-          <ul>
-            <li>Developed a <strong>Bitcoin Lightning</strong> wallet with native <strong>SwiftUI</strong> for iOS and <strong>Jetpack Compose</strong> for Android</li>
-            <li>Integrated an internally developed <strong>Rust</strong> library into Android and iOS using platform-specific bindings and an <strong>event-driven architecture</strong></li>
-            <li>Built a high-performance, memory-leak-free networking layer with the <strong>Apollo GraphQL</strong> client for both platforms</li>
-            <li>Implemented biometric security using <strong>Touch ID</strong>, <strong>Face ID</strong> (iOS), and <strong>BiometricPrompt</strong> (Android)</li>
-            <li>Designed efficient background data processing for real-time transaction and wallet state updates</li>
-            <li>Created a modular architecture with <strong>Swift Package Manager (SPM)</strong> for iOS and <strong>JitPack</strong> for Android, reducing code duplication</li>
-            <li>Automated development and release workflows using <strong>Fastlane</strong></li>
-          </ul>
-        </div>
-        <div class="project-links">
+        </header>
+        <ul>
+          <li>Developed a <strong>Bitcoin Lightning</strong> wallet with native <strong>SwiftUI</strong> for iOS and <strong>Jetpack Compose</strong> for Android</li>
+          <li>Integrated an internally developed <strong>Rust</strong> library into Android and iOS using platform-specific bindings and an <strong>event-driven architecture</strong></li>
+          <li>Built a high-performance, memory-leak-free networking layer with the <strong>Apollo GraphQL</strong> client for both platforms</li>
+          <li>Implemented biometric security using <strong>Touch ID</strong>, <strong>Face ID</strong> (iOS), and <strong>BiometricPrompt</strong> (Android)</li>
+          <li>Designed efficient background data processing for real-time transaction and wallet state updates</li>
+          <li>Created a modular architecture with <strong>Swift Package Manager (SPM)</strong> for iOS and <strong>JitPack</strong> for Android, reducing code duplication</li>
+          <li>Automated development and release workflows using <strong>Fastlane</strong></li>
+        </ul>
+        <div class="project-links" role="group" aria-label="Download links">
           <a class="project-link-btn Android" href="https://play.google.com/store/apps/details?id=com.getlipa.wallet&amp%3Bhl=en" target="_blank" rel="noopener">Android</a>
           <a class="project-link-btn iOS" href="https://apps.apple.com/ch/app/lipa-wallet/id1658329527" target="_blank" rel="noopener">iOS</a>
         </div>
       </section>
 
       <section class="project-section">
-        <div class="project-header-row">
-          <div class="project-title">Scan360</div>
+        <header class="project-header-row">
+          <h2>Scan360</h2>
           <div class="tech-stack">
             <img class="tech-icon" src="/assets/techStacks/Swift.svg" alt="Swift icon"><span>Swift</span>
             <img class="tech-icon" src="/assets/techStacks/UIKit.svg" alt="UIKit icon"><span>UIKit</span>
           </div>
-        </div>
-        <div class="project-desc">
-          <ul>
-            <li>Developed a full-featured document scanner using <strong>UIKit</strong> and <strong>VisionKit</strong> for iOS, supporting high-quality scanning and automatic document detection</li>
-            <li>Integrated PDF generation, document editing (crop, rotate, filter), and multi-page scan support</li>
-            <li>Implemented features for signing, sharing, and exporting documents in various formats (PDF, JPEG)</li>
-            <li>Built a smooth user experience with real-time image processing and seamless camera integration</li>
-            <li>Integrated <strong>StoreKit</strong> to manage in-app purchases and trials for premium features such as unlimited scans, advanced editing tools</li>
-          </ul>
-        </div>
-        <div class="project-links">
+        </header>
+        <ul>
+          <li>Developed a full-featured document scanner using <strong>UIKit</strong> and <strong>VisionKit</strong> for iOS, supporting high-quality scanning and automatic document detection</li>
+          <li>Integrated PDF generation, document editing (crop, rotate, filter), and multi-page scan support</li>
+          <li>Implemented features for signing, sharing, and exporting documents in various formats (PDF, JPEG)</li>
+          <li>Built a smooth user experience with real-time image processing and seamless camera integration</li>
+          <li>Integrated <strong>StoreKit</strong> to manage in-app purchases and trials for premium features such as unlimited scans, advanced editing tools</li>
+        </ul>
+        <div class="project-links" role="group" aria-label="Download links">
           <a class="project-link-btn iOS" href="https://apps.apple.com/us/app/scan360-pdf-scanner-sign/id1589134970" target="_blank" rel="noopener">iOS</a>
         </div>
       </section>
 
       <section class="project-section">
-        <div class="project-header-row">
-          <div class="project-title">Emlakjet</div>
+        <header class="project-header-row">
+          <h2>Emlakjet</h2>
           <div class="tech-stack">
             <img class="tech-icon" src="/assets/techStacks/Java.svg" alt="Java icon"><span>Java</span>
             <img class="tech-icon" src="/assets/techStacks/XML.svg" alt="XML icon"><span>XML</span>
             <img class="tech-icon" src="/assets/techStacks/ObjectiveC.svg" alt="Objective-C icon"><span>Objective-C</span>
             <img class="tech-icon" src="/assets/techStacks/UIKit.svg" alt="UIKit icon"><span>UIKit</span>
           </div>
-        </div>
-        <div class="project-desc">
-          <ul>
-            <li>Developed a full-featured real estate app for listing, searching, and managing properties using <strong>Java</strong> and <strong>Objective-C</strong></li>
-            <li>Implemented features such as <strong>advanced search filters</strong>, saved searches, favorite listings, and direct contact with real estate agents</li>
-            <li>Built a user-friendly experience with market analysis tools and real-time listing updates</li>
-            <li>Maintained codebase across Android and iOS using <strong>XML</strong> for Android UI and <strong>UIKit</strong> for iOS</li>
-          </ul>
-        </div>
-        <div class="project-links">
+        </header>
+        <ul>
+          <li>Developed a full-featured real estate app for listing, searching, and managing properties using <strong>Java</strong> and <strong>Objective-C</strong></li>
+          <li>Implemented features such as <strong>advanced search filters</strong>, saved searches, favorite listings, and direct contact with real estate agents</li>
+          <li>Built a user-friendly experience with market analysis tools and real-time listing updates</li>
+          <li>Maintained codebase across Android and iOS using <strong>XML</strong> for Android UI and <strong>UIKit</strong> for iOS</li>
+        </ul>
+        <div class="project-links" role="group" aria-label="Download links">
           <a class="project-link-btn Android" href="https://play.google.com/store/apps/details?id=com.emlakjet.kurumsal.sekizbit" target="_blank" rel="noopener">Android</a>
           <a class="project-link-btn iOS" href="https://apps.apple.com/us/app/emlakjet-emlak-ara-i-lan-ver/id1194656334" target="_blank" rel="noopener">iOS</a>
         </div>
       </section>
 
       <section class="project-section">
-        <div class="project-header-row">
-          <div class="project-title">DentalBulut</div>
+        <header class="project-header-row">
+          <h2>DentalBulut</h2>
           <div class="tech-stack">
             <img class="tech-icon" src="/assets/techStacks/Java.svg" alt="Java icon"><span>Java</span>
             <img class="tech-icon" src="/assets/techStacks/XML.svg" alt="XML icon"><span>XML</span>
             <img class="tech-icon" src="/assets/techStacks/Swift.svg" alt="Swift icon"><span>Swift</span>
             <img class="tech-icon" src="/assets/techStacks/UIKit.svg" alt="UIKit icon"><span>UIKit</span>
           </div>
-        </div>
-        <div class="project-desc">
-          <ul>
-            <li>Developed a mobile clinic management solution for dentists, supporting <strong>patient tracking</strong>, appointment scheduling, and clinic operations</li>
-            <li>Built native mobile apps using <strong>Java</strong> and <strong>Swift</strong>, tailored for Android and iOS respectively</li>
-            <li>Implemented user-friendly UI for mobile workflows using <strong>XML</strong> and <strong>UIKit</strong></li>
-            <li>Optimized app performance for use in offline scenarios and low-bandwidth environments</li>
-          </ul>
-        </div>
-        <div class="project-links">
+        </header>
+        <ul>
+          <li>Developed a mobile clinic management solution for dentists, supporting <strong>patient tracking</strong>, appointment scheduling, and clinic operations</li>
+          <li>Built native mobile apps using <strong>Java</strong> and <strong>Swift</strong>, tailored for Android and iOS respectively</li>
+          <li>Implemented user-friendly UI for mobile workflows using <strong>XML</strong> and <strong>UIKit</strong></li>
+          <li>Optimized app performance for use in offline scenarios and low-bandwidth environments</li>
+        </ul>
+        <div class="project-links" role="group" aria-label="Download links">
           <a class="project-link-btn Android" href="https://play.google.com/store/apps/details?id=com.dentalbulut.android&hl=en_US" target="_blank" rel="noopener">Android</a>
           <a class="project-link-btn iOS" href="https://apps.apple.com/us/app/dentalbulut/id687279571" target="_blank" rel="noopener">iOS</a>
         </div>
       </section>
 
       <section class="project-section">
-        <div class="project-header-row">
-          <div class="project-title">FirePlayer Android</div>
+        <header class="project-header-row">
+          <h2>FirePlayer Android</h2>
           <div class="tech-stack">
             <img class="tech-icon" src="/assets/techStacks/Kotlin.svg" alt="Kotlin icon"><span>Kotlin</span>
             <img class="tech-icon" src="/assets/techStacks/JetpackCompose.svg" alt="Jetpack Compose icon"><span>Jetpack Compose</span>
           </div>
-        </div>
-        <div class="project-desc">
-          Developed a music player application using the Media3 library in combination with Kotlin coroutines and the MVVM architecture. Designed a user-friendly and intuitive interface that offers a more practical experience compared to typical music player apps. Room Database used for local data storage.
-        </div>
+        </header>
+        <p>
+          Developed a music player application using the Media3 library in combination with Kotlin coroutines and the
+          MVVM architecture. Designed a user-friendly and intuitive interface that offers a more practical experience
+          compared to typical music player apps. Room Database used for local data storage.
+        </p>
         <div class="screenshots">
           <img class="screenshot-img" src="/assets/projects/FirePlayer Android/1.png" alt="FirePlayer Android screenshot 1" tabindex="0">
           <img class="screenshot-img" src="/assets/projects/FirePlayer Android/2.png" alt="FirePlayer Android screenshot 2" tabindex="0">
@@ -170,16 +201,17 @@
       </section>
 
       <section class="project-section">
-        <div class="project-header-row">
-          <div class="project-title">FirePlayer macOS</div>
+        <header class="project-header-row">
+          <h2>FirePlayer macOS</h2>
           <div class="tech-stack">
             <img class="tech-icon" src="/assets/techStacks/Swift.svg" alt="Swift icon"><span>Swift</span>
             <img class="tech-icon" src="/assets/techStacks/SwiftUI.svg" alt="SwiftUI icon"><span>SwiftUI</span>
           </div>
-        </div>
-        <div class="project-desc">
-          Developed a macOS music player application using Swift, SwiftUI, and AVFoundation. Native APIs are used to deliver responsive performance and smooth user experience. I use it every day.
-        </div>
+        </header>
+        <p>
+          Developed a macOS music player application using Swift, SwiftUI, and AVFoundation. Native APIs are used to
+          deliver responsive performance and smooth user experience. I use it every day.
+        </p>
         <div class="screenshots">
           <img class="screenshot-img" src="/assets/projects/FirePlayer macOS/1.png" alt="FirePlayer macOS screenshot 1" tabindex="0">
           <img class="screenshot-img" src="/assets/projects/FirePlayer macOS/2.png" alt="FirePlayer macOS screenshot 2" tabindex="0">
@@ -189,16 +221,19 @@
       </section>
 
       <section class="project-section">
-        <div class="project-header-row">
-          <div class="project-title">TextLauncher</div>
+        <header class="project-header-row">
+          <h2>TextLauncher</h2>
           <div class="tech-stack">
             <img class="tech-icon" src="/assets/techStacks/Kotlin.svg" alt="Kotlin icon"><span>Kotlin</span>
             <img class="tech-icon" src="/assets/techStacks/JetpackCompose.svg" alt="Jetpack Compose icon"><span>Jetpack Compose</span>
           </div>
-        </div>
-        <div class="project-desc">
-          A simple, fast, and user-friendly launcher application for Android, developed for personal use. It allows users to create folders, mark applications as hidden or favorites, and customize background and content colors. Inspired by my nostalgia for Windows Phone, I designed this launcher by blending its elements with my own preferences.
-        </div>
+        </header>
+        <p>
+          A simple, fast, and user-friendly launcher application for Android, developed for personal use.
+          It allows users to create folders, mark applications as hidden or favorites, and customize background
+          and content colors. Inspired by my nostalgia for Windows Phone, I designed this launcher by blending
+          its elements with my own preferences.
+        </p>
         <div class="screenshots">
           <img class="screenshot-img" src="/assets/projects/TextLauncher/1.png" alt="TextLauncher screenshot 1" tabindex="0">
           <img class="screenshot-img" src="/assets/projects/TextLauncher/2.png" alt="TextLauncher screenshot 2" tabindex="0">
@@ -211,16 +246,19 @@
       </section>
 
       <section class="project-section">
-        <div class="project-header-row">
-          <div class="project-title">MyLocker</div>
+        <header class="project-header-row">
+          <h2>MyLocker</h2>
           <div class="tech-stack">
             <img class="tech-icon" src="/assets/techStacks/Kotlin.svg" alt="Kotlin icon"><span>Kotlin</span>
             <img class="tech-icon" src="/assets/techStacks/JetpackCompose.svg" alt="Jetpack Compose icon"><span>Jetpack Compose</span>
           </div>
-        </div>
-        <div class="project-desc">
-          This project uses androidx.security:security-crypto along with Jetpack libraries. Users can export their encrypted passwords, which can only be decrypted using their own private key. The private key is never transmitted to any server and remains solely under the user's control, placing full responsibility for key management on the user.
-        </div>
+        </header>
+        <p>
+          This project uses androidx.security:security-crypto along with Jetpack libraries. Users can export their
+          encrypted passwords, which can only be decrypted using their own private key. The private key is never
+          transmitted to any server and remains solely under the user's control, placing full responsibility for key
+          management on the user.
+        </p>
         <div class="screenshots">
           <img class="screenshot-img" src="/assets/projects/MyLocker/1.png" alt="MyLocker screenshot 1" tabindex="0">
           <img class="screenshot-img" src="/assets/projects/MyLocker/2.png" alt="MyLocker screenshot 2" tabindex="0">
