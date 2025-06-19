@@ -1,8 +1,0 @@
-@media (max-width: 600px) {
-    main {
-        padding: 1rem;
-    }
-    .screenshots img {
-        max-height: 160px;
-    }
-}

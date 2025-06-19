@@ -6,7 +6,9 @@ let currentModal = {
 
 let modal, modalImg, modalClose, modalPrev, modalNext;
 
-export function initModal() {
+initModal();
+
+function initModal() {
   modal = document.getElementById('img-modal');
   modalImg = document.getElementById('modal-img');
   modalClose = document.getElementById('modal-close');
