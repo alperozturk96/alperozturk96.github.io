@@ -36,4 +36,11 @@ export const blogData = [
     "path": "../../blog/post/swift/uiKitDynamics/UIKit Dynamics.html",
     "date": "15 June 2025"
   },
+  {
+    "title": "Managing App Lifecycle with UIApplicationDelegate & UISceneDelegate",
+    "summary": "",
+    "type": PostType.Swift,
+    "path": "../../blog/post/swift/managingAppLifeCycle/Managing App Life Cycle.html",
+    "date": "22 June 2025"
+  },
 ]

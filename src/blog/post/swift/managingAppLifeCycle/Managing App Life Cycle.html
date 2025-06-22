@@ -1,0 +1,444 @@
+<article class="post">
+    <header class="post-header">
+        <h1>Managing App Life Cycle</h1>
+        <time datetime="2025-06-22">22 June 2025</time>
+    </header>
+
+    <main class="post-content">
+        <section class="post-section">
+            <p>
+                Most apps respond to changes in its execution state launching, entering the background,
+                receiving notifications, and more. Since iOS 13, Apple has introduced Scenes to enable fine-grained,
+                per window lifecycle management alongside the traditional UIApplicationDelegate. In this post,
+                we’ll explore both approaches, clarify their responsibilities, and build a simple multi-window demo
+                in UIKit.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>The Role of UIApplicationDelegate</h2>
+            <p>
+                The
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/uikit/uiapplicationdelegate">UIApplicationDelegate</a>
+                </span>
+
+                protocol defines methods for handling high-level events in your app’s life cycle.
+            </p>
+
+            <ul>
+                <li>App launch and termination</li>
+                <li>Entering the background and returning to the foreground</li>
+                <li>Receiving a memory warning from the system</li>
+                <li>Push-notification registration (APNs)</li>
+                <li>Receiving data from a paired watchOS app</li>
+                <li>... and much more</li>
+            </ul>
+
+            <p>
+                Most of us working with single-scene, single-window apps and implement common methods such as initializing
+                the UIWindow, setting the root view controller, and registering for
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/usernotifications/registering-your-app-with-apns">Apple Push Notification Service (APNs).</a>
+                </span>
+
+                I'm pretty sure you've written the code below. It just worked for you, but I want to dive a bit deeper
+                and understand it better.
+            </p>
+
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+import UIKit
+
+final class AppDelegate: UIResponder, UIApplicationDelegate {
+
+    var window: UIWindow?
+
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        window = UIWindow(frame: UIScreen.main.bounds)
+        let rootVC = ViewController()
+        window?.rootViewController = rootVC
+        window?.makeKeyAndVisible()
+
+        return true
+    }
+
+    func application(_ application: UIApplication,
+                     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        print("Device Token: \(deviceToken)")
+    }
+
+    func application(_ application: UIApplication,
+                     didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("Failed to register: \(error.localizedDescription)")
+    }
+}
+</code></pre>
+            </div>
+        </section>
+
+        <section class="post-section">
+            <h2>Why an Array of UIWindow Isn’t Enough?</h2>
+            <p>
+                We have a
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/uikit/uiwindow">UIWindow</a>
+                </span>
+
+
+                , a
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/uikit/uinavigationcontroller">UINavigationController</a>
+                </span>
+
+                , and then
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/uikit/uiviewcontroller">UIViewControllers</a>
+                </span>
+
+                within it. This makes
+                perfect sense to me. Each UIViewController contains a bunch of
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/uikit/uiview">UIViews</a>
+                </span>
+
+                , allowing us to build our screens in a structured way.
+            </p>
+
+            <p>
+                If we need to show multiple windows with different navigation hierarchies, why can't we just add another
+                UIWindow? Why do we need Scenes, SceneDelegate?
+            </p>
+
+            <p>
+                Before iOS 13, you could create multiple UIWindow instances, but all lifecycle methods
+                (applicationWillResignActive(_:), applicationDidEnterBackground(_:), etc.) still funneled through
+                a single AppDelegate. You could not determine which window was moving to the background or becoming
+                active.
+
+                With Scenes, each window is managed by its own UIScene and SceneDelegate. For example, if you have both
+                a main content window and a sidebar window, each fires its own lifecycle callbacks:
+            </p>
+
+            <ul>
+                <li>
+                    <span class="external-link">
+                        <a href="https://developer.apple.com/documentation/uikit/uiscenedelegate/scenediddisconnect(_:)">sceneDidDisconnect(_:)</a>
+                     </span>
+                </li>
+
+                <li>
+                    <span class="external-link">
+                        <a href="https://developer.apple.com/documentation/uikit/uiscenedelegate/scenedidbecomeactive(_:)">sceneDidBecomeActive(_:)</a>
+                     </span>
+                </li>
+
+                <li>
+                    <span class="external-link">
+                        <a href="https://developer.apple.com/documentation/uikit/uiscenedelegate/scenewillenterforeground(_:)">sceneWillEnterForeground(_:)</a>
+                     </span>
+                </li>
+
+                <li>... and more</li>
+            </ul>
+
+            <p>
+                You can now save, restore, and synchronize state on a per-window basis—something you simply cannot
+                achieve by juggling naked UIWindow objects.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>SceneDelegate</h2>
+            <p>
+                The
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/uikit/uiscenedelegate">UISceneDelegate</a>
+                </span>
+
+                protocol handles events for a scene. Unlike AppDelegate, which manages life-cycle
+                events occurring within a scene.
+            </p>
+
+            <p>
+                You can trigger certain code when a scene is removed from your app, when a scene enters the foreground
+                and becomes visible to the user, or when a scene is running in the background and is no longer onscreen,
+                etc.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Building a Simple Multi-Window App</h2>
+            <p>
+                By default, when you create an application, the
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/bundleresources/information-property-list">Info.plist</a>
+                </span>
+                file contains a key called Application Scene
+                Manifest, which includes a boolean value named Enable Multiple Windows. This value is set to false by
+                default. To support multiple windows, you first need to enable this option. Of course, this feature is
+                only available starting from iOS 13.0+, iPadOS 13.0+, Mac Catalyst 13.1.
+            </p>
+
+            <img class="post-img" src="/src/blog/post/swift/managingAppLifeCycle/Info.plist.png" alt="Info.plist screenshot">
+
+            <section class="post-section">
+                <h3>AppDelegate Implementation</h3>
+                <p>Connect scenes by returning a configuration for each new session</p>
+                <div class="code-container">
+                    <button class="copy-button">Copy</button>
+                    <pre><code class="language-swift">
+import UIKit
+
+@main
+final class AppDelegate: UIResponder, UIApplicationDelegate {
+
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Override point for customization after application launch.
+        return true
+    }
+
+    // MARK: UISceneSession Lifecycle
+
+    func application(_ application: UIApplication,
+                     configurationForConnecting connectingSceneSession: UISceneSession,
+                     options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        return UISceneConfiguration(name: "Default Configuration",
+                                    sessionRole: connectingSceneSession.role)
+    }
+
+    func application(_ application: UIApplication,
+                     didDiscardSceneSessions sceneSessions: ...) {
+        // Called when the user discards a scene session.
+    }
+}
+  </code></pre>
+                </div>
+            </section>
+
+            <section class="post-section">
+                <h3>Windows Enum</h3>
+                <div class="code-container">
+                    <button class="copy-button">Copy</button>
+                    <pre><code class="language-swift">
+import Foundation
+
+enum Windows: String {
+   case firstWindow = "com.example.first.window"
+   case secondWindow = "com.example.second.window"
+   case thirdWindow = "com.example.third.window"
+}
+   </code></pre>
+                </div>
+            </section>
+
+            <section class="post-section">
+                <h3>Scene Delegate Implementation</h3>
+                <p>
+                    I'm setting the root view controller of the active window based on the window type.
+                    The UIWindowSceneDelegate protocol provides functions that allow me to run specific code for the
+
+                    <span class="external-link">
+                        <a href="https://developer.apple.com/documentation/uikit/uiwindow">UIWindow</a>
+                    </span>
+                    .
+                </p>
+
+                <div class="code-container">
+                    <button class="copy-button">Copy</button>
+                    <pre><code class="language-swift">
+import UIKit
+
+final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+
+   var window: UIWindow?
+   var windowType: Windows = .firstWindow
+
+   func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+       guard let windowScene = scene as? UIWindowScene else { return }
+
+       let window = UIWindow(windowScene: windowScene)
+       if let activityType = connectionOptions.userActivities.first?.activityType {
+           switch activityType {
+           case Windows.firstWindow.rawValue:
+               window.rootViewController = ViewController()
+               windowType = .firstWindow
+           case Windows.secondWindow.rawValue:
+               window.rootViewController = SecondViewController()
+               windowType = .secondWindow
+           case Windows.thirdWindow.rawValue:
+               window.rootViewController = ThirdViewController()
+               windowType = .thirdWindow
+           default:
+               window.rootViewController = ViewController()
+               windowType = .firstWindow
+           }
+       } else {
+           window.rootViewController = ViewController()
+           windowType = .firstWindow
+       }
+
+       self.window = window
+       window.makeKeyAndVisible()
+
+       let appWindowScenes = UIApplication.shared.connectedScenes
+           .compactMap { $0 as? UIWindowScene }
+
+       print("Total scenes: \(appWindowScenes.count)")
+   }
+
+   private func getWindowName(_ scene: UIScene) -> String {
+       return windowType.rawValue
+   }
+
+   func sceneDidDisconnect(_ scene: UIScene) {
+       print("SCENE DID DISCONNECT: \(getWindowName(scene))")
+   }
+
+   func sceneDidBecomeActive(_ scene: UIScene) {
+       print("SCENE BECOME ACTIVE: \(getWindowName(scene))")
+   }
+
+   func sceneWillResignActive(_ scene: UIScene) {
+       print("SCENE WILL RESIGN ACTIVE: \(getWindowName(scene))")
+   }
+
+   func sceneWillEnterForeground(_ scene: UIScene) {
+       print("SCENE WILL ENTER FOREGROUND: \(getWindowName(scene))")
+   }
+
+   func sceneDidEnterBackground(_ scene: UIScene) {
+       print("SCENE DID ENTER BACKGROUND: \(getWindowName(scene))")
+   }
+}
+   </code></pre>
+                </div>
+            </section>
+
+            <section class="post-section">
+                <h3>ViewControllers</h3>
+                <p>
+                    They each contain a button, and each button calls the extension function.
+                </p>
+
+                <div class="code-container">
+                    <button class="copy-button">Copy</button>
+                    <pre><code class="language-swift">
+final class ViewController: UIViewController {
+   override func viewDidLoad() {
+       super.viewDidLoad()
+       view.backgroundColor = .black
+
+       let button = UIButton(type: .system, primaryAction: UIAction(title: "Open Second Window", handler: { _ in
+           self.openNewScene(.secondWindow)
+       }))
+       button.translatesAutoresizingMaskIntoConstraints = false
+       view.addSubview(button)
+
+       NSLayoutConstraint.activate([
+           button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+           button.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+       ])
+   }
+}
+
+final class SecondViewController: UIViewController {
+   override func viewDidLoad() {
+       super.viewDidLoad()
+       view.backgroundColor = .orange
+
+       let button = UIButton(type: .system, primaryAction: UIAction(title: "Open Third Window", handler: { _ in
+           self.openNewScene(.thirdWindow)
+       }))
+       button.translatesAutoresizingMaskIntoConstraints = false
+       view.addSubview(button)
+
+       NSLayoutConstraint.activate([
+           button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+           button.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+       ])
+   }
+}
+
+final class ThirdViewController: UIViewController {
+   override func viewDidLoad() {
+       super.viewDidLoad()
+       view.backgroundColor = .red
+
+       let button = UIButton()
+       button.setTitle("Third View Controller", for: .normal)
+       button.translatesAutoresizingMaskIntoConstraints = false
+       view.addSubview(button)
+
+       NSLayoutConstraint.activate([
+           button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+           button.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+       ])
+   }
+}
+   </code></pre>
+                </div>
+
+                <p>
+                    With this ViewController
+                    <span class="external-link">
+                    <a href="https://docs.swift.org/swift-book/documentation/the-swift-programming-language/extensions/">extension</a>
+                </span>
+                    , I'm sending a request to the system for a new scene via
+
+                    <span class="external-link">
+                        <a href="https://developer.apple.com/documentation/foundation/nsuseractivity">NSUserActivity</a>
+                    </span>
+                </p>
+
+                <div class="code-container">
+                    <button class="copy-button">Copy</button>
+                    <pre><code class="language-swift">
+import UIKit.UIViewController
+
+extension UIViewController {
+   func openNewScene(_ window: Windows) {
+       let activity = NSUserActivity(activityType: window.rawValue)
+       activity.userInfo = ["windowName": window.rawValue]
+       UIApplication.shared.requestSceneSessionActivation(nil, userActivity: activity, options: nil) { error in
+           print("Failed to open new scene: \(error.localizedDescription)")
+       }
+   }
+}
+   </code></pre>
+                </div>
+            </section>
+        </section>
+
+        <section class="post-section">
+            <h2>Demo</h2>
+            <video class="video" controls>
+                <source src="/src/blog/post/swift/managingAppLifeCycle/iPad_Mini_Demo.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+
+            <img class="post-img" src="/src/blog/post/swift/managingAppLifeCycle/log.png" alt="Log output screenshot">
+        </section>
+
+        <section class="post-section">
+            <h2>Conclusion</h2>
+            <p>
+                I find this separation quite helpful and easy to use. However, some of the terminology
+                can be confusing and lead to misunderstandings. Over time, operating systems evolve, and we have to
+                keep up with new changes. What I’ve shown in this blog post is actually a bit outdated, but it might
+                still help someone understand the concept a little better.
+            </p>
+        </section>
+    </main>
+
+</article>
