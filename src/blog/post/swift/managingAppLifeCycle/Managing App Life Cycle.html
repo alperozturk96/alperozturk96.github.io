@@ -1,6 +1,6 @@
 <article class="post">
     <header class="post-header">
-        <h1>Managing App Life Cycle</h1>
+        <h1>Managing App Lifecycle with UIApplicationDelegate & UISceneDelegate</h1>
         <time datetime="2025-06-22">22 June 2025</time>
     </header>
 
@@ -8,9 +8,21 @@
         <section class="post-section">
             <p>
                 Most apps respond to changes in its execution state launching, entering the background,
-                receiving notifications, and more. Since iOS 13, Apple has introduced Scenes to enable fine-grained,
-                per window lifecycle management alongside the traditional UIApplicationDelegate. In this post,
-                we’ll explore both approaches, clarify their responsibilities, and build a simple multi-window demo
+                receiving notifications, and more. Since iOS 13, Apple has introduced
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/uikit/scenes">Scenes</a>
+                </span>
+
+                for window lifecycle
+                management alongside the traditional
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/uikit/uiapplicationdelegate">UIApplicationDelegate</a>
+                </span>
+
+                .In this post, we’ll explore both approaches,
+                clarify their responsibilities, and build a simple multi-window demo
                 in UIKit.
             </p>
         </section>
@@ -32,12 +44,11 @@
                 <li>Entering the background and returning to the foreground</li>
                 <li>Receiving a memory warning from the system</li>
                 <li>Push-notification registration (APNs)</li>
-                <li>Receiving data from a paired watchOS app</li>
                 <li>... and much more</li>
             </ul>
 
             <p>
-                Most of us working with single-scene, single-window apps and implement common methods such as initializing
+                Most of us work with single window apps and implement common methods such as initializing
                 the UIWindow, setting the root view controller, and registering for
 
                 <span class="external-link">
@@ -120,12 +131,37 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 
             <p>
                 Before iOS 13, you could create multiple UIWindow instances, but all lifecycle methods
-                (applicationWillResignActive(_:), applicationDidEnterBackground(_:), etc.) still funneled through
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/uikit/uiapplicationdelegate/applicationwillresignactive(_:)">applicationWillResignActive(_:)</a>
+                </span>
+                ,
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/uikit/uiapplicationdelegate/applicationdidenterbackground(_:)">applicationDidEnterBackground(_:)</a>
+                </span>
+
+                , etc. still funneled through
                 a single AppDelegate. You could not determine which window was moving to the background or becoming
                 active.
+            </p>
+        </section>
 
-                With Scenes, each window is managed by its own UIScene and SceneDelegate. For example, if you have both
-                a main content window and a sidebar window, each fires its own lifecycle callbacks:
+        <section class="post-section">
+            <h2>SceneDelegate</h2>
+            <p>
+                The
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/uikit/uiscenedelegate">UISceneDelegate</a>
+                </span>
+
+                handles scene-level events, whereas AppDelegate manages app-wide lifecycle events.
+            </p>
+
+            <p>
+                With Scenes, each window is managed by its own UIScene. For example, if you have two windows,
+                each fires its own lifecycle callbacks:
             </p>
 
             <ul>
@@ -151,28 +187,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
             </ul>
 
             <p>
-                You can now save, restore, and synchronize state on a per-window basis—something you simply cannot
+                You can now save, restore, and synchronize state on a per window basis something you simply cannot
                 achieve by juggling naked UIWindow objects.
-            </p>
-        </section>
-
-        <section class="post-section">
-            <h2>SceneDelegate</h2>
-            <p>
-                The
-
-                <span class="external-link">
-                    <a href="https://developer.apple.com/documentation/uikit/uiscenedelegate">UISceneDelegate</a>
-                </span>
-
-                protocol handles events for a scene. Unlike AppDelegate, which manages life-cycle
-                events occurring within a scene.
-            </p>
-
-            <p>
-                You can trigger certain code when a scene is removed from your app, when a scene enters the foreground
-                and becomes visible to the user, or when a scene is running in the background and is no longer onscreen,
-                etc.
             </p>
         </section>
 
@@ -218,7 +234,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ application: UIApplication,
-                     didDiscardSceneSessions sceneSessions: ...) {
+                     didDiscardSceneSessions sceneSessions: Set&lt;UISceneSession&gt;) {
         // Called when the user discards a scene session.
     }
 }
@@ -435,8 +451,11 @@ extension UIViewController {
             <p>
                 I find this separation quite helpful and easy to use. However, some of the terminology
                 can be confusing and lead to misunderstandings. Over time, operating systems evolve, and we have to
-                keep up with new changes. What I’ve shown in this blog post is actually a bit outdated, but it might
-                still help someone understand the concept a little better.
+                keep up with new changes.
+            </p>
+
+            <p>
+                I hope to find time soon to share content related to WWDC25.
             </p>
         </section>
     </main>
