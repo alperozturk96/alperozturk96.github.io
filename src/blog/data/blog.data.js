@@ -43,4 +43,11 @@ export const blogData = [
     "path": "../../blog/post/swift/managingAppLifeCycle/Managing App Life Cycle.html",
     "date": "22 June 2025"
   },
+  {
+    "title": "SwiftUI Navigation Problems",
+    "summary": "",
+    "type": PostType.Swift,
+    "path": "../../blog/post/swift/swiftUINavigationProblems/SwiftUI Navigation Problems.html",
+    "date": "05 July 2025"
+  },
 ]
