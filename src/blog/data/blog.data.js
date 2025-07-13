@@ -50,4 +50,11 @@ export const blogData = [
     "path": "../../blog/post/swift/swiftUINavigationProblems/SwiftUI Navigation Problems.html",
     "date": "05 July 2025"
   },
+  {
+    "title": "Kotlin Flows",
+    "summary": "",
+    "type": PostType.Kotlin,
+    "path": "../../blog/post/kotlin/Kotlin Flows.html",
+    "date": "13 July 2025"
+  },
 ]
