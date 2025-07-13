@@ -9,7 +9,7 @@
             <p>
                 There are several ways to implement similar functionality in an application. When designing app
                 architecture, we often rely on patterns and techniques that are widely adopted or recommended by the
-                official guidelines, community. However, it's important to apply these practices thoughtfully what
+                official guidelines and community. However, it's important to apply these practices thoughtfully what
                 works well in one context might introduce unnecessary complexity in another. For reactive and asynchronous
                 programming, Kotlin Flows offer a clean and powerful way to manage data streams.
             </p>
@@ -111,64 +111,60 @@ viewModelScope.launch {
                 <h2>Reactive Networking</h2>
 
                 <p>
-                    In this section, we demonstrate a reactive data stream using the JsonPlaceHolderAPI, with Ktor
+                    In this section, we demonstrate a reactive data stream using the JsonPlaceholderAPI, with Ktor
                     serving as the HTTP client.
                 </p>
 
                 <h3>PostsScreen</h3>
                 <p>
-                    The PostsScreen composable receives a ViewModel as a parameter and collects the list of posts
-                    within its scope. Whenever the posts data changes, the UI updates automatically. Additionally, a
-                    "Create Post" button is provided to trigger post creation.
+                    The PostsScreen composable receives a ViewModel as a parameter and collects the random post within
+                    its scope. Whenever the post data changes, the UI updates automatically. The UI in this example is
+                    intentionally kept minimal for demonstration purposes.
                 </p>
                 <div class="code-container">
                     <button class="copy-button" title="Copy">Copy</button>
                     <pre><code class="language-kotlin">
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+
 @Composable
 fun PostsScreen(modifier: Modifier, viewModel: PostsViewModel) {
-    val posts by viewModel.posts.collectAsState()
+    val post by viewModel.post.collectAsState()
 
-    Scaffold(
-        bottomBar = {
-            Row {
-                Button(onClick = {
-                    viewModel.createPost()
-                }) {
-                    Text("Create Post")
-                }
-            }
-        }
-    ) {
-        LazyColumn(modifier = modifier.padding(it)) {
-            items(posts) { post ->
-                Text("${'$'}{post.title}\n${'$'}{post.body}")
-            }
+    Scaffold(modifier = modifier) {
+        post?.let { post ->
+            Text("${post.title}\n${post.body}", modifier = Modifier.padding(it))
         }
     }
 }
-</code></pre>
+  </code></pre>
                 </div>
+
 
                 <h3>PostsViewModel</h3>
                 <p>
                     The PostsViewModel accepts a <code>PostsRepository</code> interface as a dependency. This approach
                     enables dependency injection and promotes flexibility by allowing different implementations of the
-                    repository, such as mock versions for UI previews or unit tests.
+                    repository, such as mock versions for UI previews or tests.
                 </p>
 
                 <p>
-                    Internally, the ViewModel maintains a private <code>MutableStateFlow</code> to hold the posts,
-                    ensuring encapsulation and preventing external modification. Externally, it exposes a read-only
-                    <code>StateFlow</code> for observation by the UI layer.
+                    ViewModel directly exposes a <code>StateFlow</code> that reflects the repository’s <code>postFlow</code>.
+                    This <code>StateFlow</code> is created using the <code>stateIn</code> operator within the ViewModel's
+                    <code>viewModelScope</code>, which scopes the lifecycle of the flow collection to the ViewModel.
                 </p>
 
                 <p>
-                    The repository provides a <code>postsFlow</code> which the ViewModel collects.
-                    The <code>SharingStarted.WhileSubscribed(2000)</code> strategy manages the lifecycle of the shared
-                    flow—starting collection when the first subscriber appears and keeping it active for 2 seconds
-                    after the last subscriber disconnects.
+                    The <code>SharingStarted.WhileSubscribed(2000)</code> strategy governs the flow's active collection
+                    lifecycle. It begins collecting when the first subscriber appears and continues for 2 seconds after
+                    the last subscriber disappears, helping optimize resource usage by stopping collection when no UI is
+                    observing.
                 </p>
-
                 <div class="code-container">
                     <button class="copy-button" title="Copy">Copy</button>
                     <pre><code class="language-kotlin">
@@ -176,55 +172,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.liontech.exampleapp.ui.post.model.Post
 import com.liontech.exampleapp.ui.post.repository.PostsRepository
-import com.liontech.exampleapp.util.generateRandomPost
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
-class PostsViewModel(private val repository: PostsRepository) : ViewModel() {
-
-    private val _posts = MutableStateFlow&lt;List&lt;Post&gt;&gt;(emptyList())
-    val posts: StateFlow&lt;List&lt;Post&gt;&gt; = _posts
-
-    init {
-        viewModelScope.launch {
-            repository.postsFlow
-                .stateIn(
-                    this,
-                    SharingStarted.WhileSubscribed(2000),
-                    emptyList()
-                )
-                .collect { fetchedPosts -&gt;
-                    _posts.value = fetchedPosts
-                }
-        }
-    }
-
-    fun createPost() {
-        viewModelScope.launch {
-            val (title, body) = generateRandomPost()
-            val post = Post(title = title, body = body)
-            val response = repository.createPost(post)
-
-            // NOTE: The API currently doesn't return the updated list of posts after creation.
-            // So, for demonstration purposes, we're manually appending the new post to the list.
-            // In a real-world scenario where the API returns the updated data,
-            // this manual update wouldn't be necessary.
-            _posts.update {
-                it.plus(response)
-            }
-        }
-    }
+class PostsViewModel(repository: PostsRepository) : ViewModel() {
+    val post: StateFlow&lt;Post?&gt; = repository.postFlow
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(2000),
+            null
+        )
 }
-</code></pre>
+  </code></pre>
                 </div>
 
                 <h3>PostsRemoteRepository</h3>
                 <p>
-                    In this implementation, an infinite loop with a delay is used to periodically fetch posts.
+                    In this implementation, an infinite loop with a delay is used to periodically fetch random post.
                     It’s important to note that this loop continues to operate only as long as there is an active
                     collector. Once the collector stops, the flow collection terminates accordingly.
                 </p>
@@ -236,7 +201,6 @@ class PostsViewModel(private val repository: PostsRepository) : ViewModel() {
                     of the associated UI component. In our example, the collection occurs inside the ViewModel, ensuring
                     that when the ViewModel is cleared, the flow collection stops automatically.
                 </p>
-
                 <div class="code-container">
                     <button class="copy-button" title="Copy">Copy</button>
                     <pre><code class="language-kotlin">
@@ -244,65 +208,44 @@ import android.util.Log
 import com.liontech.exampleapp.api.JsonPlaceHolderAPI
 import com.liontech.exampleapp.ktor.ktorClient
 import com.liontech.exampleapp.ui.post.model.Post
-import io.ktor.client.call.body
 import io.ktor.client.request.get
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 
 class PostsRemoteRepository(
     private val refreshIntervalMs: Long = 5000L
 ) : PostsRepository {
-
-    override val postsFlow: Flow&lt;List&lt;Post&gt;&gt; = flow {
+    override val postFlow: Flow&lt;Post?&gt; = flow {
         while (true) {
             try {
-                val posts = fetchPosts()
+                val posts = fetchPost()
                 emit(posts)
-                Log.d("PostsRemoteRepository", "✅ Posts fetched: ${'$'}{posts.size}")
+                Log.d("PostsRemoteRepository", "✅ Random post fetched")
             } catch (e: Exception) {
-                Log.e("PostsRemoteRepository", "❌ Error fetching posts: ${'$'}{e.message}", e)
-                emit(emptyList())
+                Log.e("PostsRemoteRepository", "❌ Error fetching post: ${e.message}", e)
+                emit(null)
             }
             delay(refreshIntervalMs)
         }
     }
 
-    override suspend fun createPost(post: Post): Post {
-        return try {
-            val response = ktorClient.post(JsonPlaceHolderAPI.posts) {
-                contentType(ContentType.Application.Json)
-                setBody(post)
-            }
-
-            Log.d("PostsRemoteRepository", "✅ createPost: ${'$'}{response.status}")
-
-            response.body()
-        } catch (e: Exception) {
-            Log.e("PostsRemoteRepository", "⚠️ Exception: ${'$'}{e.localizedMessage}")
-            throw e
-        }
-    }
-
-    private suspend fun fetchPosts(): List&lt;Post&gt; {
-        val response: HttpResponse = ktorClient.get(JsonPlaceHolderAPI.posts)
+    private suspend fun fetchPost(): Post {
+        val randomPostId = (0..100).random()
+        val response: HttpResponse =
+            ktorClient.get(JsonPlaceHolderAPI.baseURL + "/posts/$randomPostId")
         val json = Json { ignoreUnknownKeys = true }
         val body = response.bodyAsText()
-        return json.decodeFromString(ListSerializer(Post.serializer()), body)
+        return json.decodeFromString(Post.serializer(), body)
     }
 }
-</code></pre>
+  </code></pre>
                 </div>
 
-                <h3>ktorClient & JsonPlaceHolderAPI</h3>
+                <h3>KtorClient & JsonPlaceholderAPI</h3>
                 <div class="code-container">
                     <button class="copy-button" title="Copy">Copy</button>
                     <pre><code class="language-kotlin">
@@ -323,17 +266,18 @@ val ktorClient = HttpClient(CIO) {
 }
 
 object JsonPlaceHolderAPI {
-    private val baseURL = "https://jsonplaceholder.typicode.com"
-
-    val posts = "${'$'}baseURL/posts"
+    val baseURL = "https://jsonplaceholder.typicode.com"
 }
 </code></pre>
                 </div>
 
                 <p>
-                    This approach enables reactive data fetching, allowing the UI to display the most up-to-date posts
-                    without any manual intervention. Additionally, it ensures that data fetching ceases when the view is
-                    no longer active, optimizing resource usage.
+                    This implementation supports reactive data streaming by continuously fetching a random post at fixed
+                    intervals and emitting it to the UI. The UI automatically updates as new data becomes available,
+                    without requiring any manual user action. Since the flow is scoped to the ViewModel's lifecycle,
+                    data collection stops when the ViewModel is cleared, preventing unnecessary resource usage. Although
+                    this example fetches a random post for demonstration purposes, the same approach can be applied to
+                    APIs that return frequently changing data, enabling real-time updates in the client.
                 </p>
             </section>
 
