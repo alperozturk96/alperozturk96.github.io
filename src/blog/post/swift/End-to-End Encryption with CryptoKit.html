@@ -7,10 +7,9 @@
     <main class="post-content">
         <section class="post-section">
             <p>
-                As technology becomes more integrated into our daily lives, the importance of data security cannot be overstated.
+                As technology becomes more integrated into our daily lives, the importance of data security is inevitable.
                 Every day, we share files, store information in the cloud, and sometimes handle highly sensitive data.
                 It's unthinkable for any modern product to store or transmit this data without proper encryption.
-                Whenever I use a digital service, I always check whether it supports end-to-end encryption and two-factor authentication.
             </p>
 
             <p>
@@ -34,7 +33,7 @@
             <section class="post-section">
                 <h2>Implementation</h2>
                 <p>
-                    To implement true end-to-end encryption, we need both Diffie-Hellman key agreement keys
+                    To implement end-to-end encryption, we need both Diffie-Hellman key agreement keys
                     (for securely deriving a shared secret) and signing keys (to verify message authenticity). While
                     Diffie-Hellman ensures that the message content is encrypted and decrypted only by the intended parties,
                     signing keys confirm that the message was not altered and truly came from the sender.
@@ -117,7 +116,8 @@ struct Message: Codable {
                 <h3>Discrete Logarithm Problem</h3>
                 <p>To explain this clearly, I will use small numbers for demonstration purposes:</p>
                 <p><strong>Step 1:</strong><br>
-                    User 1 and User 2 agree on two public values: a large prime number <code>p</code>. Let’s say <code>p = 7</code>.
+                    User 1 and User 2 agree on public value: a prime number <code>p</code>. Let’s say <code>p = 7</code>.
+                    In a real-world scenario, this prime number and other numbers would be large.
                 </p>
 
                 <p><strong>Step 2:</strong><br>
@@ -125,11 +125,11 @@ struct Message: Codable {
                 </p>
 
                 <p><strong>Step 3:</strong><br>
-                    User 1 picks a private number <code>a = 4</code> and computes <code>A = 3^4 mod 7</code>.
+                    User 1 picks a private number <code>a = 4</code> and computes <code>A = 3⁴ mod 7</code>.
                 </p>
 
                 <p><strong>Step 4:</strong><br>
-                    User 2 picks a private number <code>b = 5</code> and computes <code>B = 3^5 mod 7</code>.
+                    User 2 picks a private number <code>b = 5</code> and computes <code>B = 3⁵ mod 7</code>.
                 </p>
 
                 <p><strong>Step 5:</strong><br>
@@ -139,19 +139,19 @@ struct Message: Codable {
                 </p>
 
                 <p><strong>Step 6:</strong><br>
-                    User 1 computes the shared secret: <code>K = B^4 mod 7</code>. 4 is here private key.
+                    User 1 computes the shared secret: <code>K = B⁴ mod 7</code> (where 4 is User 1's private key).
                 </p>
 
                 <p><strong>Step 7:</strong><br>
-                    User 2 computes the same shared secret: <code>K = A^5 mod 7</code>. 5 is here private key.
+                    User 2 computes the same shared secret: <code>K = A⁵ mod 7</code> (where 5 is User 2's private key).
                 </p>
 
                 <p>
                     Now both users share the same secret key <code>K</code> without ever sending it directly.
                     Even though User 3 knows <code>g</code>, <code>p</code>, <code>A</code>, and <code>B</code>,
-                    they cannot calculate <code>K</code>without solving for <code>a</code> or <code>b</code>.
+                    they cannot calculate <code>K</code> without solving for <code>a</code> or <code>b</code>.
                     This is known as the <strong>Discrete Logarithm Problem</strong>, and for large numbers, it is
-                    computationally infeasible to solve.
+                    computationally hard to solve.
                 </p>
 
                 <p>
@@ -213,7 +213,7 @@ func encryptAndSignMessage(from sender: User,
         throw CryptoError.sharedInfoCreation
     }
 
-    // Derive shared secret via Diffie-Hellman
+    // Derive shared secret
     let sharedSecret = try sender.privateKey.sharedSecretFromKeyAgreement(with: recipientPublicKey)
     let symmetricKey = sharedSecret.hkdfDerivedSymmetricKey(
         using: SHA256.self,
