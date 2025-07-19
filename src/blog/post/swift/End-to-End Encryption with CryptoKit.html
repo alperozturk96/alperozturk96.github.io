@@ -126,26 +126,24 @@ struct Message: Codable {
 
                 <p><strong>Step 3:</strong><br>
                     User 1 picks a private number <code>a = 4</code> and computes <code>A = 3^4 mod 7</code>.
-                    A = 81 (mod 7) so A is 4.
                 </p>
 
                 <p><strong>Step 4:</strong><br>
                     User 2 picks a private number <code>b = 5</code> and computes <code>B = 3^5 mod 7</code>.
-                    B = 243 (mod 7) so B is 4.
                 </p>
 
                 <p><strong>Step 5:</strong><br>
                     User 1 sends <code>A</code> to User 2, and User 2 sends <code>B</code> to User 1.
-                    Now, User 3 sees <code>p = 7</code>, <code>g = 3</code>, <code>A</code>, and <code>B</code>,
+                    Now, User 3 sees <code>p = 7</code>, <code>g = 3</code>, <code>result of A</code>, and <code>result of B</code>,
                     but does not know <code>a</code> or <code>b</code>.
                 </p>
 
                 <p><strong>Step 6:</strong><br>
-                    User 1 computes the shared secret: <code>K = B^4 mod 7</code>.
+                    User 1 computes the shared secret: <code>K = B^4 mod 7</code>. 4 is here private key.
                 </p>
 
                 <p><strong>Step 7:</strong><br>
-                    User 2 computes the same shared secret: <code>K = A^5 mod 7</code>.
+                    User 2 computes the same shared secret: <code>K = A^5 mod 7</code>. 5 is here private key.
                 </p>
 
                 <p>
