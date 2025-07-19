@@ -251,7 +251,7 @@ func decryptAndVerifyMessage(from senderPublicKey: Curve25519.KeyAgreement.Publi
         throw CryptoError.sharedInfoCreation
     }
 
-    // Derive shared key
+    // Derive shared secret
     let sharedSecret = try recipient.privateKey.sharedSecretFromKeyAgreement(with: senderPublicKey)
     let symmetricKey = sharedSecret.hkdfDerivedSymmetricKey(
         using: SHA256.self,
