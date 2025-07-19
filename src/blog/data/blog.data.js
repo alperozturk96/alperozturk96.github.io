@@ -57,4 +57,11 @@ export const blogData = [
     "path": "../../blog/post/kotlin/Kotlin Flows.html",
     "date": "13 July 2025"
   },
+  {
+    "title": "End-to-End Encryption with CryptoKit",
+    "summary": "Using Apple’s CryptoKit, this post demonstrates how to implement end-to-end encryption with Diffie-Hellman key exchange to securely transmit data over an insecure channel. It also includes digital signature verification to ensure the authenticity and integrity of the messages.",
+    "type": PostType.Swift,
+    "path": "../../blog/post/swift/End-to-End Encryption with CryptoKit.html",
+    "date": "19 July 2025"
+  },
 ]

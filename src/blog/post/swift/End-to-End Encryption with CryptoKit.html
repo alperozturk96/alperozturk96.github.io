@@ -1,0 +1,358 @@
+<article class="post">
+    <header class="post-header">
+        <h1>End-to-End Encryption with CryptoKit</h1>
+        <time datetime="2025-07-19">19 July 2025</time>
+    </header>
+
+    <main class="post-content">
+        <section class="post-section">
+            <p>
+                As technology becomes more integrated into our daily lives, the importance of data security cannot be overstated.
+                Every day, we share files, store information in the cloud, and sometimes handle highly sensitive data.
+                It's unthinkable for any modern product to store or transmit this data without proper encryption.
+                Whenever I use a digital service, I always check whether it supports end-to-end encryption and two-factor authentication.
+            </p>
+
+            <p>
+                In this post, I will provide a high-level overview of end-to-end encryption using Apple's
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/cryptokit">CryptoKit</a>
+                </span>
+                .
+            </p>
+
+            <section class="post-section">
+                <h2>Use Case</h2>
+                <p>
+                    Imagine User 1 wants to send a message to User 2 over the internet an insecure channel.
+                    A third party (User 3) might intercept or tamper with the message in transit.
+                    Our goal is to prevent User 3 from reading or modifying this communication.
+                </p>
+            </section>
+
+            <section class="post-section">
+                <h2>Implementation</h2>
+                <p>
+                    To implement true end-to-end encryption, we need both Diffie-Hellman key agreement keys
+                    (for securely deriving a shared secret) and signing keys (to verify message authenticity). While
+                    Diffie-Hellman ensures that the message content is encrypted and decrypted only by the intended parties,
+                    signing keys confirm that the message was not altered and truly came from the sender.
+                </p>
+
+                <h3>User</h3>
+                <div class="code-container">
+                    <button class="copy-button" title="Copy">Copy</button>
+                    <pre><code class="language-swift">
+struct User {
+    let id: UUID
+    let name: String
+    let surname: String
+
+    // Diffie-Hellman keys
+    let privateKey: Curve25519.KeyAgreement.PrivateKey
+    var publicKey: Curve25519.KeyAgreement.PublicKey {
+        privateKey.publicKey
+    }
+
+    // Signing keys
+    let signingPrivateKey: Curve25519.Signing.PrivateKey
+    var signingPublicKey: Curve25519.Signing.PublicKey {
+        signingPrivateKey.publicKey
+    }
+
+    let messageHistory: [Message]
+}
+</code></pre>
+                </div>
+
+                <h3>Message</h3>
+                <p>
+                    The <code>Message</code> struct includes the message text, its timestamp, and an optional digital signature.
+                    The <code>dataToSign()</code> method encodes only the core message fields (excluding the signature)
+                    to ensure consistent signing and verification.
+                </p>
+
+                <div class="code-container">
+                    <button class="copy-button" title="Copy">Copy</button>
+                    <pre><code class="language-swift">
+struct Message: Codable {
+    let text: String
+    let date: Date
+
+    // This field is not part of the data to be signed
+    let signature: Data?
+
+    // A separate struct to represent the data that should be signed
+    private struct SignableMessageData: Codable {
+        let text: String
+        let date: Date
+    }
+
+    func dataToSign() throws -> Data {
+        let signableData = SignableMessageData(text: text, date: date)
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        return try encoder.encode(signableData)
+    }
+}
+</code></pre>
+                </div>
+
+                <h3>Encrypt & Sign Message</h3>
+                <p>
+                    The sender signs the message using their private signing key, ensuring authenticity.
+                    Then, using the Diffie-Hellman key agreement, the sender derives a shared symmetric key
+                    from their private key and the recipient's public key. This symmetric key is used to encrypt the signed message.
+                    The result can be transmitted securely over an untrusted network.
+                </p>
+
+                <h3>Why Can’t the Attacker Decrypt?</h3>
+                <p>
+                    Imagine User 3 is a malicious attacker intercepting the communication between User 1 and User 2.
+                    Even if User 3 sees the entire key exchange, including the values being transmitted across the network,
+                    they still cannot decrypt the actual message. Why? Because of a fundamental mathematical principle.
+                </p>
+
+                <h3>Discrete Logarithm Problem</h3>
+                <p>To explain this clearly, I will use small numbers for demonstration purposes:</p>
+                <p><strong>Step 1:</strong><br>
+                    User 1 and User 2 agree on two public values: a large prime number <code>p</code>. Let’s say <code>p = 7</code>.
+                </p>
+
+                <p><strong>Step 2:</strong><br>
+                    They also agree on a public generator <code>g</code>. Let’s pick <code>g = 3</code>.
+                </p>
+
+                <p><strong>Step 3:</strong><br>
+                    User 1 picks a private number <code>a = 4</code> and computes <code>A = 3^4 mod 7</code>.
+                    A = 81 (mod 7) so A is 4.
+                </p>
+
+                <p><strong>Step 4:</strong><br>
+                    User 2 picks a private number <code>b = 5</code> and computes <code>B = 3^5 mod 7</code>.
+                    B = 243 (mod 7) so B is 4.
+                </p>
+
+                <p><strong>Step 5:</strong><br>
+                    User 1 sends <code>A</code> to User 2, and User 2 sends <code>B</code> to User 1.
+                    Now, User 3 sees <code>p = 7</code>, <code>g = 3</code>, <code>A</code>, and <code>B</code>,
+                    but does not know <code>a</code> or <code>b</code>.
+                </p>
+
+                <p><strong>Step 6:</strong><br>
+                    User 1 computes the shared secret: <code>K = B^4 mod 7</code>.
+                </p>
+
+                <p><strong>Step 7:</strong><br>
+                    User 2 computes the same shared secret: <code>K = A^5 mod 7</code>.
+                </p>
+
+                <p>
+                    Now both users share the same secret key <code>K</code> without ever sending it directly.
+                    Even though User 3 knows <code>g</code>, <code>p</code>, <code>A</code>, and <code>B</code>,
+                    they cannot calculate <code>K</code>without solving for <code>a</code> or <code>b</code>.
+                    This is known as the <strong>Discrete Logarithm Problem</strong>, and for large numbers, it is
+                    computationally infeasible to solve.
+                </p>
+
+                <p>
+                    The actual cryptographic implementation uses very large prime numbers and elliptic curve math
+                    (like Curve25519), making it practically impossible for any attacker to compute the shared key.
+                </p>
+
+                <p>Here’s the Swift implementation of this secure exchange:</p>
+
+                <h3>Salt & Shared Info Creation</h3>
+                <p>
+                    This function guarantees that both sender and recipient compute the same salt value, which is then
+                    used during key derivation with HKDF. If needed, additional protocol-specific metadata can also be
+                    added to the <code>sharedInfo</code> parameter to further scope the derived key.
+                </p>
+                <p>
+                    When deriving a symmetric key using the shared secret from Diffie-Hellman key exchange, it’s
+                    important to include a salt and shared info to ensure that the derived key is unique and secure.
+                    In our implementation, we generate a deterministic salt using the raw representations of both users'
+                    public keys.
+                </p>
+                <p>
+                    By sorting and concatenating these keys, we ensure the same salt is derived regardless of which
+                    user initiates the exchange. This prevents mismatches in key derivation and adds an additional layer
+                    of uniqueness to the key.
+                </p>
+
+                <div class="code-container">
+                    <button class="copy-button" title="Copy">Copy</button>
+                    <pre><code class="language-swift">
+func createSharedSalt(_ senderPublicKey: Curve25519.KeyAgreement.PublicKey,
+                      _ recipientPublicKey: Curve25519.KeyAgreement.PublicKey) -> Data {
+    let local = senderPublicKey.rawRepresentation
+    let remote = recipientPublicKey.rawRepresentation
+
+    let (first, second) = local.lexicographicallyPrecedes(remote) ? (local, remote) : (remote, local)
+    return first + second
+}
+</code></pre>
+                </div>
+
+                <div class="code-container">
+                    <button class="copy-button" title="Copy">Copy</button>
+                    <pre><code class="language-swift">
+func encryptAndSignMessage(from sender: User,
+                           to recipientPublicKey: Curve25519.KeyAgreement.PublicKey,
+                           messageText: String) throws -> Data? {
+    // Create the message
+    let message = Message(text: messageText, date: Date(), signature: nil)
+    let messageData = try message.dataToSign()
+
+    // Sign the message
+    let signature = try sender.signingPrivateKey.signature(for: messageData)
+    let signedMessage = Message(text: message.text, date: message.date, signature: signature)
+
+    // Create shared salt and shared info
+    let salt = createSharedSalt(sender.publicKey, recipientPublicKey)
+    guard let sharedInfo = "com.example.cryptokit".data(using: .utf8) else {
+        throw CryptoError.sharedInfoCreation
+    }
+
+    // Derive shared secret via Diffie-Hellman
+    let sharedSecret = try sender.privateKey.sharedSecretFromKeyAgreement(with: recipientPublicKey)
+    let symmetricKey = sharedSecret.hkdfDerivedSymmetricKey(
+        using: SHA256.self,
+        salt: salt,
+        sharedInfo: sharedInfo,
+        outputByteCount: 32
+    )
+
+    // Encrypt
+    let encoder = JSONEncoder()
+    encoder.dateEncodingStrategy = .iso8601
+    let signedMessageData = try encoder.encode(signedMessage)
+
+    return try AES.GCM.seal(signedMessageData, using: symmetricKey).combined
+}
+</code></pre>
+                </div>
+
+                <h3>Decrypt & Verify Message</h3>
+                <p>
+                    The recipient uses their private key and the sender’s public key to derive the same shared secret
+                    key through Diffie-Hellman. Then, they decrypt the message and verify the signature using the
+                    sender’s public signing key to ensure the message’s authenticity and integrity.
+                </p>
+                <div class="code-container">
+                    <button class="copy-button" title="Copy">Copy</button>
+                    <pre><code class="language-swift">
+func decryptAndVerifyMessage(from senderPublicKey: Curve25519.KeyAgreement.PublicKey,
+                              senderSigningKey: Curve25519.Signing.PublicKey,
+                              to recipient: User,
+                              encryptedData: Data) throws -> Message {
+    // Create shared salt and shared info
+    let salt = createSharedSalt(recipient.publicKey, senderPublicKey)
+    guard let sharedInfo = "com.example.cryptokit".data(using: .utf8) else {
+        throw CryptoError.sharedInfoCreation
+    }
+
+    // Derive shared key
+    let sharedSecret = try recipient.privateKey.sharedSecretFromKeyAgreement(with: senderPublicKey)
+    let symmetricKey = sharedSecret.hkdfDerivedSymmetricKey(
+        using: SHA256.self,
+        salt: salt,
+        sharedInfo: sharedInfo,
+        outputByteCount: 32
+    )
+
+    // Decrypt
+    let sealedBox = try AES.GCM.SealedBox(combined: encryptedData)
+    let decryptedData = try AES.GCM.open(sealedBox, using: symmetricKey)
+
+    // Decode
+    let decoder = JSONDecoder()
+    decoder.dateDecodingStrategy = .iso8601
+    let message = try decoder.decode(Message.self, from: decryptedData)
+
+    // Verify Signature
+    let signedData = try message.dataToSign()
+    guard let signature = message.signature else {
+        throw CryptoError.missingSignature
+    }
+
+    if senderSigningKey.isValidSignature(signature, for: signedData) {
+        return message
+    } else {
+        throw CryptoError.invalidSignature
+    }
+}
+</code></pre>
+                </div>
+
+                <h3>Test</h3>
+                <p>
+                    The following code demonstrates the complete flow: User 1 sends an encrypted and signed message to User 2.
+                    Then, User 2 decrypts the message and verifies its authenticity.
+                </p>
+
+                <p>
+                    In a real-world scenario, these users could be on separate devices communicating over the internet,
+                    and their cryptographic keys should be securely stored.
+                </p>
+                <div class="code-container">
+                    <button class="copy-button" title="Copy">Copy</button>
+                    <pre><code class="language-swift">
+func test() throws {
+    let user1 = createUser(name: "User", surname: "1")
+    let user2 = createUser(name: "User", surname: "2")
+
+    // User 1 encrypts and signs a message for User 2
+    guard let encrypted = try encryptAndSignMessage(
+        from: user1,
+        to: user2.publicKey,
+        messageText: "SOME_IMPORTANT_SECRET_MESSAGE"
+    ) else {
+        throw CryptoError.unexpectedEncryption
+    }
+
+    print("Encrypted data: " + encrypted.base64EncodedString())
+
+    // User 2 decrypts and verifies
+    let decrypted = try decryptAndVerifyMessage(
+        from: user1.publicKey,
+        senderSigningKey: user1.signingPublicKey,
+        to: user2,
+        encryptedData: encrypted
+    )
+
+    print("Decrypted data:  \(decrypted.text) at \(decrypted.date)")
+}
+</code></pre>
+                </div>
+
+                <h3>Output</h3>
+                <div class="code-container">
+                    <button class="copy-button" title="Copy">Copy</button>
+                    <pre><code class="language-swift">
+Encrypted data: VbX7fLL7J/kAuKpw7WHbId4xo0HubD2BA4u5wVy0nvEF729tH8tvn0jnsxGh/zhh0cSIW2umkd0hXWSMY2Wvo83OuEXV9dHVq8vqjpKd
+                        8/VE15zNKBpn48fPpHPF/6nnv9apwfFl3cfYeu7ODZoeX+0SJ4B8+786XK4PzDorXjZ+wYt6PB29q0ixwYAMSsnlPNEJ82TE
+                        mstN43dJ0zWc9ArgM5TU2cr1ledpuukKZT8QEZefw75ZIhU7K7iebJLQS634MbFwORkf
+
+Decrypted data:  SOME_IMPORTANT_SECRET_MESSAGE at 2025-07-19 16:14:53 +0000
+</code></pre>
+                </div>
+            </section>
+
+            <section class="post-section">
+                <h2>Conclusion</h2>
+                <p>
+                    In this post, we implemented end-to-end encryption using Apple's <code>CryptoKit</code>.
+                    With Diffie-Hellman key agreement, we ensured that only the intended sender and recipient can derive
+                    the encryption key. With digital signatures, we verified the authenticity and integrity of the messages.
+                </p>
+                <p>
+                    While this example was written in Swift, the same principles apply to other programming languages and platforms.
+                    Secure communication is achievable using modern cryptography and best practices and it starts with
+                    understanding the math and mechanisms behind it.
+                </p>
+            </section>
+        </section>
+    </main>
+</article>
