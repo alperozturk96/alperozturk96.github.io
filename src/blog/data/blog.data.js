@@ -2,13 +2,6 @@ import {BlogType as PostType} from "./blog.type.js";
 
 export const blogData = [
   {
-    "title": "Do not think different. Listen users.",
-    "summary": "Think Different. Those words used to mean something powerful. Now, they feel hollow. What changed? Let’s rewind and take a closer look at how Apple lost its way and what it needs to do to reconnect with real user needs.",
-    "type": PostType.Tech,
-    "path": "../../blog/post/tech/Do Not Think Different.html",
-    "date": "24 May 2025"
-  },
-  {
     "title": "Customizing the Navigation Bar in SwiftUI",
     "summary": "Let’s take a quick look at why customizing SwiftUI’s navigation bar isn’t as simple as it should be and how you can fix it with a clean, reusable solution that works across iOS versions. Despite improvements in iOS 16, full control still needs some UIKit magic.",
     "type": PostType.Swift,
@@ -63,5 +56,12 @@ export const blogData = [
     "type": PostType.Swift,
     "path": "../../blog/post/swift/End-to-End Encryption with CryptoKit.html",
     "date": "19 July 2025"
+  },
+  {
+    "title": "Using A Locally Hosted Large Language Model with MapKit",
+    "summary": "",
+    "type": PostType.Swift,
+    "path": "../../blog/post/swift/Using Locally Hosted Large Language Model with MapKit.html",
+    "date": "27 July 2025"
   },
 ]

@@ -1,0 +1,749 @@
+<article class="post">
+    <header class="post-header">
+        <h1>Using A Locally Hosted Large Language Model with MapKit</h1>
+        <time datetime="2025-07-27">27 July 2025</time>
+    </header>
+
+    <main class="post-content">
+        <section class="post-section">
+            <p>
+            While I was watching Apple's latest WWDC event videos I wanted to discover and work on new Foundation Models
+            framework. To me using large language modal locally more reliable approach than using cloud ones. Especially
+            if these large language models specialized in some certain area intead of big one generilizated one.
+            </p>
+
+            <p>
+                Then for demo purpose I wanted to do something a bit meaningful as well.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Use Case</h2>
+            <p>
+                Imagine we have a map and we want to ask some question about places that we see on the map. It could be
+                restaurant suggestion or where to go etc. One use scenariou would be you visit the some place first time
+                and dont want to use search engine you just opening the map and see where you are and ask to assistant to
+                get some recommendations.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Details</h2>
+            <p>
+                I combined Apple's Mapkit with their Foundation Model. However I'm using macOS 15.5 along with Xcode 26
+                Beta and iOS 26 Beta but if I'm not wrong Foundation Model not exists if I don't use macOS 26 beta as
+                well. So I got error like no model founded or something like that.
+            </p>
+
+            <p>
+                Then I checked the availiblity of the model via SystemLanguageModel.default. If model not available I'm
+                using another modal that I have in my 10 core M2 Pro Macbook which is that liquid/lfm2-1.2b. First I tried
+                with google/gemma-3-12b however getting answer took like almost 60 seconds. Then I wanted to try with lower
+                parameter model and result was not that much bad and faster.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Implementation</h2>
+            <p>
+                I want to display map fully and below of the map I want to display two button and one of the button would
+                be the search and the other one is assistant button. Both are taking input from user thus they must also
+                use some input field. To make transition between these two button smooth and match with latest design
+                guideline I had to have state of the screen.
+            </p>
+
+            <h3>MapActionState</h3>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+enum MapActionState {
+    case assistant, search, idle
+}
+</code></pre>
+            </div>
+
+            <p>
+                Before show how I used my action state I want to show how I'm achieving the transition between the two actions.
+            </p>
+
+            <h3>GlassEffectContainer</h3>
+            <p>
+                This container allows you to create a components from another component by breaking of animation. It is
+                like you are taking some piece from first component and then you create the new one and transition between
+                them are smooth.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+struct TestGlassEffectContainer: View {
+    @State private var isExpanded: Bool = false
+    @Namespace private var namespace
+
+    var body: some View {
+        GlassEffectContainer(spacing: 40.0) {
+            HStack(spacing: 40.0) {
+                Image(systemName: "plus.circle.fill")
+                    .frame(width: 80.0, height: 80.0)
+                    .font(.system(size: 36))
+                    .glassEffect()
+                    .glassEffectID("plus", in: namespace)
+
+
+                if isExpanded {
+                    Image(systemName: "ellipsis.circle.fill")
+                        .frame(width: 80.0, height: 80.0)
+                        .font(.system(size: 36))
+                        .glassEffect()
+                        .glassEffectID("more", in: namespace)
+                }
+            }
+        }
+
+        Button("Animate") {
+            withAnimation {
+                isExpanded.toggle()
+            }
+        }
+        .buttonStyle(.glass)
+    }
+}
+</code></pre>
+            </div>
+
+            <video class="video" controls>
+                <source src="/src/blog/post/swift/usingLanguageModelWithMapKit/1.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+
+            <h3>Transition Between Assistant and Search</h3>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+// MARK: - ChildViews
+extension ContentView {
+    private var MapActionButtons: some View {
+        GlassEffectContainer {
+            HStack {
+                if state != .assistant {
+                    ImageButton("apple.intelligence") {
+                        state = .assistant
+                    }
+                    .glassEffectID("assistant", in: namespace)
+                }
+
+                switch(state) {
+                    case .idle:
+                        Spacer()
+                    case .assistant:
+                        AssistantView(namespace: namespace)
+                        Spacer()
+                    case .search:
+                        Spacer()
+                        SearchBottomBar
+                }
+
+                if state != .search {
+                    ImageButton("magnifyingglass.circle.fill") {
+                        state = .search
+                    }
+                    .glassEffectID("search", in: namespace)
+                }
+            }
+            .padding(.horizontal, 8)
+        }
+    }
+}
+</code></pre>
+            </div>
+            <video class="video" controls>
+                <source src="/src/blog/post/swift/usingLanguageModelWithMapKit/2.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+
+            <h3>MapKit</h3>
+            <p>
+                Creating map in SwiftUI pretty easy but some nounces you have to deal with. You can construct the Map
+                instance with MapCameraPosition or another alternative would be the MKCoordinateRegion. But MKCoordinateRegion
+                one is deprecated since iOS 17 thus I had to use camera position but MapCameraPosition is taking coordinate
+                as well. Also wanted to add the slider to the right side of the map to control zoom level.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+import SwiftUI
+import MapKit
+
+struct MapContentView&lt;MapActionButtons: View&gt;: View {
+    @Binding private var zoomLevel: Double
+    @Binding private var currentCenter: CLLocationCoordinate2D
+    @Binding private var cameraPosition: MapCameraPosition
+
+    @Binding private var state: MapActionState
+    private let sliderHeight: CGFloat
+    @ViewBuilder private var mapActionButtons: MapActionButtons
+
+    init(
+        _ zoomLevel: Binding&lt;Double&gt;,
+        _ currentCenter: Binding&lt;CLLocationCoordinate2D&gt;,
+        _ cameraPosition: Binding&lt;MapCameraPosition&gt;,
+        _ state: Binding&lt;MapActionState&gt;,
+        _ sliderHeight: CGFloat,
+        @ViewBuilder mapActionButtons: @escaping () -&gt; MapActionButtons
+    ) {
+        self._zoomLevel = zoomLevel
+        self._currentCenter = currentCenter
+        self._cameraPosition = cameraPosition
+        self._state = state
+        self.sliderHeight = sliderHeight
+        self.mapActionButtons = mapActionButtons()
+    }
+
+    var body: some View {
+        ZStack {
+            ContentMap
+                .overlay(alignment: .bottom) {
+                    mapActionButtons
+                }
+                .onTapGesture {
+                    state = .idle
+                }
+
+            MapSlider(sliderHeight)
+        }
+    }
+}
+
+// MARK: - ChildViews
+extension MapContentView {
+    @ViewBuilder
+    private var ContentMap: some View {
+        Map(position: $cameraPosition)
+            .onMapCameraChange { context in
+                currentCenter = context.region.center
+            }
+    }
+
+    @ViewBuilder
+    private func MapSlider(_ bottomPadding: CGFloat) -> some View {
+        Slider(value: $zoomLevel, in: 0.001...0.1)
+            .onChange(of: zoomLevel) { oldValue, newValue in
+                cameraPosition = MapCameraPosition.region(
+                    MKCoordinateRegion(
+                        center: currentCenter,
+                        span: MKCoordinateSpan(latitudeDelta: newValue, longitudeDelta: newValue)
+                    )
+                )
+            }
+            .rotationEffect(.degrees(-90), anchor: .trailing)
+            .padding(.bottom, bottomPadding)
+            .padding(.trailing, 24)
+    }
+}
+</code></pre>
+            </div>
+
+            <p>
+                Whenever zoomLevel changes I am updating the camera position and with rotationEffect I am making the
+                vertical slider.
+            </p>
+
+            <video class="video" controls>
+                <source src="/src/blog/post/swift/usingLanguageModelWithMapKit/3.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+
+            <h3>AssistantView</h3>
+            <p>
+                In this view user enters the prompt and getting answer from if Foundation model exists else using locally
+                hosted large language model in my case it is liquid/lfm2-1.2b. Of course you can replace this logic with
+                remote one for demo purposes I used my local dev environment. Large language model runs on my M2 Pro Macbook.
+            </p>
+
+            <p>
+                Another technical challenge here getting answer from assistant may take some time especially if its locally
+                hosted it would take more time thus we have to indicate the user. Instead of simple loading progress bar
+                I tought implementing glow affect around AssistantView would be great.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+import SwiftUI
+import FoundationModels
+
+struct AssistantView: View {
+    private let model = SystemLanguageModel.default
+    private let localLM = LocalLM()
+    private let namespace: Namespace.ID
+
+    @State private var gradientTimer: Timer?
+    @State private var gradientStops: [Gradient.Stop] = GradientConfig.defaultStops
+    @State private var prompt = ""
+    @State private var isLoading = false
+    @State private var answer: String = ""
+
+    init(namespace: Namespace.ID) {
+        self.namespace = namespace
+    }
+
+    var body: some View {
+        HStack {
+            SparkleIcon
+
+            if isLoading {
+                LoadingView
+            } else {
+                InputField
+            }
+
+            if !prompt.isEmpty && !isLoading {
+                ClearButton
+            }
+        }
+        .padding()
+        .overlay(LoadingOverlay)
+        .glassEffect()
+        .glassEffectID("assistantContent", in: namespace)
+        .sheet(isPresented: showAnswerBinding) {
+            AnswerSheet
+        }
+    }
+}
+
+// MARK: - View Components
+private extension AssistantView {
+    var SparkleIcon: some View {
+        Image(systemName: "sparkles")
+            .foregroundColor(.gray)
+    }
+
+    var LoadingView: some View {
+        Text("Thinking...")
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .font(.title3)
+    }
+
+    var InputField: some View {
+        TextField("Ask...", text: $prompt)
+            .font(.title3)
+            .autocorrectionDisabled()
+            .textInputAutocapitalization(.never)
+            .onSubmit {
+                askAssistant()
+            }
+    }
+
+    var ClearButton: some View {
+        Button(action: clearPrompt) {
+            Image(systemName: "xmark.circle.fill")
+                .foregroundColor(.gray)
+        }
+    }
+
+    @ViewBuilder
+    var LoadingOverlay: some View {
+        if isLoading {
+            Capsule()
+                .glow(
+                    fill: .angularGradient(
+                        stops: gradientStops,
+                        center: .center,
+                        startAngle: .degrees(0),
+                        endAngle: .degrees(360)
+                    ),
+                    lineWidth: 4.0
+                )
+                .onAppear(perform: startGradientAnimation)
+                .onDisappear(perform: stopGradientAnimation)
+        }
+    }
+
+    var AnswerSheet: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            ScrollView {
+                Text(answer)
+                    .font(.body)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .padding()
+        .presentationDetents([.fraction(0.3), .medium])
+    }
+
+    var showAnswerBinding: Binding&lt;Bool&gt; {
+        Binding(
+            get: { !answer.isEmpty },
+            set: { if !$0 { answer = "" } }
+        )
+    }
+}
+
+// MARK: - Actions
+private extension AssistantView {
+    func clearPrompt() {
+        prompt = ""
+    }
+
+    func startGradientAnimation() {
+        stopGradientAnimation()
+        gradientTimer = Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { _ in
+            shiftGradientStops()
+        }
+    }
+
+    func stopGradientAnimation() {
+        gradientTimer?.invalidate()
+        gradientTimer = nil
+    }
+
+    func shiftGradientStops() {
+        let step = 0.02
+        gradientStops = gradientStops.map { stop in
+            var newLocation = stop.location + step
+            if newLocation > 1 { newLocation -= 1 }
+            return Gradient.Stop(color: stop.color, location: newLocation)
+        }.sorted { $0.location < $1.location }
+    }
+
+    func askAssistant() {
+        guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+
+        Task {
+            await processAssistantRequest()
+        }
+    }
+
+    @MainActor
+    func processAssistantRequest() async {
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            let response: String
+
+            if model.availability == .available {
+                response = try await getSystemModelResponse()
+            } else {
+                response = try await getLocalModelResponse()
+            }
+
+            answer = response
+            prompt = ""
+
+        } catch {
+            print("Assistant Error: \(error.localizedDescription)")
+        }
+    }
+
+    func getSystemModelResponse() async throws -> String {
+        let session = LanguageModelSession()
+        let response = try await session.respond(to: prompt)
+        return response.content
+    }
+
+    func getLocalModelResponse() async throws -> String {
+        return try await localLM.askLocalAssistant(prompt: prompt)
+    }
+}
+
+// MARK: - Configuration
+private enum GradientConfig {
+    static let defaultStops: [Gradient.Stop] = [
+        .init(color: .blue, location: 0.0),
+        .init(color: .purple, location: 0.2),
+        .init(color: .red, location: 0.4),
+        .init(color: .mint, location: 0.5),
+        .init(color: .indigo, location: 0.7),
+        .init(color: .pink, location: 0.9),
+        .init(color: .blue, location: 1.0)
+    ]
+}
+</code></pre>
+            </div>
+            <video class="video" controls>
+                <source src="/src/blog/post/swift/usingLanguageModelWithMapKit/4.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+
+            <h3>Glowing Effect</h3>
+            <p>
+                With this extension I'm drawing line around the shape with given ShapeStyle.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+extension View where Self: Shape {
+    func glow(
+        fill: some ShapeStyle,
+        lineWidth: Double,
+        blurRadius: Double = 8.0,
+        lineCap: CGLineCap = .round
+    ) -> some View {
+        let strokeStyle = StrokeStyle(lineWidth: lineWidth, lineCap: lineCap)
+        let baseStrokeStyle = StrokeStyle(lineWidth: lineWidth / 2, lineCap: lineCap)
+
+        return self
+            .stroke(style: baseStrokeStyle)
+            .fill(fill)
+            .background {
+                glowLayer(fill: fill, strokeStyle: strokeStyle, blur: blurRadius)
+            }
+            .background {
+                glowLayer(fill: fill, strokeStyle: strokeStyle, blur: blurRadius / 2)
+            }
+    }
+
+    private func glowLayer(
+        fill: some ShapeStyle,
+        strokeStyle: StrokeStyle,
+        blur: Double
+    ) -> some View {
+        self
+            .stroke(style: strokeStyle)
+            .fill(fill)
+            .blur(radius: blur)
+    }
+}
+</code></pre>
+            </div>
+
+            <p>
+                In LoadingOverlay is just a Capsule with this extension. Angular Gradient is used for ShapeStyle. With
+                repeated Timer I'm changing the Gradient.Stop and it looks like spinning and colors are keep changing
+                it doesnt look like steady.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+@ViewBuilder
+    var LoadingOverlay: some View {
+        if isLoading {
+            Capsule()
+                .glow(
+                    fill: .angularGradient(
+                        stops: gradientStops,
+                        center: .center,
+                        startAngle: .degrees(0),
+                        endAngle: .degrees(360)
+                    ),
+                    lineWidth: 4.0
+                )
+                .onAppear(perform: startGradientAnimation)
+                .onDisappear(perform: stopGradientAnimation)
+        }
+    }
+</code></pre>
+            </div>
+
+            <h3>Requesting To The Locally Hosted Language Model</h3>
+            <p>
+                Here is the our configuration options and potential errors.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+enum SystemPrompts {
+    static let restaurantRecommendation = """
+        You are a helpful assistant that provides local food and restaurant recommendations
+        based on the user's location or the city they mention. Recommend a mix of popular,
+        unique, and culturally significant places.
+        """
+}
+
+enum LanguageModelAPI: String {
+    case localHost = "http://localhost:1234/api/v0/chat/completions" // for demo purposes
+}
+
+enum LanguageModel: String {
+    case liquid = "liquid/lfm2-1.2b"
+    case gemma = "google/gemma-3-12b"
+}
+
+enum LocalLMError: LocalizedError {
+    case emptyPrompt
+    case invalidURL
+    case networkError(Error)
+    case invalidResponse
+    case serverError(Int, String)
+    case decodingError
+    case emptyResponse
+
+    var errorDescription: String? {
+        switch self {
+        case .emptyPrompt:
+            return "Prompt cannot be empty"
+        case .invalidURL:
+            return "Invalid server URL"
+        case .networkError(let error):
+            return "Network error: \(error.localizedDescription)"
+        case .invalidResponse:
+            return "Invalid server response"
+        case .serverError(let code, let message):
+            return "Server error (\(code)): \(message)"
+        case .decodingError:
+            return "Failed to decode server response"
+        case .emptyResponse:
+            return "Server returned empty response"
+        }
+    }
+}
+</code></pre>
+            </div>
+
+            <p>
+                And now lets check the our response structs.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+struct ChatMessage: Codable {
+    let role: String
+    let content: String
+}
+
+struct ChatRequest: Codable {
+    let model: String
+    let messages: [ChatMessage]
+    let temperature: Double
+    let max_tokens: Int
+    let stream: Bool
+}
+
+struct ChatResponse: Codable {
+    struct Choice: Codable {
+        let index: Int
+        let message: ChatMessage
+    }
+
+    let choices: [Choice]
+    let usage: Usage?
+
+    struct Usage: Codable {
+        let prompt_tokens: Int
+        let completion_tokens: Int
+        let total_tokens: Int
+    }
+}
+</code></pre>
+            </div>
+
+            <p>
+                Here is the actual request implementation.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+
+import Foundation
+
+struct LocalLM {
+    private let baseURL: LanguageModelAPI
+    private let model: LanguageModel
+    private let timeout: TimeInterval
+    private let encoder = JSONEncoder()
+    private let decoder = JSONDecoder()
+
+    init(
+        baseURL: LanguageModelAPI = .localHost,
+        model: LanguageModel = .liquid,
+        timeout: TimeInterval = 60
+    ) {
+        self.baseURL = baseURL
+        self.model = model
+        self.timeout = timeout
+    }
+
+    func askLocalAssistant(prompt: String) async throws -> String {
+        guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw LocalLMError.emptyPrompt
+        }
+
+        let request = try buildRequest(for: prompt)
+        let response = try await performRequest(request)
+        return try parseResponse(response)
+    }
+}
+
+// MARK: - Private Methods
+private extension LocalLM {
+    func buildRequest(for prompt: String) throws -> URLRequest {
+        guard let url = URL(string: baseURL.rawValue) else {
+            throw LocalLMError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.timeoutInterval = timeout
+
+        let requestBody = ChatRequest(
+            model: model.rawValue,
+            messages: [
+                ChatMessage(
+                    role: "system",
+                    content: SystemPrompts.restaurantRecommendation
+                ),
+                ChatMessage(role: "user", content: prompt)
+            ],
+            temperature: 0.7,
+            max_tokens: -1,
+            stream: false
+        )
+
+        request.httpBody = try encoder.encode(requestBody)
+        return request
+    }
+
+    func performRequest(_ request: URLRequest) async throws -> (Data, URLResponse) {
+        do {
+            return try await URLSession.shared.data(for: request)
+        } catch {
+            throw LocalLMError.networkError(error)
+        }
+    }
+
+    func parseResponse(_ response: (Data, URLResponse)) throws -> String {
+        let (data, urlResponse) = response
+
+        guard let httpResponse = urlResponse as? HTTPURLResponse else {
+            throw LocalLMError.invalidResponse
+        }
+
+        guard httpResponse.statusCode == 200 else {
+            let errorMessage = String(data: data, encoding: .utf8) ?? "Unknown server error"
+            throw LocalLMError.serverError(httpResponse.statusCode, errorMessage)
+        }
+
+        do {
+            let decoded = try decoder.decode(ChatResponse.self, from: data)
+
+            guard let content = decoded.choices.first?.message.content,
+                  !content.isEmpty else {
+                throw LocalLMError.emptyResponse
+            }
+
+            return content
+        } catch is DecodingError {
+            throw LocalLMError.decodingError
+        }
+    }
+}
+</code></pre>
+            </div>
+
+            <h3>Result</h3>
+            <video class="video" controls>
+                <source src="/src/blog/post/swift/usingLanguageModelWithMapKit/res.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+
+            <h2>Conclusion</h2>
+            <p>
+                It was really fun to play with language model locally with Swift and SwiftUI. Once again I really like
+                Apple's API how easy to build. Maybe in future we can see more local language models specialized in same
+                areas.
+            </p>
+        </section>
+
+    </main>
+</article>
+
