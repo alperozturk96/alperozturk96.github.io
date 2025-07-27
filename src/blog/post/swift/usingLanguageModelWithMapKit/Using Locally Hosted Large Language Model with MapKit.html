@@ -7,9 +7,13 @@
     <main class="post-content">
         <section class="post-section">
             <p>
-                While watching Apple's latest WWDC event videos, I became interested in exploring the new Foundation Models
-                framework. Personally, I find using language models locally to be a more reliable approach than relying
-                on cloud-based ones.
+                While watching Apple's latest WWDC event videos, I became interested in exploring the new
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/FoundationModels">Foundation Models</a>
+                </span>
+
+                framework. Personally, I find using language models locally more reliable approach than cloud-based ones.
             </p>
 
             <p>
@@ -20,24 +24,43 @@
         <section class="post-section">
             <h2>Use Case</h2>
             <p>
-                Imagine a scenario where you’re exploring a new place and want recommendations without having to open a
-                search engine. You simply open your map, see where you are, and ask your assistant for suggestions—like
-                where to eat or what to see nearby. This is one potential use case I aimed to implement.
+                Imagine you are exploring a new place and want recommendations without having to open a search engine.
+                Map apps are especially useful when you're unfamiliar with the area. While using a map app to see where
+                you are, you could simply ask your assistant for suggestions like where to eat or what to see nearby.
+                This is one potential use case I aimed to implement.
             </p>
         </section>
 
         <section class="post-section">
             <h2>Details</h2>
             <p>
-                I integrated Apple’s MapKit with their Foundation Model. I’m currently using macOS 15.5 with Xcode 26
+                I used Apple’s MapKit with their Foundation Model. I’m currently using macOS 15.5 with Xcode 26
                 Beta 4 and iOS 26 Beta. However, I realized that the Foundation Model doesn’t seem to be available unless
-                I’m running macOS 26 Beta as well. As a result, I encountered an error stating that no model was found.
+                I’m running macOS 26 Beta as well. When I try to use it, I encountered an error stating that no model
+                was found.
             </p>
 
             <p>
-                To handle this, I checked for the model’s availability using <code>SystemLanguageModel.default</code>.
+                To handle this, I checked for the model’s availability using
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/foundationmodels/systemlanguagemodel">SystemLanguageModel.default</a>
+                </span>
+                .
+
                 If the model isn't available, I fallback to a locally hosted model on my 10-core M2 Pro MacBook, specifically
-                <code>liquid/lfm2-1.2b</code>. Initially, I tried <code>google/gemma-3-12b</code>, but the response time
+
+                <span class="external-link">
+                    <a href="https://lmstudio.ai/models/liquid/lfm2-1.2b">liquid/lfm2-1.2b</a>
+                </span>
+
+                . Initially, I tried
+
+                <span class="external-link">
+                    <a href="https://lmstudio.ai/models/google/gemma-3-12b">google/gemma-3-12b</a>
+                </span>
+
+                , but the response time
                 was around 60 seconds. Switching to a lower-parameter model provided a good balance between output quality
                 and speed.
             </p>
@@ -47,7 +70,7 @@
             <h2>Implementation</h2>
             <p>
                 I wanted to display a full-screen map with two buttons below it, one for search and the other for the assistant
-                feature. Since both require user input, I included input fields. To ensure smooth transitions between buttons
+                feature. Since both require user input, I included input fields. To ensure smooth transitions between actions
                 and to align with the latest design guidelines, I added screen state to my view.
             </p>
 
@@ -67,7 +90,7 @@ enum MapActionState {
 
             <h3>GlassEffectContainer</h3>
             <p>
-                This container allows you to create components derived from other components by breaking down animations.
+                This container allows you to create a component from other a component.
                 It's like pulling a piece from one component to build another, creating smooth transitions between the two.
             </p>
             <div class="code-container">
@@ -161,7 +184,18 @@ extension ContentView {
             <h3>MapKit</h3>
             <p>
                 Creating a map in SwiftUI is quite straightforward, but there are a few nuances. You can construct a <code>Map</code>
-                instance using <code>MapCameraPosition</code> or the deprecated <code>MKCoordinateRegion</code>. Since <code>MKCoordinateRegion</code>
+                instance using
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/mapkit/mapcameraposition">MapCameraPosition</a>
+                </span>
+
+                or the deprecated <code>MKCoordinateRegion</code>. Since
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/mapkit/mkcoordinateregion">MKCoordinateRegion</a>
+                </span>
+
                 is deprecated as of iOS 17, I used <code>MapCameraPosition</code>, which still uses coordinates. I also
                 added a slider on the right side of the map to control the zoom level.
             </p>
@@ -240,7 +274,12 @@ extension MapContentView {
 </code></pre>
             </div>
             <p>
-                Whenever <code>zoomLevel</code> changes, I update the camera position. By applying <code>rotationEffect</code>,
+                Whenever <code>zoomLevel</code> changes, I update the camera position. By applying
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/swiftui/view/rotationeffect(_:anchor:)">rotationEffect</a>
+                </span>
+                ,
                 I transformed the horizontal slider into a vertical one.
             </p>
             <video class="video" controls>
@@ -257,7 +296,7 @@ extension MapContentView {
             </p>
 
             <p>
-                Another technical challenge was that generating answers, especially with local models—can take some time.
+                Another technical challenge was that generating answers, especially with local models can take some time.
                 Rather than using a basic loading spinner, I decided to implement a glowing effect around the <code>AssistantView</code>
                 to indicate activity.
             </p>
@@ -504,8 +543,13 @@ extension View where Self: Shape {
             </div>
 
             <p>
-                The <code>LoadingOverlay</code> is just a <code>Capsule</code> using this glowing extension. I applied an
-                angular gradient for the <code>ShapeStyle</code>. With a repeating timer, I continuously update the <code>Gradient.Stop</code>
+                The <code>LoadingOverlay</code> is just a <code>Capsule</code> using this glow extension. I applied an
+                angular gradient for the <code>ShapeStyle</code>. With a repeating timer, I continuously update the
+
+                <span class="external-link">
+                    <a href="https://developer.apple.com/documentation/swiftui/gradient/stop">Gradient.Stop</a>
+                </span>
+
                 values to create a dynamic, spinning color effect that doesn’t feel static.
             </p>
             <div class="code-container">
