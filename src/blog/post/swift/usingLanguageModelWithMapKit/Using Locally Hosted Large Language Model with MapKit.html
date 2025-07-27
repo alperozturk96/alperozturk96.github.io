@@ -7,49 +7,48 @@
     <main class="post-content">
         <section class="post-section">
             <p>
-            While I was watching Apple's latest WWDC event videos I wanted to discover and work on new Foundation Models
-            framework. To me using large language modal locally more reliable approach than using cloud ones. Especially
-            if these large language models specialized in some certain area intead of big one generilizated one.
+                While watching Apple's latest WWDC event videos, I became interested in exploring the new Foundation Models
+                framework. Personally, I find using language models locally to be a more reliable approach than relying
+                on cloud-based ones.
             </p>
 
             <p>
-                Then for demo purpose I wanted to do something a bit meaningful as well.
+                For demonstration purposes, I wanted to build something both meaningful and practical.
             </p>
         </section>
 
         <section class="post-section">
             <h2>Use Case</h2>
             <p>
-                Imagine we have a map and we want to ask some question about places that we see on the map. It could be
-                restaurant suggestion or where to go etc. One use scenariou would be you visit the some place first time
-                and dont want to use search engine you just opening the map and see where you are and ask to assistant to
-                get some recommendations.
+                Imagine a scenario where you’re exploring a new place and want recommendations without having to open a
+                search engine. You simply open your map, see where you are, and ask your assistant for suggestions—like
+                where to eat or what to see nearby. This is one potential use case I aimed to implement.
             </p>
         </section>
 
         <section class="post-section">
             <h2>Details</h2>
             <p>
-                I combined Apple's Mapkit with their Foundation Model. However I'm using macOS 15.5 along with Xcode 26
-                Beta and iOS 26 Beta but if I'm not wrong Foundation Model not exists if I don't use macOS 26 beta as
-                well. So I got error like no model founded or something like that.
+                I integrated Apple’s MapKit with their Foundation Model. I’m currently using macOS 15.5 with Xcode 26
+                Beta 4 and iOS 26 Beta. However, I realized that the Foundation Model doesn’t seem to be available unless
+                I’m running macOS 26 Beta as well. As a result, I encountered an error stating that no model was found.
             </p>
 
             <p>
-                Then I checked the availiblity of the model via SystemLanguageModel.default. If model not available I'm
-                using another modal that I have in my 10 core M2 Pro Macbook which is that liquid/lfm2-1.2b. First I tried
-                with google/gemma-3-12b however getting answer took like almost 60 seconds. Then I wanted to try with lower
-                parameter model and result was not that much bad and faster.
+                To handle this, I checked for the model’s availability using <code>SystemLanguageModel.default</code>.
+                If the model isn't available, I fallback to a locally hosted model on my 10-core M2 Pro MacBook, specifically
+                <code>liquid/lfm2-1.2b</code>. Initially, I tried <code>google/gemma-3-12b</code>, but the response time
+                was around 60 seconds. Switching to a lower-parameter model provided a good balance between output quality
+                and speed.
             </p>
         </section>
 
         <section class="post-section">
             <h2>Implementation</h2>
             <p>
-                I want to display map fully and below of the map I want to display two button and one of the button would
-                be the search and the other one is assistant button. Both are taking input from user thus they must also
-                use some input field. To make transition between these two button smooth and match with latest design
-                guideline I had to have state of the screen.
+                I wanted to display a full-screen map with two buttons below it, one for search and the other for the assistant
+                feature. Since both require user input, I included input fields. To ensure smooth transitions between buttons
+                and to align with the latest design guidelines, I added screen state to my view.
             </p>
 
             <h3>MapActionState</h3>
@@ -61,16 +60,15 @@ enum MapActionState {
 }
 </code></pre>
             </div>
-
             <p>
-                Before show how I used my action state I want to show how I'm achieving the transition between the two actions.
+                Before diving into how I used the <code>MapActionState</code>, I want to explain how I handled the transition
+                between the two modes.
             </p>
 
             <h3>GlassEffectContainer</h3>
             <p>
-                This container allows you to create a components from another component by breaking of animation. It is
-                like you are taking some piece from first component and then you create the new one and transition between
-                them are smooth.
+                This container allows you to create components derived from other components by breaking down animations.
+                It's like pulling a piece from one component to build another, creating smooth transitions between the two.
             </p>
             <div class="code-container">
                 <button class="copy-button" title="Copy">Copy</button>
@@ -162,10 +160,10 @@ extension ContentView {
 
             <h3>MapKit</h3>
             <p>
-                Creating map in SwiftUI pretty easy but some nounces you have to deal with. You can construct the Map
-                instance with MapCameraPosition or another alternative would be the MKCoordinateRegion. But MKCoordinateRegion
-                one is deprecated since iOS 17 thus I had to use camera position but MapCameraPosition is taking coordinate
-                as well. Also wanted to add the slider to the right side of the map to control zoom level.
+                Creating a map in SwiftUI is quite straightforward, but there are a few nuances. You can construct a <code>Map</code>
+                instance using <code>MapCameraPosition</code> or the deprecated <code>MKCoordinateRegion</code>. Since <code>MKCoordinateRegion</code>
+                is deprecated as of iOS 17, I used <code>MapCameraPosition</code>, which still uses coordinates. I also
+                added a slider on the right side of the map to control the zoom level.
             </p>
             <div class="code-container">
                 <button class="copy-button" title="Copy">Copy</button>
@@ -241,12 +239,10 @@ extension MapContentView {
 }
 </code></pre>
             </div>
-
             <p>
-                Whenever zoomLevel changes I am updating the camera position and with rotationEffect I am making the
-                vertical slider.
+                Whenever <code>zoomLevel</code> changes, I update the camera position. By applying <code>rotationEffect</code>,
+                I transformed the horizontal slider into a vertical one.
             </p>
-
             <video class="video" controls>
                 <source src="/src/blog/post/swift/usingLanguageModelWithMapKit/3.mp4" type="video/mp4">
                 Your browser does not support the video tag.
@@ -254,15 +250,16 @@ extension MapContentView {
 
             <h3>AssistantView</h3>
             <p>
-                In this view user enters the prompt and getting answer from if Foundation model exists else using locally
-                hosted large language model in my case it is liquid/lfm2-1.2b. Of course you can replace this logic with
-                remote one for demo purposes I used my local dev environment. Large language model runs on my M2 Pro Macbook.
+                In this view, users can enter prompts and receive answers, either from Apple’s Foundation Model, if available
+                or from a locally hosted language model. In my case, I used <code>liquid/lfm2-1.2b</code>. Of course,
+                you can replace this with a remote model if needed. For demonstration, I used my local development environment.
+                The model runs entirely on my M2 Pro MacBook.
             </p>
 
             <p>
-                Another technical challenge here getting answer from assistant may take some time especially if its locally
-                hosted it would take more time thus we have to indicate the user. Instead of simple loading progress bar
-                I tought implementing glow affect around AssistantView would be great.
+                Another technical challenge was that generating answers, especially with local models—can take some time.
+                Rather than using a basic loading spinner, I decided to implement a glowing effect around the <code>AssistantView</code>
+                to indicate activity.
             </p>
             <div class="code-container">
                 <button class="copy-button" title="Copy">Copy</button>
@@ -466,7 +463,7 @@ private enum GradientConfig {
 
             <h3>Glowing Effect</h3>
             <p>
-                With this extension I'm drawing line around the shape with given ShapeStyle.
+                This extension allows you to draw a stroke around a shape using a specified <code>ShapeStyle</code>.
             </p>
             <div class="code-container">
                 <button class="copy-button" title="Copy">Copy</button>
@@ -507,9 +504,9 @@ extension View where Self: Shape {
             </div>
 
             <p>
-                In LoadingOverlay is just a Capsule with this extension. Angular Gradient is used for ShapeStyle. With
-                repeated Timer I'm changing the Gradient.Stop and it looks like spinning and colors are keep changing
-                it doesnt look like steady.
+                The <code>LoadingOverlay</code> is just a <code>Capsule</code> using this glowing extension. I applied an
+                angular gradient for the <code>ShapeStyle</code>. With a repeating timer, I continuously update the <code>Gradient.Stop</code>
+                values to create a dynamic, spinning color effect that doesn’t feel static.
             </p>
             <div class="code-container">
                 <button class="copy-button" title="Copy">Copy</button>
@@ -534,9 +531,9 @@ extension View where Self: Shape {
 </code></pre>
             </div>
 
-            <h3>Requesting To The Locally Hosted Language Model</h3>
+            <h3>Interacting with the Locally Hosted Model</h3>
             <p>
-                Here is the our configuration options and potential errors.
+                Here are our configuration options and possible errors for interacting with the locally hosted language model.
             </p>
             <div class="code-container">
                 <button class="copy-button" title="Copy">Copy</button>
@@ -590,7 +587,7 @@ enum LocalLMError: LocalizedError {
             </div>
 
             <p>
-                And now lets check the our response structs.
+                Now, let’s take a look at the data structures used for request and response handling.
             </p>
             <div class="code-container">
                 <button class="copy-button" title="Copy">Copy</button>
@@ -627,7 +624,7 @@ struct ChatResponse: Codable {
             </div>
 
             <p>
-                Here is the actual request implementation.
+                Here is the actual implementation of the local model request.
             </p>
             <div class="code-container">
                 <button class="copy-button" title="Copy">Copy</button>
@@ -738,12 +735,10 @@ private extension LocalLM {
 
             <h2>Conclusion</h2>
             <p>
-                It was really fun to play with language model locally with Swift and SwiftUI. Once again I really like
-                Apple's API how easy to build. Maybe in future we can see more local language models specialized in same
-                areas.
+                It was incredibly fun experimenting with a locally hosted language model using Swift and SwiftUI. Once
+                again, I’m impressed by how easy and intuitive Apple’s APIs make development.
             </p>
         </section>
-
     </main>
 </article>
 

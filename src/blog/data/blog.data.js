@@ -61,7 +61,7 @@ export const blogData = [
     "title": "Using A Locally Hosted Large Language Model with MapKit",
     "summary": "",
     "type": PostType.Swift,
-    "path": "../../blog/post/swift/Using Locally Hosted Large Language Model with MapKit.html",
+    "path": "../../blog/post/swift/usingLanguageModelWithMapKit/Using Locally Hosted Large Language Model with MapKit.html",
     "date": "27 July 2025"
   },
 ]
