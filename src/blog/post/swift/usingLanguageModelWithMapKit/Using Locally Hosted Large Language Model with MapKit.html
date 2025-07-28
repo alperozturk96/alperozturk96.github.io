@@ -379,14 +379,13 @@ private extension AssistantView {
     var LoadingOverlay: some View {
         if isLoading {
             Capsule()
-                .glow(
-                    fill: .angularGradient(
+                .glowEffect(
+                    style: .angularGradient(
                         stops: gradientStops,
                         center: .center,
                         startAngle: .degrees(0),
                         endAngle: .degrees(360)
-                    ),
-                    lineWidth: 4.0
+                    )
                 )
                 .onAppear(perform: startGradientAnimation)
                 .onDisappear(perform: stopGradientAnimation)
@@ -508,34 +507,27 @@ private enum GradientConfig {
                 <button class="copy-button" title="Copy">Copy</button>
                 <pre><code class="language-swift">
 extension View where Self: Shape {
-    func glow(
-        fill: some ShapeStyle,
-        lineWidth: Double,
-        blurRadius: Double = 8.0,
-        lineCap: CGLineCap = .round
-    ) -> some View {
-        let strokeStyle = StrokeStyle(lineWidth: lineWidth, lineCap: lineCap)
-        let baseStrokeStyle = StrokeStyle(lineWidth: lineWidth / 2, lineCap: lineCap)
+    func glowEffect(style: some ShapeStyle, _ width: Double = 4.0) -> some View {
+        let strokeStyle = StrokeStyle(lineWidth: width, lineCap: .round)
+        let baseStrokeStyle = StrokeStyle(lineWidth: width / 2, lineCap: .round)
+        let firstLayer = glowLayer(style: style, strokeStyle: strokeStyle, blur: 8.0)
+        let secondLayer = glowLayer(style: style, strokeStyle: strokeStyle, blur: 8.0 / 2)
 
         return self
             .stroke(style: baseStrokeStyle)
-            .fill(fill)
-            .background {
-                glowLayer(fill: fill, strokeStyle: strokeStyle, blur: blurRadius)
-            }
-            .background {
-                glowLayer(fill: fill, strokeStyle: strokeStyle, blur: blurRadius / 2)
-            }
+            .fill(style)
+            .background(firstLayer)
+            .background(secondLayer)
     }
 
     private func glowLayer(
-        fill: some ShapeStyle,
+        style: some ShapeStyle,
         strokeStyle: StrokeStyle,
         blur: Double
     ) -> some View {
         self
             .stroke(style: strokeStyle)
-            .fill(fill)
+            .fill(style)
             .blur(radius: blur)
     }
 }
@@ -559,14 +551,13 @@ extension View where Self: Shape {
     var LoadingOverlay: some View {
         if isLoading {
             Capsule()
-                .glow(
-                    fill: .angularGradient(
+                .glowEffect(
+                    style: .angularGradient(
                         stops: gradientStops,
                         center: .center,
                         startAngle: .degrees(0),
                         endAngle: .degrees(360)
-                    ),
-                    lineWidth: 4.0
+                    )
                 )
                 .onAppear(perform: startGradientAnimation)
                 .onDisappear(perform: stopGradientAnimation)
