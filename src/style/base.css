@@ -77,3 +77,18 @@ li {
 .external-link a:hover {
     text-decoration: underline;
 }
+
+.footer {
+    background-color: #18181A;
+    color: #eee;
+    text-align: center;
+    padding: 2rem;
+    font-size: 14px;
+    border-top: 2px solid #202022;
+    margin-top: 1rem;
+}
+
+.footer .no-ai {
+    color: #ffffff;
+    margin-top: 1rem;
+}
