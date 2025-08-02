@@ -64,4 +64,11 @@ export const blogData = [
     "path": "../../blog/post/swift/usingLanguageModelWithMapKit/Using Locally Hosted Large Language Model with MapKit.html",
     "date": "27 July 2025"
   },
+  {
+    "title": "Concurrency with Swift 6",
+    "summary": "",
+    "type": PostType.Swift,
+    "path": "../../blog/post/swift/concurrencyWithSwift6/Concurrency with Swift 6.html",
+    "date": "02 August 2025"
+  },
 ]

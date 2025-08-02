@@ -1,0 +1,424 @@
+<article class="post">
+    <header class="post-header">
+      <h1>Concurrency with Swift 6</h1>
+      <time datetime="2025-08-02">02 August 2025</time>
+    </header>
+
+  <main class="post-content">
+    <section class="post-section">
+      <p>
+        Last couple of years concurrency in Swift is evolved and we are seeing a new WWDC video about it. Idea behind it
+        nothing but good at the same time this can be a hard topic to understand. Before that post I recommend to read
+        my previous blog post about Concurrency in general then this blogpost would be more easy to understand.
+      </p>
+    </section>
+
+    <section class="post-section">
+      <h2>Concepts</h2>
+      <p>
+        Before diving into code or migrating to Swift 6, it's crucial to understand the foundational concepts of concurrency.
+        What are actors, the MainActor, isolated, nonisolated, Sendable, parallelism, and concurrency? Without a solid
+        grasp of these core ideas, it's challenging to build a reliable and maintainable project.
+      </p>
+
+      <h2>Sendable</h2>
+      <p>
+        When sharing data or state across multiple tasks, race conditions can arise. To prevent such issues, programming
+        languages offer various solutions. In Swift, the Sendable protocol allows you to safely share data between tasks,
+        as long as the data types conform to the protocol.
+      </p>
+
+      <p>
+        Consider a scenario where multiple users attempt to modify a post simultaneously. Direct modifications are unsafe
+        because we cannot guarantee data consistency. Therefore, it’s essential to ensure we’re updating the latest state
+        before applying any changes.
+      </p>
+
+      <p>
+        Let’s examine a basic example: 1,000 concurrent tasks attempt to update a post. This code won’t compile without
+        explicitly marking the repository as @unchecked Sendable and setting the actor isolation level to nonisolated in
+        the Swift compiler (a new option in Xcode 26). This is a significant improvement, Swift now proactively prevents
+        potentially unsafe code at compile time.
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+class Post {
+    let title: String
+    let description: String
+    private var _likeCount: Int = 0
+
+    init(title: String, description: String, likeCount: Int) {
+        self.title = title
+        self.description = description
+        self._likeCount = likeCount
+    }
+
+    var likeCount: Int {
+        return _likeCount
+    }
+
+    func like() {
+        _likeCount += 1
+    }
+}
+
+
+class PostRepository: @unchecked Sendable {
+    var post: Post = .init(title: "test", description: "demo", likeCount: 0)
+
+    func likePost() async {
+        await withTaskGroup(of: Void.self) { group in
+            for _ in 1...1000 {
+                group.addTask {
+                    await self.likePostConcurrently()
+                }
+            }
+        }
+        print("Expected: 1000, Actual: \(post.likeCount)")
+    }
+
+    private func likePostConcurrently() async {
+        post.like()
+    }
+}
+</code></pre>
+      </div>
+
+      <p>
+        Running the example without proper synchronization results: Expected: 1000, Actual: 983
+        This discrepancy is due to a race condition. If we attempt to make the Post class conform to Sendable,
+        Swift throws a compile-time error:
+      </p>
+
+      <p>
+        “Stored property '_likeCount' of 'Sendable'-conforming class 'Post' is mutable.”
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+final class Post: Sendable {
+    let title: String
+    let description: String
+    private var _likeCount: Int = 0
+
+    init(title: String, description: String, likeCount: Int) {
+        self.title = title
+        self.description = description
+        self._likeCount = likeCount
+    }
+
+    var likeCount: Int {
+        return _likeCount
+    }
+
+    func like() {
+        _likeCount += 1
+    }
+}
+</code></pre>
+      </div>
+
+      <p>
+        One solution is to use OSAllocatedUnfairLock, which ensures thread safety by synchronizing access to the mutable
+        property. With this approach, we achieve consistent results:
+        Expected: 1000, Actual: 1000
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+import os
+
+final class Post: Sendable {
+    let title: String
+    let description: String
+    private let _likeCount = OSAllocatedUnfairLock(initialState: 0)
+
+    init(title: String, description: String, likeCount: Int) {
+        self.title = title
+        self.description = description
+        _likeCount.withLock { $0 = likeCount }
+    }
+
+    var likeCount: Int {
+        return _likeCount.withLock { $0 }
+    }
+
+    func like() {
+        _likeCount.withLock { $0 += 1 }
+    }
+}
+</code></pre>
+      </div>
+
+      <h2>Actor</h2>
+      <p>
+        Do we need to use a class in this situation? Actors offer a more appropriate and modern alternative. As reference
+        types that conform to Sendable by default, actors manage their internal state in a thread-safe manner without
+        requiring explicit locking mechanisms.
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+actor Post {
+    let title: String
+    let description: String
+    private var likeCountValue: Int
+
+    init(title: String, description: String, likeCount: Int) {
+        self.title = title
+        self.description = description
+        self.likeCountValue = likeCount
+    }
+
+    var likeCount: Int {
+        return likeCountValue
+    }
+
+    func like() {
+        likeCountValue += 1
+    }
+}
+
+class PostRepository: @unchecked Sendable {
+    var post: Post = .init(title: "test", description: "demo", likeCount: 0)
+
+    func likePost() async {
+        await withTaskGroup(of: Void.self) { group in
+            for _ in 1...1000 {
+                group.addTask {
+                    await self.likePostConcurrently()
+                }
+            }
+        }
+        print("Expected: 1000, Actual: \(await post.likeCount)")
+    }
+
+    private func likePostConcurrently() async {
+        await post.like()
+    }
+}
+</code></pre>
+      </div>
+      <p>
+        By converting our Post class to an actor, we naturally ensure thread safety. Accessing actor properties or methods
+        from outside requires the await keyword. This provides both clarity and safety by enforcing structured concurrency.
+      </p>
+
+      <h2>MainActor, Isolated, Non-Isolated</h2>
+      <p>
+        Since we know Sendable protocol and Actors now we can understand better about MainActor, Isolated, Non-Isolated.
+        MainActor is equivalent to the main dispatch queue. It ensures that any code annotated with @MainActor runs on the main thread.
+      </p>
+
+      <p>
+        Now that we've covered Sendable and actors, it’s easier to understand the roles of MainActor, isolated, and nonisolated.
+        MainActor is similar to the main dispatch queue, it guarantees that annotated code runs on the main thread.
+      </p>
+
+      <p>
+        We can create an Actor and by default all methods and properties are isolated it means that function has exclusive access to a
+        specific actor’s internal state. For example our like() function is isolated function. If you want to create a
+        new function or property that can run outside of the actor's isolation you can use nonisolated keyword.
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+actor Post {
+    let title: String
+    let description: String
+    private var likeCountValue: Int
+
+    private let tag = "Post - Actor"
+
+    init(title: String, description: String, likeCount: Int) {
+        self.title = title
+        self.description = description
+        self.likeCountValue = likeCount
+    }
+
+    var likeCount: Int {
+        return likeCountValue
+    }
+
+    func like() {
+        likeCountValue += 1
+    }
+
+    nonisolated func log(_ message: String) {
+        print(tag + " : " + message)
+    }
+}
+</code></pre>
+      </div>
+
+      <h2>Parallelism</h2>
+      <p>
+        While this post doesn't cover the differences between parallelism and concurrency in detail (you can refer to my
+        earlier blog post on that topic), here’s a practical example.
+      </p>
+
+      <p>
+        Imagine we need to process multiple files concurrently. Since the tasks are independent, they can run in parallel
+        without blocking each other.
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+struct FileProcessor {
+    func processFilesInParallel(_ filePaths: [String]) async -> ProcessingResult {
+        await withTaskGroup(of: FileResult.self, returning: ProcessingResult.self) { group in
+            for filePath in filePaths {
+                group.addTask {
+                    await processFile(filePath)
+                }
+            }
+
+            var successCount = 0
+            var failureCount = 0
+            var totalSize = 0
+
+            for await unsafe result in group {
+                switch result {
+                case .success(let size):
+                    successCount += 1
+                    totalSize += size
+                case .failure:
+                    failureCount += 1
+                }
+            }
+
+            return ProcessingResult(
+                successCount: successCount,
+                failureCount: failureCount,
+                totalSizeProcessed: totalSize
+            )
+        }
+    }
+
+    private func processFile(_ path: String) async -> FileResult {
+        print("Processing file: \(path)")
+
+        do {
+            let processingTime = Double.random(in: 0.5...2.0)
+            try await Task.sleep(for: .seconds(processingTime))
+
+            let fileSize = Int.random(in: 1000...10000)
+            print("Completed processing: \(path) (size: \(fileSize) bytes)")
+
+            return .success(size: fileSize)
+        } catch {
+            print("Failed processing: \(path)")
+            return .failure(error: error)
+        }
+    }
+}
+
+enum FileResult {
+    case success(size: Int)
+    case failure(error: Error)
+}
+
+struct ProcessingResult {
+    let successCount: Int
+    let failureCount: Int
+    let totalSizeProcessed: Int
+}
+</code></pre>
+      </div>
+      <p>
+        Using withTaskGroup, we can process files concurrently. As seen in the output, tasks complete in a non-sequential order,
+        demonstrating parallel execution.
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+Processing file: file1.txt
+Processing file: file2.txt
+Processing file: file3.txt
+Processing file: file4.txt
+Processing file: file5.txt
+
+Completed processing: file2.txt (size: 7391 bytes)
+Completed processing: file3.txt (size: 9347 bytes)
+Completed processing: file5.txt (size: 8953 bytes)
+Completed processing: file4.txt (size: 4220 bytes)
+Completed processing: file1.txt (size: 8947 bytes)
+</code></pre>
+      </div>
+
+      <p>
+        Alternatively, you can achieve similar results using async let. This syntax allows multiple tasks to be launched
+        in parallel and awaited collectively. The completion order still varies, proving that these operations execute in
+        parallel.
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+func processFilesInParallel(_ filePaths: [String]) async -> ProcessingResult {
+        // Launch all tasks in parallel
+        async let file1 = processFile(filePaths[0])
+        async let file2 = processFile(filePaths[1])
+        async let file3 = processFile(filePaths[2])
+        async let file4 = processFile(filePaths[3])
+        async let file5 = processFile(filePaths[4])
+
+        // Wait for all tasks to complete
+        let results = await [file1, file2, file3, file4, file5]
+
+        var successCount = 0
+        var failureCount = 0
+        var totalSize = 0
+
+        for result in results {
+            switch result {
+            case .success(let size):
+                successCount += 1
+                totalSize += size
+            case .failure:
+                failureCount += 1
+            }
+        }
+
+        return ProcessingResult(
+            successCount: successCount,
+            failureCount: failureCount,
+            totalSizeProcessed: totalSize
+        )
+    }
+</code></pre>
+      </div>
+      <p>
+        Output:
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+Processing file: file1.txt
+Processing file: file2.txt
+Processing file: file3.txt
+Processing file: file4.txt
+Processing file: file5.txt
+
+Completed processing: file5.txt (size: 1628 bytes)
+Completed processing: file3.txt (size: 1741 bytes)
+Completed processing: file1.txt (size: 3003 bytes)
+Completed processing: file2.txt (size: 8394 bytes)
+Completed processing: file4.txt (size: 3064 bytes)
+</code></pre>
+      </div>
+
+      <h2>Conclusion</h2>
+      <p>
+        Concurrency is a broad topic with multiple ways to avoid common pitfalls like race conditions. You can use low-level
+        locking tools like os_unfair_lock, NSLock, or OSAllocatedUnfairLock. Alternatively, DispatchQueue.sync can ensure
+        serial execution.
+      </p>
+
+      <p>
+        However, modern Swift offers a solution through actors and the Sendable protocol. With Swift 6 and improved
+        compiler support, we can now write concurrent code that is safer, more readable, and less error-prone.
+      </p>
+    </section>
+  </main>
+</article>
