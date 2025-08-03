@@ -9,7 +9,13 @@
       <p>
         In recent years, Swift's concurrency model has evolved significantly, with each WWDC bringing new updates and
         improvements. While the ideas behind these changes are sound, concurrency can still be a challenging topic to fully
-        grasp. If you're new to the subject, I recommend reading my previous blog post on general concurrency concepts before
+        grasp. If you're new to the subject, I recommend reading my
+
+        <span class="external-link">
+              <a href="https://alperozturk.me/src/blog/post/post.html?path=..%2F..%2Fblog%2Fpost%2FcomputerScience%2Fconcurrency%2FConcurrency.html">previous</a>
+        </span>
+
+        blog post on general concurrency concepts before
         continuing, it will provide helpful context and make this post easier to follow.
       </p>
     </section>
@@ -17,16 +23,28 @@
     <section class="post-section">
       <h2>Concepts</h2>
       <p>
-        Before diving into code or migrating to Swift 6, it's crucial to understand the foundational concepts of concurrency.
-        What are actors, the MainActor, isolated, nonisolated, Sendable, parallelism, and concurrency? Without a solid
+        Before diving into code or
+
+        <span class="external-link">
+              <a href="https://www.swift.org/migration/documentation/migrationguide/">migrating to Swift 6</a>
+        </span>
+
+        , it's crucial to understand the foundational concepts of concurrency.
+        What are actors, the MainActor, isolated, non-isolated, Sendable, parallelism, and concurrency? Without a solid
         grasp of these core ideas, it's challenging to build a reliable and maintainable project.
       </p>
 
       <h2>Sendable</h2>
       <p>
         When sharing data or state across multiple tasks, race conditions can arise. To prevent such issues, programming
-        languages offer various solutions. In Swift, the Sendable protocol allows you to safely share data between tasks,
-        as long as the data types conform to the protocol.
+        languages offer various solutions. In Swift, the
+
+
+        <span class="external-link">
+              <a href="https://developer.apple.com/documentation/Swift/Sendable"> Sendable protocol</a>
+        </span>
+
+        allows you to safely share data between tasks, as long as the data types conform to the protocol.
       </p>
 
       <p>
@@ -36,10 +54,8 @@
       </p>
 
       <p>
-        Let’s examine a basic example: 1,000 concurrent tasks attempt to update a post. This code won’t compile without
-        explicitly marking the repository as @unchecked Sendable and setting the actor isolation level to nonisolated in
-        the Swift compiler (a new option in Xcode 26). This is a significant improvement, Swift now proactively prevents
-        potentially unsafe code at compile time.
+        Let’s examine a common concurrency problem using a basic example: launching 1,000 concurrent tasks that attempt
+        to update a shared Post object.
       </p>
       <div class="code-container">
         <button class="copy-button" title="Copy">Copy</button>
@@ -87,43 +103,100 @@ class PostRepository: @unchecked Sendable {
       </div>
 
       <p>
-        Running the example without proper synchronization results: Expected: 1000, Actual: 983
-        This discrepancy is due to a race condition. If we attempt to make the Post class conform to Sendable,
-        Swift throws a compile-time error:
+        In this example, 1,000 concurrent tasks call post.like(). Since Post is a class with mutable state and no
+        synchronization mechanism, this results in a race condition.
       </p>
 
       <p>
-        “Stored property '_likeCount' of 'Sendable'-conforming class 'Post' is mutable.”
+        The output may look like:
       </p>
       <div class="code-container">
         <button class="copy-button" title="Copy">Copy</button>
         <pre><code class="language-swift">
-final class Post: Sendable {
-    let title: String
-    let description: String
-    private var _likeCount: Int = 0
-
-    init(title: String, description: String, likeCount: Int) {
-        self.title = title
-        self.description = description
-        self._likeCount = likeCount
-    }
-
-    var likeCount: Int {
-        return _likeCount
-    }
-
-    func like() {
-        _likeCount += 1
-    }
-}
+Expected: 1000, Actual: 983.
 </code></pre>
       </div>
 
       <p>
-        One solution is to use OSAllocatedUnfairLock, which ensures thread safety by synchronizing access to the mutable
-        property. With this approach, we achieve consistent results:
-        Expected: 1000, Actual: 1000
+        This occurs because multiple threads are accessing and modifying _likeCount simultaneously, leading to lost updates.
+      </p>
+
+      <h3>Default Actor Isolation</h3>
+      <p>
+        With Xcode 26, you can configure the default actor isolation behavior between nonisolated or MainActor.
+        It is generally recommended to default to MainActor this ensures your isolated methods execute on the main thread
+        unless explicitly overridden.
+      </p>
+
+      <p>
+        For computationally intensive tasks or background operations, you should offload the work to a background thread
+        allowing Swift's concurrency system to manage thread usage efficiently.
+      </p>
+
+      <img class="post-img" src="/src/blog/post/swift/concurrencyWithSwift6/1.png" alt="Swift Compiler Concurrency screenshot">
+
+      <p>
+        The default actor isolation level is currently set to "non-isolated."
+      </p>
+
+      <p>
+        If you annotate the PostRepository class with
+
+        <span class="external-link">
+              <a href="https://developer.apple.com/documentation/swift/mainactor">@MainActor</a>
+        </span>
+
+        or set the default actor isolation level to MainActor you can remove the @unchecked Sendable annotation.
+        This ensures that all code within the class runs on the main thread, providing implicit synchronization.
+        As a result, the compiler allows the code to compile successfully and outputs:
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+Expected: 1000, Actual: 1000.
+</code></pre>
+      </div>
+
+      <p>
+        While @MainActor is useful for ensuring thread safety on the main thread, there are many scenarios, especially
+        involving heavy computations, where executing tasks in the background is necessary to avoid blocking the main thread
+        or freezing the UI.
+      </p>
+
+      <p>
+        In such cases, any shared mutable state must be accessed and modified safely. One approach is to make the shared
+        class, such as Post, conform to the Sendable protocol. This allows instances of the class to be passed across
+        concurrency domains safely.
+      </p>
+
+      <p>
+        However, if we attempt to make the Post class conform to Sendable, Swift will emit a compile-time error:
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+“Stored property '_likeCount' of 'Sendable'-conforming class 'Post' is mutable.”
+</code></pre>
+      </div>
+
+      <p>
+        First of all Post class must be a final class, and it should not inherit from any superclass.
+      </p>
+
+      <p>
+        When working with shared mutable state in a background context, one effective solution is to use a lock to synchronize access.
+        Apple provides
+
+        <span class="external-link">
+              <a href="https://developer.apple.com/documentation/os/osallocatedunfairlock">OSAllocatedUnfairLock</a>
+        </span>
+
+        in the os module, which offers efficient, low-level locking with minimal overhead.
+      </p>
+
+      <p>
+        By wrapping access to mutable properties inside a lock, we can ensure safe concurrent reads and writes.
+        This approach eliminates race conditions and provides consistent results.
       </p>
       <div class="code-container">
         <button class="copy-button" title="Copy">Copy</button>
@@ -151,12 +224,25 @@ final class Post: Sendable {
 }
 </code></pre>
       </div>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+Expected: 1000, Actual: 1000.
+</code></pre>
+      </div>
+
 
       <h2>Actor</h2>
       <p>
-        Do we need to use a class in this situation? Actors offer a more appropriate and modern alternative. As reference
-        types that conform to Sendable by default, actors manage their internal state in a thread-safe manner without
-        requiring explicit locking mechanisms.
+        Do we need to use a class in this situation? Swift's concurrency model introduces the
+
+        <span class="external-link">
+              <a href="https://developer.apple.com/documentation/swift/actor">Actors</a>
+        </span>
+
+        type, designed to protect mutable state through isolation. When you
+        define a method or property within an actor, it is automatically isolated. This means only one task at a time can
+        access or modify the actor’s internal state, ensuring thread safety without requiring locks.
       </p>
       <div class="code-container">
         <button class="copy-button" title="Copy">Copy</button>
@@ -203,24 +289,12 @@ class PostRepository: @unchecked Sendable {
       </div>
       <p>
         By converting our Post class to an actor, we naturally ensure thread safety. Accessing actor properties or methods
-        from outside requires the await keyword. This provides both clarity and safety by enforcing structured concurrency.
+        from outside requires the await keyword.
       </p>
 
-      <h2>MainActor, Isolated, Non-Isolated</h2>
+      <h2>Isolated, Non-Isolated</h2>
       <p>
-        Since we know Sendable protocol and Actors now we can understand better about MainActor, Isolated, Non-Isolated.
-        MainActor is equivalent to the main dispatch queue. It ensures that any code annotated with @MainActor runs on the main thread.
-      </p>
-
-      <p>
-        Now that we've covered Sendable and actors, it’s easier to understand the roles of MainActor, isolated, and nonisolated.
-        MainActor is similar to the main dispatch queue, it guarantees that annotated code runs on the main thread.
-      </p>
-
-      <p>
-        We can create an Actor and by default all methods and properties are isolated it means that function has exclusive access to a
-        specific actor’s internal state. For example our like() function is isolated function. If you want to create a
-        new function or property that can run outside of the actor's isolation you can use nonisolated keyword.
+        For example, the like() function below is an isolated method. It has exclusive access to the actor’s mutable state:
       </p>
       <div class="code-container">
         <button class="copy-button" title="Copy">Copy</button>
@@ -253,14 +327,40 @@ actor Post {
 </code></pre>
       </div>
 
-      <h2>Parallelism</h2>
       <p>
-        While this post doesn't cover the differences between parallelism and concurrency in detail (you can refer to my
-        earlier blog post on that topic), here’s a practical example.
+        By default, all methods inside an actor are isolated. However, if a method doesn’t interact with the actor's mutable
+        state or needs to be accessed without requiring the actor’s isolation context, you can mark it with the nonisolated
+        keyword. This allows the method to run on any thread without going through the actor's queue.
       </p>
 
       <p>
-        Imagine we need to process multiple files concurrently. Since the tasks are independent, they can run in parallel
+        The log(_:) function is marked nonisolated. It doesn’t touch any mutable state and is safe
+        to call from outside the actor’s context, even on different threads.
+      </p>
+
+      <h3>When to Use nonisolated?</h3>
+      <ul>
+        <li>The function does not depend on the actor’s internal mutable state.</li>
+        <li>The method must be available from any context or thread.</li>
+        <li>You're building a library or API and want consumers to decide which thread or context to run a function on.</li>
+      </ul>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+struct Parser {
+    nonisolated func parse(data: Data) async throws -> Int {
+        // ...
+    }
+}
+</code></pre>
+      </div>
+      <p>
+        This makes your code more flexible and avoids unnecessary serialization on the actor’s internal queue.
+      </p>
+
+      <h2>Parallelism</h2>
+      <p>
+        Now, imagine we need to process multiple files concurrently. Since the tasks are independent, they can run in parallel
         without blocking each other.
       </p>
       <div class="code-container">
@@ -412,8 +512,33 @@ Completed processing: file4.txt (size: 3064 bytes)
       <h2>Conclusion</h2>
       <p>
         Concurrency is a broad topic with multiple ways to avoid common pitfalls like race conditions. You can use low-level
-        locking tools like os_unfair_lock, NSLock, or OSAllocatedUnfairLock. Alternatively, DispatchQueue.sync can ensure
-        serial execution.
+        locking tools like
+
+        <span class="external-link">
+              <a href="https://developer.apple.com/documentation/os/os_unfair_lock">os_unfair_lock</a>
+        </span>
+
+        ,
+
+
+        <span class="external-link">
+              <a href="https://developer.apple.com/documentation/foundation/nslock">NSLock</a>
+        </span>
+
+        , or
+
+        <span class="external-link">
+              <a href="https://developer.apple.com/documentation/os/osallocatedunfairlock">OSAllocatedUnfairLock</a>
+        </span>
+
+        . Alternatively,
+
+
+        <span class="external-link">
+              <a href="https://developer.apple.com/documentation/dispatch/dispatchqueue/sync(execute:)-3segw">DispatchQueue.sync</a>
+        </span>
+
+        can ensure serial execution.
       </p>
 
       <p>
