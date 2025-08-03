@@ -108,6 +108,17 @@ class PostRepository: @unchecked Sendable {
       </p>
 
       <p>
+        By using <code>@unchecked Sendable</code>, we inform the compiler that we are taking responsibility for ensuring the
+        thread-safety of the type. Without this annotation, the compiler emits an error such as the following:
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+Passing closure as a 'sending' parameter risks causing data races between code in the current task and concurrent execution of the closure.
+</code></pre>
+      </div>
+
+      <p>
         The output may look like:
       </p>
       <div class="code-container">
@@ -146,8 +157,12 @@ Expected: 1000, Actual: 983.
               <a href="https://developer.apple.com/documentation/swift/mainactor">@MainActor</a>
         </span>
 
-        or set the default actor isolation level to MainActor you can remove the @unchecked Sendable annotation.
-        This ensures that all code within the class runs on the main thread, providing implicit synchronization.
+        or set the default actor isolation level to MainActor you can remove the <code>@unchecked Sendable</code> annotation.
+
+        @MainActor ensures that all code within the class is isolated to the main actor's execution context. This provides
+        synchronization by serializing access to the shared state, with the additional guarantee that UI-related operations
+        execute on the main dispatch queue.
+
         As a result, the compiler allows the code to compile successfully and outputs:
       </p>
       <div class="code-container">
@@ -180,7 +195,7 @@ Expected: 1000, Actual: 1000.
       </div>
 
       <p>
-        First of all Post class must be a final class, and it should not inherit from any superclass.
+        First of all Post class must be a final class, and it should not have superclass or have NSObject as the superclass.
       </p>
 
       <p>
@@ -230,7 +245,6 @@ final class Post: Sendable {
 Expected: 1000, Actual: 1000.
 </code></pre>
       </div>
-
 
       <h2>Actor</h2>
       <p>
@@ -291,6 +305,64 @@ class PostRepository: @unchecked Sendable {
         By converting our Post class to an actor, we naturally ensure thread safety. Accessing actor properties or methods
         from outside requires the await keyword.
       </p>
+
+      <h2>struct & Sendable</h2>
+      <p>
+        In the previous example, we relied on <code>@unchecked Sendable</code> because <code>PostRepository</code> was a class
+        and contained mutable state not guaranteed to be thread-safe. However, there's no requirement for the repository to be a class.
+        By converting it into a <code>struct</code> and conforming it to the <code>Sendable</code> protocol, we can eliminate
+        the need for <code>@unchecked</code> entirely.
+      </p>
+
+      <p>
+        With Swift 6 and the default actor isolation set to <code>nonisolated</code>, this code compiles cleanly, without
+        suppressing any compiler warnings because the struct is value type-safe and immutable by default, and all shared mutable
+        state remains protected inside the <code>Post</code> actor.
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+actor Post {
+    let title: String
+    let description: String
+    private var _likeCount: Int = 0
+
+    init(title: String, description: String, likeCount: Int) {
+        self.title = title
+        self.description = description
+        self._likeCount = likeCount
+    }
+
+    var likeCount: Int {
+        return _likeCount
+    }
+
+    func like() {
+        _likeCount += 1
+    }
+}
+
+
+struct PostRepository: Sendable {
+    let post: Post = .init(title: "test", description: "demo", likeCount: 0)
+
+    func likePost() async {
+        await withTaskGroup(of: Void.self) { group in
+            for _ in 1...1000 {
+                group.addTask {
+                    await self.likePostConcurrently()
+                }
+            }
+        }
+        print("Expected: 1000, Actual: \(await post.likeCount)")
+    }
+
+    private func likePostConcurrently() async {
+        await post.like()
+    }
+}
+</code></pre>
+      </div>
 
       <h2>Isolated, Non-Isolated</h2>
       <p>
@@ -379,7 +451,7 @@ struct FileProcessor {
             var failureCount = 0
             var totalSize = 0
 
-            for await unsafe result in group {
+            for await result in group {
                 switch result {
                 case .success(let size):
                     successCount += 1
