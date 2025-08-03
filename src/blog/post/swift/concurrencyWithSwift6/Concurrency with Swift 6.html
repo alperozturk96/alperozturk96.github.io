@@ -439,19 +439,6 @@ actor Post {
         <li>The method must be available from any context or thread.</li>
         <li>You're building a library or API and want consumers to decide which thread or context to run a function on.</li>
       </ul>
-      <div class="code-container">
-        <button class="copy-button" title="Copy">Copy</button>
-        <pre><code class="language-swift">
-struct Parser {
-    nonisolated func parse(data: Data) async throws -> Int {
-        // ...
-    }
-}
-</code></pre>
-      </div>
-      <p>
-        This makes your code more flexible and avoids unnecessary serialization on the actor’s internal queue.
-      </p>
 
       <h2>Parallelism</h2>
       <p>
