@@ -82,7 +82,7 @@ class Post {
 
 
 class PostRepository: @unchecked Sendable {
-    var post: Post = .init(title: "test", description: "demo", likeCount: 0)
+    let post: Post = .init(title: "test", description: "demo", likeCount: 0)
 
     func likePost() async {
         await withTaskGroup(of: Void.self) { group in
@@ -134,7 +134,7 @@ Expected: 1000, Actual: 983.
 
       <h3>Default Actor Isolation</h3>
       <p>
-        With Xcode 26, you can configure the default actor isolation behavior between nonisolated or MainActor.
+        You can configure the default actor isolation behavior between nonisolated or MainActor.
         It is generally recommended to default to MainActor this ensures your isolated methods execute on the main thread
         unless explicitly overridden.
       </p>
@@ -282,7 +282,7 @@ actor Post {
 }
 
 class PostRepository: @unchecked Sendable {
-    var post: Post = .init(title: "test", description: "demo", likeCount: 0)
+    let post: Post = .init(title: "test", description: "demo", likeCount: 0)
 
     func likePost() async {
         await withTaskGroup(of: Void.self) { group in
@@ -303,7 +303,8 @@ class PostRepository: @unchecked Sendable {
       </div>
       <p>
         By converting our Post class to an actor, we naturally ensure thread safety. Accessing actor properties or methods
-        from outside requires the await keyword.
+        from outside requires the await keyword. But we are still using the <code>@unchecked Sendable</code> because
+
       </p>
 
       <h2>struct & Sendable</h2>
@@ -428,6 +429,61 @@ struct Parser {
       </div>
       <p>
         This makes your code more flexible and avoids unnecessary serialization on the actor’s internal queue.
+      </p>
+
+      <h2>@concurrent</h2>
+      <p>
+        The
+
+        <span class="external-link">
+              <a href="https://developer.apple.com/videos/play/wwdc2025/268/">@concurrent</a>
+        </span>
+
+        attribute allows you to explicitly indicate that an <code>async</code> function should
+        not inherit actor isolation from its caller. This is particularly useful when you want to perform
+        work in parallel or offload a task from the current actor, such as when you're running on the <code>MainActor</code>
+        and need to execute a compute-heavy operation in the background without blocking the main thread.
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+struct ImageProcessor {
+
+    func isMainThread() -> Bool {
+        return Thread.isMainThread
+    }
+
+    func processImage() async {
+        print("Running on main thread: \(isMainThread())")
+
+        // Offload heavy task
+        await performHeavyWork()
+
+        print("Back on main thread: \(isMainThread())")
+    }
+
+    @concurrent
+    func performHeavyWork() async {
+        print("Running heavy task on background thread: \(await isMainThread() == false)")
+        // Simulate heavy computation
+        try? await Task.sleep(nanoseconds: 1_000_000_000)
+    }
+}
+
+</code></pre>
+      </div>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+Running on main thread: true
+Running heavy task on background thread: false
+Back on main thread: true
+</code></pre>
+      </div>
+      <p>
+        In the example above, <code>processImage()</code> is isolated to the <code>MainActor</code>, meaning all of its
+        code would normally run on the main thread. However, by marking <code>performHeavyWork()</code> with <code>@concurrent</code>,
+        we allow it to run concurrently outside of the main thread.
       </p>
 
       <h2>Parallelism</h2>
