@@ -311,10 +311,8 @@ class PostRepository: @unchecked Sendable {
 
       <h2>struct & Sendable</h2>
       <p>
-        In the previous example, we relied on <code>@unchecked Sendable</code> because <code>PostRepository</code> was a class
-        and contained mutable state not guaranteed to be thread-safe. However, there's no requirement for the repository to be a class.
-        By converting it into a <code>struct</code> and conforming it to the <code>Sendable</code> protocol, we can eliminate
-        the need for <code>@unchecked</code> entirely.
+        By converting PostRepository class into a <code>struct</code> and conforming it to the <code>Sendable</code> protocol,
+        we can eliminate the need for <code>@unchecked</code> entirely.
       </p>
 
       <p>
