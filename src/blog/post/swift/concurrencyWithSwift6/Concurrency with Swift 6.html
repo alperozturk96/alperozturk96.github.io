@@ -304,7 +304,9 @@ class PostRepository: @unchecked Sendable {
       <p>
         By converting our Post class to an actor, we naturally ensure thread safety. Accessing actor properties or methods
         from outside requires the await keyword. But we are still using the <code>@unchecked Sendable</code> because
-
+        even though Post is now an actor and safe to share, the PostRepository class itself is not inherently thread-safe.
+        A different thread could potentially assign a completely new Post actor instance to self.post, creating a data race
+        on the reference itself.
       </p>
 
       <h2>struct & Sendable</h2>
