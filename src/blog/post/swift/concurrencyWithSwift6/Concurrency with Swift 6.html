@@ -302,11 +302,33 @@ class PostRepository: @unchecked Sendable {
 </code></pre>
       </div>
       <p>
-        By converting our Post class to an actor, we naturally ensure thread safety. Accessing actor properties or methods
-        from outside requires the await keyword. But we are still using the <code>@unchecked Sendable</code> because
-        even though Post is now an actor and safe to share, the PostRepository class itself is not inherently thread-safe.
-        A different thread could potentially assign a completely new Post actor instance to self.post, creating a data race
-        on the reference itself.
+        By converting our <code>Post</code> class to an <code>actor</code>, we ensure that its internal mutable state is
+        protected through actor isolation. Accessing its properties or methods from outside requires the <code>await</code>
+        keyword, which serializes access and prevents race conditions.
+      </p>
+
+      <p>
+        However, we're still marking <code>PostRepository</code> as <code>@unchecked Sendable</code>. Why? Because
+        <code>PostRepository</code> is a class a reference type and reference types are inherently not thread-safe.
+        Multiple concurrent tasks could access and mutate the same instance simultaneously. Even if the <code>post</code>
+        property inside it is safe (since it's an actor), the <strong>reference to that property</strong> is not protected.
+      </p>
+
+      <p>
+        For example, if one task reads <code>self.post</code> while another assigns a new <code>Post</code> instance to it,
+        that introduces a race condition on the reference itself. The actor doesn't protect the enclosing object, it only
+        protects its own internal state. This is why classes like <code>PostRepository</code> must either be:
+      </p>
+
+      <ul>
+        <li>Properly synchronized</li>
+        <li>Isolated with <code>@MainActor</code> or another actor</li>
+        <li>Rewritten as a <code>struct</code> (a value type) that conforms to <code>Sendable</code>.</li>
+      </ul>
+
+      <p>
+        Reference types shared across concurrency domains require extra care, since their memory is shared, and any mutation
+        or reassignment from multiple tasks may lead to data races, even if the properties they point to are otherwise thread-safe.
       </p>
 
       <h2>struct & Sendable</h2>
