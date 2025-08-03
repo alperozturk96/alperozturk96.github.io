@@ -327,7 +327,7 @@ class PostRepository: @unchecked Sendable {
       </ul>
 
       <p>
-        Reference types shared across concurrency domains require extra care, since their memory is shared, and any mutation
+        Classes shared across concurrency domains require extra care, since their memory is shared, and any mutation
         or reassignment from multiple tasks may lead to data races, even if the properties they point to are otherwise thread-safe.
       </p>
 
