@@ -83,12 +83,10 @@ li {
     color: #eee;
     text-align: center;
     padding: 2rem;
-    font-size: 14px;
-    border-top: 2px solid #202022;
+    font-size: 1rem;
     margin-top: 1rem;
 }
 
 .footer .no-ai {
     color: #ffffff;
-    margin-top: 1rem;
 }
