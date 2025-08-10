@@ -71,4 +71,11 @@ export const blogData = [
     "path": "../../blog/post/swift/concurrencyWithSwift6/Concurrency with Swift 6.html",
     "date": "02 August 2025"
   },
+  {
+    "title": "Android runtime and Dalvik",
+    "summary": "",
+    "type": PostType.Android,
+    "path": "../../blog/post/android/Android runtime and Dalvik.html",
+    "date": "10 August 2025"
+  },
 ]

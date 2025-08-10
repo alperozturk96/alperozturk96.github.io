@@ -1,0 +1,163 @@
+<article class="post">
+    <header class="post-header">
+        <h1>Android runtime and Dalvik</h1>
+        <time datetime="2025-08-10">10 August 2025</time>
+    </header>
+
+    <main class="post-content">
+        <section class="post-section">
+            <p>
+                You’ve probably heard people say Android is slower than iOS. Maybe you bumped into a tech enthusiast who
+                told you it’s because Android runs on Java and the Java Virtual Machine (JVM), while iOS apps are
+                compiled
+                directly to machine code, making iPhones faster.
+            </p>
+
+            <p>
+                Well, let me tell you. That’s not quite right. To really understand, let’s dive deeper.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Java, Kotlin, and the JVM</h2>
+            <p>
+                Most Android apps are written in Java or Kotlin. Sometimes, if you need it, you can use languages like C++.
+                <strong>But here’s the catch: Java and Kotlin are often associated with the JVM, but Android has never used
+                the standard JVM. Instead, Android's build tools (like D8/R8) compile Java/Kotlin code into DEX
+                format.</strong>
+            </p>
+
+            <p>
+                Once you install an app and start using it, it’s not running on a standard JVM anymore. This is a common
+                misunderstanding that even some tech enthusiasts get wrong.
+            </p>
+
+            <p>
+              Performance comparisons between Android and iOS devices are complex and depend heavily on the specific devices
+              being compared, the apps being tested, and the testing conditions. While some high-end Android phones may
+              outperform certain iPhones in specific scenarios like app launch times or page load, overall performance
+              varies significantly across different use cases and hardware configurations.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>DEX Files</h2>
+            <p>
+              When you install an Android app, it's actually DEX files your phone uses. DEX files are a special bytecode
+              format that Android apps compile down to. They are designed for devices with limited memory and processing power.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Dalvik (Android 1.0 – 4.4)</h2>
+            <p>
+                Dalvik was responsible to handle these DEX files. Dalvik is a virtual machine, yes, but it’s quite
+                different from the JVM. It was designed to work on devices with limited RAM and CPU power.
+            </p>
+
+            <p>
+                Dalvik uses Just-In-Time (JIT) compilation, that means your app’s DEX bytecode gets compiled into machine
+                code while you’re using the app, on the fly.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>ART – Android Runtime (Android 5.0+)</h2>
+            <p>
+                Starting with Android 5.0,
+                <span class="external-link">
+                   <a href="https://source.android.com/docs/core/runtime">ART</a>
+                </span>
+                replaced Dalvik. The big difference? ART used pure Ahead-Of-Time (AOT) compilation at first.
+                When you install an app, ART compiles its DEX bytecode into native machine code once and stores it on
+                your device.
+            </p>
+
+            <p>
+              That means faster app execution and less CPU work while you’re actually using the app. The tradeoff?
+              Installations take longer, and apps use more storage space. This changed with Android 7.0, which reintroduced
+              JIT alongside AOT in a hybrid approach.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Hybrid Compilation (Android 7.0+)</h2>
+            <p>
+              Starting from Android 7.0, Google introduced a smarter,
+
+              <span class="external-link">
+                   <a href="https://source.android.com/docs/core/runtime/configure#how_art_works">hybrid approach</a>
+              </span>
+
+              combining both AOT and JIT. It combines
+              the fast installation of Just-In-Time (JIT) compilation with the long-term performance benefits of Ahead-Of-Time
+              (AOT) compilation.
+            </p>
+
+            <p>
+              When you first install and run an app, it starts with basic JIT compilation, and the JIT compiler runs in the background
+              collecting performance data. The JIT identifies hot methods, parts of the code you use frequently and compiles
+              them to native machine code on the fly for immediate performance boosts. It also generates a profile of this usage.
+            </p>
+
+            <p>
+              This means that the next time you launch the app, these critical sections are already compiled and run at
+              native speed from the start. This approach offers faster installation, less storage use but still
+              really good performance.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Cloud Profiles (Android 9.0+)</h2>
+            <p>
+              One challenge in all this is figuring out the most efficient way to optimize apps so they run fast without
+              bloating storage or install times.
+            </p>
+            <p>
+              <span class="external-link">
+                   <a href="https://developer.android.com/topic/performance/baselineprofiles/overview#cloud-profiles">Cloud Profiles</a>
+              </span>
+
+              help ART optimize apps by identifying the most commonly used code paths.
+              As a developer, you don’t have to do anything extra. Google Play handles all this automatically but they
+              may take some time after a new release before enough data is collected to be effective.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Baseline Profiles</h2>
+            <p>
+              Cloud profiles are powerful but they do take some time to gather and analyze data before they become truly accurate.
+            </p>
+
+            <p>
+              That’s where
+
+              <span class="external-link">
+                   <a href="https://developer.android.com/topic/performance/baselineprofiles/overview">baseline profiles</a>
+              </span>
+
+              come in. Developers can ship these profiles directly with their apps, giving
+              Android Runtime a head start on what to optimize right from the first install, no waiting needed.
+            </p>
+
+            <p>
+              Because cloud profiles rely on usage data from existing installs, they need to be updated with every new app
+              release. Baseline profiles solve that by being bundled with each update. Developers generate and include them.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Conclusion</h2>
+            <p>
+              All this might sound complicated or even overwhelming, but the reality is Android has come a long way.
+              It’s fast, highly optimized, and keeps getting better with every update.
+            </p>
+
+            <p>
+              Modern Android devices are extremely smooth and responsive, even after years of use. Many manufacturers now
+              support OS updates for 5 to 7 years.
+            </p>
+        </section>
+    </main>
+</article>
