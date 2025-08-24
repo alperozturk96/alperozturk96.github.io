@@ -78,4 +78,11 @@ export const blogData = [
     "path": "../../blog/post/android/Android runtime and Dalvik.html",
     "date": "10 August 2025"
   },
+  {
+    "title": "GraphQL & Apollo Client",
+    "summary": "",
+    "type": PostType.Swift,
+    "path": "../../blog/post/swift/graphQLAndApolloClient/GraphQL & Apollo Client.html",
+    "date": "24 August 2025"
+  },
 ]
