@@ -71,7 +71,7 @@ function renderPosts(posts, container) {
                 <h2>${post.title}</h2>
                 <p>${post.summary}</p>
                 <div class="external-link">
-                   <a href="/post/index.html?path=${post.path}">
+                   <a href="/post?id=${post.path}">
                         Continue Reading
                     </a>
                 </div>

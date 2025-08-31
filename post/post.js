@@ -2,7 +2,7 @@ import { blogData } from "../blog/data/blog.data.js";
 import {UnicodeIcons} from "../assets/icons/unicode.icons.js";
 
 const params = new URLSearchParams(window.location.search);
-const path = params.get("path");
+const path = params.get("id");
 const contentEl = document.getElementById("post-element");
 const post = blogData.find(p => p.path === path);
 
