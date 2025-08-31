@@ -85,4 +85,11 @@ export const blogData = [
     "path": "../../blog/post/swift/graphQLAndApolloClient/GraphQL & Apollo Client.html",
     "date": "24 August 2025"
   },
+  {
+    "title": "Integrating an Interval Timer into the Music Player",
+    "summary": "",
+    "type": PostType.Android,
+    "path": "../../blog/post/android/integratingAnIntervalTimerIntoTheMusicPlayer/Integrating an Interval Timer into the Music Player.html",
+    "date": "31 August 2025"
+  },
 ]
