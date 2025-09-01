@@ -247,9 +247,10 @@ private suspend fun countdown(
 ) {
     var remaining = seconds
     while (remaining > 0) {
-        while (!isRunning) {
+        if (!isRunning) {
             // Check every 100ms if we should resume
             delay(100)
+            continue
         }
 
         val text = if (isWork) {
