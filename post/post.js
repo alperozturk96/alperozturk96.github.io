@@ -6,12 +6,11 @@ const path = params.get("id");
 const contentEl = document.getElementById("post-element");
 const post = blogData.find(p => p.path === path);
 
-init();
+
+init()
 
 function init() {
-    if (!post) {
-        contentEl.textContent = "Post not found.";
-    } else {
+    if (post) {
         document.title = post.title;
 
         fetch(post.path)
@@ -22,6 +21,7 @@ function init() {
                 return response.text();
             })
             .then(html => {
+                contentEl.innerHTML = "";
                 const postBody = document.createElement("div");
                 postBody.innerHTML = html;
                 contentEl.appendChild(postBody);
@@ -34,7 +34,10 @@ function init() {
             .catch(error => {
                 contentEl.textContent = "Error loading post: " + error.message;
             });
+        return;
     }
+
+    contentEl.textContent = "Post not found.";
 }
 
 function makeExpandableImages() {
