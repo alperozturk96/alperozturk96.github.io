@@ -92,4 +92,11 @@ export const blogData = [
     "path": "integrating-an-interval-timer-into-the-music-player",
     "date": "31 August 2025"
   },
+  {
+    "title": "Creating a Launcher with Tile Layouts",
+    "summary": "",
+    "type": PostType.Android,
+    "path": "creating-a-launcher-with-tile-layouts",
+    "date": "7 September 2025"
+  },
 ]

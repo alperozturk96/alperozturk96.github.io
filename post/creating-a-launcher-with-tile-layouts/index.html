@@ -1,0 +1,490 @@
+<article class="post">
+    <header class="post-header">
+        <h1>Creating a Launcher with Tile Layouts</h1>
+        <time datetime="2025-09-7">7 September 2025</time>
+    </header>
+
+    <main class="post-content">
+        <section class="post-section">
+            <p>
+                I'm using my own launcher application called TextLauncher. It's simple and written in Jetpack Compose.
+                I want to add a new option to have tiles on the home screen. Back when I was using a Lumia 920, I really
+                loved its UI/UX — it was so simple and straightforward.
+            </p>
+
+            <p>
+                Since I already have my own launcher, I thought: why not add that option too?
+            </p>
+        </section>
+
+
+        <section class="post-section">
+            <h2>Problem</h2>
+            <p>
+                As far as I remember, Windows Phone 8 had three different tile types: Small, Medium, and Large.
+            </p>
+
+            <ul>
+                <li>The Small tile was half the height of the Medium.</li>
+                <li>The Large tile had the same height as the Medium but was twice as wide.</li>
+            </ul>
+
+            <p>
+                This meant you could fit different combinations in a row, such as:
+            </p>
+
+            <ul>
+                <li>6 small tiles</li>
+                <li>3 medium tiles</li>
+                <li>1 medium + 1 large</li>
+            </ul>
+
+            <p>
+                …and so on. Basically, we need some math to calculate and resize each row.
+            </p>
+
+            <p>
+                Drag & Drop support is out of this initial implementation, but I might add it later — with animations too —
+                since that part is also important.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Implementation</h2>
+            <h3>AppTileSize</h3>
+            <p>
+                All width and height calculations are based on the Small tile size. We’ll use it as the base and then
+                multiply it with lineSpan. lineSpan tells us how much space a tile will take. This value is important
+                because we’ll later use it in LazyVerticalGrid.
+            </p>
+
+            <p>
+                On top of that, I also added a MediumPlus tile size.
+            </p>
+
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-kotlin">
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import kotlinx.serialization.Serializable
+
+private const val MIN_TILE_SIZE = 73.6
+
+@Serializable
+enum class AppTileSize(
+    val width: Dp,
+    val height: Dp,
+    val lineSpan: Int,
+    val iconSize: Dp,
+    val fontSize: TextUnit,
+    val textId: Int
+) {
+    Small(
+        width = MIN_TILE_SIZE.dp,
+        height = MIN_TILE_SIZE.dp,
+        lineSpan = 1,
+        iconSize = 32.dp,
+        fontSize = 9.sp,
+        textId = R.string.app_tile_size_picket_bottom_sheet_small
+    ),
+    Medium(
+        width = MIN_TILE_SIZE.times(2).dp,
+        height = MIN_TILE_SIZE.times(2).dp,
+        lineSpan = 2,
+        iconSize = 64.dp,
+        fontSize = 11.sp,
+        textId = R.string.app_tile_size_picket_bottom_sheet_medium
+    ),
+    MediumPlus(
+        width = MIN_TILE_SIZE.times(3).dp,
+        height = MIN_TILE_SIZE.times(3).dp,
+        lineSpan = 3,
+        iconSize = 72.dp,
+        fontSize = 14.sp,
+        textId = R.string.app_tile_size_picket_bottom_sheet_medium_plus
+    ),
+    Large(
+        width = MIN_TILE_SIZE.times(4).dp,
+        height = MIN_TILE_SIZE.times(2).dp,
+        lineSpan = 4,
+        iconSize = 96.dp,
+        fontSize = 12.sp,
+        textId = R.string.app_tile_size_picket_bottom_sheet_large
+    );
+}
+</code></pre>
+            </div>
+
+            <h3>App</h3>
+            <p>
+                Next, we need to add a tile size property to the app itself, and also update the database. We have to
+                remember the tile size of each app to avoid unnecessary recalculations (thanks to the predefined enum values)
+                and persist the data so the UI stays consistent.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-kotlin">
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+@Entity(tableName = "apps")
+data class App(
+    val name: String,
+
+    @SerialName("package_name")
+    @PrimaryKey
+    val packageName: String,
+
+    val state: AppState,
+    val tileSize: AppTileSize
+)
+</code></pre>
+            </div>
+
+            <h3>Changing Tile Color</h3>
+            <p>
+                In my application, the user can already change the background and foreground colors.
+                However, I cannot use those same values for tiles. So, I added a separate color set specifically for tiles.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre>
+    <code class="language-kotlin">
+enum class ColorSet(val colors: List&lt;Color&gt;) {
+    TileColor(
+        listOf(
+            Color(0xFF1A2980),
+            Color(0xFF050505),
+            Color(0xFF080808),
+            Color(0xFF101010),
+            Color(0xFF111111),
+            Color(0xFF121212),
+            Color(0xFF1E1E1E),
+            Color(0xFF333333),
+            Color(0xFF2C3E50),
+            Color(0xFFFFFFFF),
+            Color(0xFF00ABA9),
+            Color(0xFFE51400),
+            Color(0xFF1BA1E2),
+            Color(0xFF8CBF26),
+            Color(0xFFFFA500),
+            Color(0xFF6A00FF),
+            Color(0xFFFFC20E),
+            Color(0xFF2D89EF),
+            Color(0xFFEE1111),
+            Color(0xFF8C0095)
+        )
+    ),
+    ContentColor
+    // ...
+}
+    </code>
+  </pre>
+            </div>
+            <img class="post-img" src="/post/creating-a-launcher-with-tile-layouts/tile_color_set.png" alt="Tile color set screenshot">
+
+            <h3>Selecting Tile Size</h3>
+            <p>
+                The user should be able to change the tile size, and the UI should react immediately.
+                Currently, I’m using a bottom sheet for this action, but I may change it in the future to make it easier
+                to use.
+            </p>
+
+            <p>
+                The AppTileSizePickerBottomSheet takes the app data and indicates the current size. Whenever the user changes
+                the index (which corresponds to a tile size), we update it via the ViewModel.
+            </p>
+
+            <p>
+                We could put the update logic in onDismiss and only update the database once. However, that would prevent
+                the user from seeing live changes. Instead, this way the user can instantly see how the tile will look and decide.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre>
+    <code class="language-kotlin">
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppTileSizePickerBottomSheet(app: App, viewModel: HomeViewModel, onDismiss: () -> Unit = {}) {
+    val userSettings by userSettings.collectAsState()
+    val sheetState = rememberModalBottomSheetState()
+    val sizes = AppTileSize.entries.toTypedArray()
+    var selectedIndex by remember { mutableIntStateOf(app.tileSize.ordinal) }
+
+    LaunchedEffect(selectedIndex) {
+        viewModel.updateApp(app.copy(tileSize = sizes[selectedIndex]))
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = userSettings.getBackgroundColor(),
+        contentColor = userSettings.getForegroundColor(),
+        content = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.app_tile_size_picket_bottom_sheet_select_tile_size),
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Slider(
+                    colors = SliderDefaults.colors(
+                        activeTrackColor = userSettings.getForegroundColor(),
+                        inactiveTrackColor = userSettings.containerColor(),
+                        inactiveTickColor = userSettings.getForegroundColor()
+                    ),
+                    value = selectedIndex.toFloat(),
+                    onValueChange = { selectedIndex = it.toInt().coerceIn(0, sizes.lastIndex) },
+                    valueRange = 0f..(sizes.lastIndex.toFloat()),
+                    steps = sizes.lastIndex - 1
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    sizes.forEach { size ->
+                        Text(text = stringResource(id = size.textId))
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+            }
+        }
+    )
+}
+    </code>
+  </pre>
+            </div>
+            <img class="post-img" src="/post/creating-a-launcher-with-tile-layouts/select_tile_size.png" alt="Select tile size screenshot">
+
+            <h3>AppGrid</h3>
+            <p>
+                This composable is responsible for drawing tiles.
+                Normally, apps have actions valid for the AppRow variant of a home item. But for the grid variant, I had to
+                add an action: change tile size.
+            </p>
+
+            <p>
+                Here, we directly use the app's tileSize for width, height, icon size, and font size. This avoids the need
+                for long if-else chains in the composable.
+            </p>
+
+            <p>
+                One small detail: just like the original Windows Phone UI, the Small tile doesn’t display the app name. This
+                makes sense, since adding text on such a small tile wouldn’t be readable anyway.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre>
+    <code class="language-kotlin">
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
+
+@Composable
+fun AppGrid(
+    viewModel: HomeViewModel,
+    app: App,
+    appActions: List&lt;ActionBottomSheetData&gt;
+) {
+    val userSettings by userSettings.collectAsState()
+    val appIcon = appModule.appManager.getAppIcon(app.packageName)
+    var showAppActions by remember { mutableStateOf(false) }
+    var showChangeTileSizeBottomSheet by remember { mutableStateOf(false) }
+
+    val gridAppActions = appActions + ActionBottomSheetData(
+        R.string.app_list_screen_change_tile_size,
+        R.drawable.ic_change_tile_size,
+        action = { showChangeTileSizeBottomSheet = true }
+    )
+    Column(
+        modifier = Modifier
+            .padding(1.dp)
+            .width(app.tileSize.width)
+            .height(app.tileSize.height)
+            .background(color = userSettings.getTileColor())
+            .combinedClickable(
+                onLongClick = { showAppActions = true },
+                onClick = { appModule.appManager.launchApp(app.packageName) }
+            ),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            appIcon?.let {
+                Image(
+                    bitmap = it.toBitmap().asImageBitmap(),
+                    contentDescription = app.name,
+                    modifier = Modifier.size(app.tileSize.iconSize),
+                )
+            }
+        }
+
+        if (app.tileSize != AppTileSize.Small) {
+            Text(
+                text = app.name,
+                fontSize = app.tileSize.fontSize,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = Color.White,
+                modifier = Modifier.padding(start = 6.dp)
+            )
+        }
+    }
+
+    if (showAppActions) {
+        ActionBottomSheet(
+            title = app.name,
+            appActions = gridAppActions,
+            dismiss = { showAppActions = false }
+        )
+    }
+
+    if (showChangeTileSizeBottomSheet) {
+        AppTileSizePickerBottomSheet(app, viewModel) {
+            showChangeTileSizeBottomSheet = false
+        }
+    }
+}
+    </code>
+  </pre>
+            </div>
+
+            <h3>HomeScreen</h3>
+            <p>
+                Now we can use these components inside the home screen. I’m using LazyVerticalGrid with GridCells.Fixed.
+                This way, the grid always has 6 columns, and it won’t change.
+            </p>
+
+            <p>
+                The most important part here is in inside items LazyGridItemSpanScope.
+                The GridItemSpan determines how many columns an item will take. This value comes directly from the app’s
+                tile size — which we predefined earlier.
+
+                This means we don’t have to write any special logic: LazyVerticalGrid handles it automatically.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre>
+    <code class="language-kotlin">
+@Composable
+fun HomeScreen(viewModel: HomeViewModel) {
+    val homeApps by viewModel.homeApps.collectAsState()
+
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize()) {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(6),
+            modifier = Modifier.fillMaxSize().padding(it),
+            content = {
+                items(
+                    items =homeApps,
+                    span = { app -> GridItemSpan(app.tileSize.lineSpan) }) { app ->
+                    AppGrid(
+                        viewModel,
+                        app = app,
+                        appActions = viewModel.getAppActions(app)
+                    )
+                }
+            }
+        )
+    }
+}
+    </code>
+  </pre>
+            </div>
+            <img class="post-img" src="/post/creating-a-launcher-with-tile-layouts/wp.png" alt="Home screen screenshot">
+
+            <h2>Conclusion</h2>
+            <p>
+                Windows Phone 8 was a really good operating system, and I loved my Lumia 920. The camera, keyboard, and
+                notification system were awesome and intuitive. The UI was so simple that I could access anything very
+                quickly — it felt snappy.
+            </p>
+
+            <p>
+                Good old days.
+                Yes, phones are much faster now, but to be honest, simplicity is gone.
+            </p>
+
+            <p>
+                For example:
+            </p>
+
+            <ul>
+                <li>I don’t want separate control panels and notification centers. I just want to see my notifications with one swipe and only the quick actions I actually need.</li>
+                <li>I want to turn Wi-Fi on with a single tap, not open another dialog with three extra options.</li>
+            </ul>
+
+            <p>
+                And so on...
+            </p>
+        </section>
+    </main>
+</article>
