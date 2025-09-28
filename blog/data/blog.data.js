@@ -99,4 +99,11 @@ export const blogData = [
     "path": "creating-a-launcher-with-tile-layouts",
     "date": "7 September 2025"
   },
+  {
+    "title": "Automatic Reference Counting in Swift",
+    "summary": "In this blogpost we will talk about ARC, strong, weak, unowned references, memory leaks, and common memory leak scenarios.",
+    "type": PostType.iOS,
+    "path": "automatic-reference-counting-in-swift",
+    "date": "28 September 2025"
+  },
 ]

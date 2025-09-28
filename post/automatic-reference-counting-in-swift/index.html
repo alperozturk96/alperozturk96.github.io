@@ -1,0 +1,336 @@
+<article class="post">
+  <header class="post-header">
+    <h1>Automatic Reference Counting in Swift</h1>
+    <time datetime="2025-09-28">28 September 2025</time>
+  </header>
+
+  <main class="post-content">
+    <section class="post-section">
+      <p>
+        You’ve probably heard of memory leaks before and applied a bunch of methods to prevent them
+        during your iOS development journey. In this blogpost, we’ll discuss what memory leaks are,
+        why they matter, and how Swift’s ARC helps us manage memory effectively.
+      </p>
+    </section>
+
+    <section class="post-section">
+      <h2>What's Memory Leak?</h2>
+      <p>
+        When we allocate variables or objects, the system reserves memory for them. Once we are done
+        with these objects, that memory should be released so it can be reused. A memory leak happens
+        when this deallocation does not occur, leaving memory occupied even though the object is no
+        longer needed.
+      </p>
+
+      <p>
+        Over time, unreleased objects accumulate and consume system resources unnecessarily. Even if
+        the leak is small, repeated occurrences can lead to degraded performance or, in severe cases,
+        app termination by the system due to memory pressure.
+      </p>
+    </section>
+
+    <section class="post-section">
+      <h2>Are Memory Leaks Really That Important?</h2>
+      <p>
+        The impact depends on size and frequency. For example, leaking a simple class instance of 8 KB
+        a few times probably won’t crash your app. But if that class participates in a chain of
+        references or is used in a repetitive process like polling, memory usage can quickly grow out
+        of control, harming performance and user experience.
+      </p>
+
+      <p>
+        Another challenge is unpredictability. Complex apps often have execution flows you can’t fully
+        foresee. As engineers, it’s our responsibility to build scalable, maintainable, and robust
+        architectures that manage memory reliably in all scenarios.
+      </p>
+    </section>
+
+    <section class="post-section">
+      <h2>Value And Reference Types</h2>
+      <p>
+        In Swift programming language, we have two types, value and reference types. Value types create a new copy when
+        assigned, while reference types share the same underlying instance in memory.
+      </p>
+
+      <p>
+        In the code below, we use a struct. When we assign <code>firstCar</code> to
+        <code>secondCar</code>, a new copy is made. Changing <code>secondCar</code> does not affect
+        <code>firstCar</code>.
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+struct Car {
+    var modelname: String
+    let hp: Int
+}
+
+let firstCar = Car(modelname: "FirstCar", hp: 110)
+var secondCar = firstCar
+
+secondCar.modelname = "SecondCar"
+
+print(firstCar.modelname) // FirstCar
+print(secondCar.modelname) // SecondCar
+</code></pre>
+      </div>
+
+      <p>
+        With classes, however, both variables point to the same memory. Updating one, updates the other
+        as well, since they are just two references to the same instance.
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+class Car {
+    var modelname: String
+    let hp: Int
+
+    init(modelname: String, hp: Int) {
+        self.modelname = modelname
+        self.hp = hp
+    }
+}
+
+let firstCar = Car(modelname: "FirstCar", hp: 110)
+var secondCar = firstCar
+
+secondCar.modelname = "SecondCar"
+
+print(firstCar.modelname) // SecondCar
+print(secondCar.modelname) // SecondCar
+</code></pre>
+      </div>
+    </section>
+
+    <section class="post-section">
+      <h2>Relationships Between Reference Types</h2>
+      <p>
+        In Swift, references can be <strong>strong</strong>, <strong>weak</strong>, or
+        <strong>unowned</strong>. These determine how ARC counts references and when objects can be
+        deallocated.
+      </p>
+
+      <p>
+        By understanding these relationships, you gain control over object lifetimes and can prevent
+        memory leaks.
+      </p>
+
+      <h3>Strong</h3>
+      <p>
+        By default, references are <em>strong</em>. A strong reference increases the retain count,
+        keeping the object alive as long as there is at least one strong reference to it.
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+class Car {
+    var modelname: String
+    let hp: Int
+
+    init(modelname: String, hp: Int) {
+        self.modelname = modelname
+        self.hp = hp
+    }
+}
+
+class Owner {
+    let car: Car
+
+    init(car: Car) {
+        self.car = car
+    }
+}
+</code></pre>
+      </div>
+
+      <h3>Weak</h3>
+      <p>
+        Declaring a reference as <code>weak</code> means it does not increase the retain count. Weak
+        references are always <code>Optional</code> and automatically set to <code>nil</code> when the
+        referenced object is deallocated. This makes them safe to use when the referenced object may
+        go away before the holder.
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+class Car {
+    var modelname: String
+    let hp: Int
+
+    init(modelname: String, hp: Int) {
+        self.modelname = modelname
+        self.hp = hp
+    }
+}
+
+class Owner {
+    weak var car: Car?
+
+    init(car: Car) {
+        self.car = car
+    }
+}
+</code></pre>
+      </div>
+
+      <h3>Unowned</h3>
+      <p>
+        An <code>unowned</code> reference also does not increase the retain count, but unlike
+        <code>weak</code>, it is non-optional. ARC does not set it to <code>nil</code> when the object
+        is freed. Accessing it after deallocation will cause a runtime crash. That’s why
+        <code>unowned</code> is only safe when the lifetime of the referenced object is guaranteed to
+        be longer than the one holding it.
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+class Car {
+    var modelname: String
+    let hp: Int
+
+    init(modelname: String, hp: Int) {
+        self.modelname = modelname
+        self.hp = hp
+    }
+}
+
+class Owner {
+    unowned let car: Car
+
+    init(car: Car) {
+        self.car = car
+    }
+}
+</code></pre>
+      </div>
+    </section>
+
+    <section class="post-section">
+      <h2>What is ARC?</h2>
+      <p>
+        <strong>Automatic Reference Counting</strong> (ARC) is Swift’s memory management system. Every
+        time we create a new instance of a class or actor, ARC allocates memory for it and keeps a
+        count of strong references. When the reference count drops to zero, ARC automatically
+        deallocates the object.
+      </p>
+
+      <ul>
+        <li>Each new strong reference increments the count</li>
+        <li>Each released strong reference decrements the count</li>
+        <li>If a cycle exists (two objects strongly reference each other), the count never reaches zero
+          and ARC cannot free the memory</li>
+      </ul>
+    </section>
+
+    <section class="post-section">
+      <h2>Common Leak Scenarios and Solutions</h2>
+
+      <h3>Strong Cycles Between Objects</h3>
+      <p>
+        In the following code, <code>Car</code> has a reference to <code>Owner</code> and
+        <code>Owner</code> has a reference to <code>Car</code>. Both are strong, so neither object’s
+        retain count can ever reach zero. As a result, their <code>deinit</code> methods never run.
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+class Car {
+    var modelname: String
+    let hp: Int
+    var owner: Owner?
+
+    init(modelname: String, hp: Int) {
+        self.modelname = modelname
+        self.hp = hp
+    }
+
+    deinit { print("Car deallocated") }
+}
+
+class Owner {
+    let car: Car
+
+    init(car: Car) {
+        self.car = car
+    }
+
+    deinit { print("Owner deallocated") }
+}
+
+var owner: Owner? = Owner(car: Car(modelname: "Car", hp: 100))
+owner?.car.owner = owner
+owner = nil
+</code></pre>
+      </div>
+
+      <p>
+        To solve this, mark one side as <code>weak</code> or <code>unowned</code>, depending on the
+        ownership model. Then ARC can correctly deallocate both objects.
+      </p>
+
+      <h3>Closures Capturing self</h3>
+      <p>
+        Another very common source of leaks is closures capturing <code>self</code> strongly. For
+        example, this <code>ViewModel</code> may live longer than intended if it’s captured by a
+        long-running task. If the user navigates away, the view is destroyed, but the
+        <code>ViewModel</code> is kept alive by the closure.
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+class ViewModel {
+    var data: [String] = []
+    var timer: Timer?
+
+    func longRunningTask() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in
+            self?.data.append("Loaded")
+        }
+    }
+
+    func startTimer() {
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            self?.tick()
+        }
+    }
+
+    func asyncTask() async {
+        await self.fetch()
+    }
+
+    private func tick() {
+        data.append("Tick")
+    }
+
+    private func fetch() async {
+        try? await Task.sleep(nanoseconds: 1_000_000_000)
+        data.append("Fetched")
+    }
+
+    deinit {
+        timer?.invalidate()
+        print("ViewModel deallocated")
+    }
+}
+</code></pre>
+      </div>
+
+      <p>
+        The fix is to capture <code>self</code> weakly inside closures. This ensures that when the
+        <code>ViewModel</code> is no longer needed, it can be deallocated even if the closure hasn’t
+        executed yet.
+      </p>
+    </section>
+
+    <section class="post-section">
+      <h2>Conclusion</h2>
+      <p>
+        Memory leaks may start small, but if ignored, they accumulate and harm your app’s performance
+        and stability. By understanding ARC and carefully managing <code>strong</code>,
+        <code>weak</code>, and <code>unowned</code> references, you can design safer, more scalable,
+        and more maintainable iOS applications.
+      </p>
+    </section>
+  </main>
+</article>
