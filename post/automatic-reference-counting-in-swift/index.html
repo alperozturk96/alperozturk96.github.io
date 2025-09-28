@@ -107,7 +107,11 @@ print(secondCar.modelname) // SecondCar
       <h2>Relationships Between Reference Types</h2>
       <p>
         In Swift, references can be <strong>strong</strong>, <strong>weak</strong>, or
-        <strong>unowned</strong>. These determine how ARC counts references and when objects can be
+        <strong>unowned</strong>. These determine how
+        <span class="external-link">
+             <a href="https://docs.swift.org/swift-book/documentation/the-swift-programming-language/automaticreferencecounting/">ARC</a>
+        </span>
+        counts references and when objects can be
         deallocated.
       </p>
 
@@ -169,6 +173,47 @@ class Owner {
 
     init(car: Car) {
         self.car = car
+    }
+}
+</code></pre>
+      </div>
+
+      <p>
+         You can use weak reference type in delegation, pattern.
+      </p>
+      <div class="code-container">
+        <button class="copy-button" title="Copy">Copy</button>
+        <pre><code class="language-swift">
+
+protocol ImageProcessingDelegate: AnyObject {
+    func process(_ data: Data)
+}
+
+class ImageProcessor {
+    weak var delegate: ImageProcessingDelegate?
+
+    func prepareImageAndProcess(_ url: String) {
+        // prepare logic
+        // ...
+        // ...
+        let data = Data()
+        delegate?.process(data)
+    }
+}
+
+final class ViewController: UIViewController {
+    private let imageProcessor = ImageProcessor()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        imageProcessor.delegate = self
+        imageProcessor.prepareImageAndProcess("some_image_url")
+    }
+}
+
+extension ViewController: @MainActor ImageProcessingDelegate {
+    func process(_ data: Data) {
+        // process logic ...
     }
 }
 </code></pre>
