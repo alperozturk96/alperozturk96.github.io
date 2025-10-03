@@ -101,9 +101,9 @@ export const blogData = [
   },
   {
     "title": "Automatic Reference Counting in Swift",
-    "summary": "In this blogpost we will talk about ARC, strong, weak, unowned references, memory leaks, and common memory leak scenarios.",
+    "summary": "In this blogpost you can learn about ARC, strong, weak, unowned references, memory leaks, and common memory leak scenarios.",
     "type": PostType.iOS,
     "path": "automatic-reference-counting-in-swift",
-    "date": "28 September 2025"
+    "date": "3 October 2025"
   },
 ]
