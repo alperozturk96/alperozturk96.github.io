@@ -106,4 +106,11 @@ export const blogData = [
     "path": "automatic-reference-counting-in-swift",
     "date": "3 October 2025"
   },
+  {
+    "title": "Understanding FileManager API",
+    "summary": "Lets explore, one of the most powerful and essential tools provided by the Foundation framework.",
+    "type": PostType.iOS,
+    "path": "understanding-file-manager-api",
+    "date": "18 October 2025"
+  },
 ]
