@@ -294,6 +294,8 @@ struct FileManagerUtil {
                 <pre><code class="language-swift">
 let key = "my_secret_file"
 
+// Each app instance gets a unique sandbox path (UUID in the path), so this can change between installs/runs. That's why you are seeing different UUID in the test but once you try yourself you will see the exact results.
+
 // ✅ Created file at: /Users/testuser/Library/Developer/CoreSimulator/Devices/C23A251B-67F8-46ED-9DA4-FB8F72670E6E/data/Containers/Data/Application/58779909-AC51-4F1C-A132-C7EDCF3F0BF3/Documents/my_secret_file
 util.createFile(named: key, content: "Hello World")
 
