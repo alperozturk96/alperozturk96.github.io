@@ -1,0 +1,428 @@
+<article class="post">
+    <header class="post-header">
+        <h1>Composition over Inheritance</h1>
+        <time datetime="2025-10-26">26 October 2025</time>
+    </header>
+
+    <main class="post-content">
+        <section class="post-section">
+            <p>
+                As software engineers, we often apply various design patterns to make our projects easier to maintain
+                and scale. Over time, we also develop certain habits and preferences that shape how we write code day
+                to day.
+
+                In this post, I want to talk about the Composition over Inheritance design principle, what it means,
+                how it differs from inheritance, and why blindly using inheritance for the sake of “clean” code can lead
+                to serious problems down the road.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Don't Repeat Yourself (DRY)</h2>
+            <p>
+                Most of us are familiar with the famous DRY principle, “Don’t Repeat Yourself.”
+                We all love that feeling of satisfaction when our codebase looks clean and reusable, and we can proudly
+                say, “I wrote super clean code, nothing is repeated.”
+            </p>
+
+            <p>
+                There are indeed multiple ways to achieve DRY code. However, when we apply those techniques incorrectly,
+                especially just for the sake of removing repetition, it can have huge negative side effects later on.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Inheritance</h2>
+            <p>
+                In object-oriented programming (OOP), inheritance is one of the most common and foundational concepts.
+                We define a base class, and child classes inherit from it, carrying its responsibilities and behavior.
+                This way, whenever we modify or extend functionality in the base class, all subclasses automatically get
+                the update.
+            </p>
+
+            <p>
+                At first glance, this sounds great, right?
+            </p>
+
+            <p>
+                Well… it depends. Let’s look at when inheritance is helpful, and when it becomes dangerous.
+            </p>
+
+            <h3>Scenario 1 - When Inheritance Helps</h3>
+            <p>
+                Imagine you need to show progress notifications for both downloads and uploads.
+                Instead of duplicating logic for creating channels, building notifications, and handling progress updates,
+                you can create a base class, then have upload and download notification managers extend from it.
+            </p>
+
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre>
+                <code class="language-kotlin">
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+
+abstract class BaseNotificationManager(
+    private val context: Context,
+    private val channelId: String,
+    private val channelName: String
+) {
+    private val notificationManager = NotificationManagerCompat.from(context)
+
+    init {
+        createNotificationChannel()
+    }
+
+    abstract fun getNotificationId(): Int
+    abstract fun getTitle(): String
+    abstract fun getDescription(): String
+    abstract fun getSmallIcon(): Int
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                channelName,
+                NotificationManager.IMPORTANCE_LOW
+            )
+            val manager = context.getSystemService(NotificationManager::class.java)
+            manager?.createNotificationChannel(channel)
+        }
+    }
+
+    protected fun buildBaseNotification(progress: Int = -1, maxProgress: Int = 100): NotificationCompat.Builder {
+        val builder = NotificationCompat.Builder(context, channelId)
+            .setContentTitle(getTitle())
+            .setContentText(getDescription())
+            .setSmallIcon(getSmallIcon())
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setOnlyAlertOnce(true)
+
+        if (progress in 0..maxProgress) {
+            builder.setProgress(maxProgress, progress, false)
+        } else {
+            builder.setProgress(0, 0, false)
+        }
+
+        return builder
+    }
+
+    fun showProgressNotification(progress: Int, maxProgress: Int = 100) {
+        val notification = buildBaseNotification(progress, maxProgress).build()
+        notificationManager.notify(getNotificationId(), notification)
+    }
+
+    fun showCompletedNotification(message: String = "Completed") {
+        val notification = buildBaseNotification()
+            .setContentText(message)
+            .setProgress(0, 0, false)
+            .build()
+        notificationManager.notify(getNotificationId(), notification)
+    }
+
+    fun cancelNotification() {
+        notificationManager.cancel(getNotificationId())
+    }
+}
+
+class DownloadNotificationManager(context: Context) : BaseNotificationManager(
+    context,
+    channelId = "download_channel",
+    channelName = "Download Notifications"
+) {
+    override fun getNotificationId(): Int = 1001
+    override fun getTitle(): String = "Downloading File"
+    override fun getDescription(): String = "Your download is in progress..."
+    override fun getSmallIcon(): Int = R.drawable.ic_download
+}
+
+class UploadNotificationManager(context: Context) : BaseNotificationManager(
+    context,
+    channelId = "upload_channel",
+    channelName = "Upload Notifications"
+) {
+    override fun getNotificationId(): Int = 1002
+    override fun getTitle(): String = "Uploading File"
+    override fun getDescription(): String = "Your upload is in progress..."
+    override fun getSmallIcon(): Int = R.drawable.ic_upload
+}
+                </code>
+                </pre>
+            </div>
+
+            <p>
+                This is a great example of inheritance working well.
+                We’re not repeating ourselves, and the code is clean and maintainable. Both upload and download notifications
+                share common behavior through a single, reusable base class.
+            </p>
+
+            <p>
+                However, the moment we start adding conditional logic or boolean flags inside the <code>BaseNotificationManager</code>
+                to handle different use cases, it’s a clear red flag. It means our abstraction is being stretched beyond
+                its original purpose, and it’s time to pause and reconsider the design before it turns into a maintenance
+                problem.
+            </p>
+
+            <h3>Scenario 2 - When Inheritance Not Good Idea</h3>
+            <p>
+                Now imagine you have multiple Activities, and each one contains multiple Fragments.
+                Naturally, you might think: “Let’s create a BaseActivity and BaseFragment to share logic.”
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre>
+                <code class="language-kotlin">
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.annotation.LayoutRes
+import androidx.fragment.app.Fragment
+
+abstract class BaseActivity : AppCompatActivity() {
+
+    abstract fun getLayoutId(): Int
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(getLayoutId())
+        initViews()
+        initObservers()
+    }
+
+    open fun initViews() {
+        // Common view setup logic
+    }
+
+    open fun initObservers() {
+        // Common observer setup logic (e.g., ViewModel observers)
+    }
+
+    fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    fun showLoading() {
+        // Show a global loading indicator
+    }
+
+    fun hideLoading() {
+        // Hide the loading indicator
+    }
+}
+
+abstract class BaseFragment(@LayoutRes private val layoutId: Int) : Fragment() {
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(layoutId, container, false)
+    }
+
+    open fun initViews(view: View) {}
+    open fun initObservers() {}
+
+    fun showSnackbar(message: String) {
+        view?.let {
+            Snackbar.make(it, message, Snackbar.LENGTH_SHORT).show()
+        }
+    }
+
+    fun showLoading() {
+        (activity as? BaseActivity)?.showLoading()
+    }
+
+    fun hideLoading() {
+        (activity as? BaseActivity)?.hideLoading()
+    }
+}
+
+class MainActivity : BaseActivity() {
+    override fun getLayoutId() = R.layout.activity_main
+
+    override fun initViews() {
+        super.initViews()
+        showToast("MainActivity started")
+    }
+}
+
+class HomeFragment : BaseFragment(R.layout.fragment_home) {
+    override fun initViews(view: View) {
+        super.initViews(view)
+        showSnackbar("Welcome to HomeFragment")
+    }
+}
+                </code>
+                </pre>
+            </div>
+
+            <p>
+                This looks convenient at first, but it’s actually a trap.
+
+                Using inheritance for UI components like Activity and Fragment creates tight coupling and fragile hierarchies.
+                Whenever you change something in BaseActivity or BaseFragment, that change affects every screen in your app
+                even those that shouldn’t be affected.
+
+                As your project grows, this pattern becomes a maintenance nightmare.
+            </p>
+
+            <p>Here’s why:</p>
+
+            <ul>
+                <li>What if one activity needs a custom loading behavior?</li>
+                <li>What if one fragment uses a different UI structure?</li>
+                <li>What if a “common” method added to the base class breaks one screen?</li>
+                <li>How will you mock and test individual screens cleanly?</li>
+            </ul>
+
+            <p>
+                These aren’t theoretical, these are real problems that developers run into every day.
+            </p>
+
+            <p>
+                I’ve seen projects with inheritance chains like:
+            </p>
+
+            <p>
+                LoginActivity → AuthActivity → UserActivity → BaseActivity
+            </p>
+
+            <p>
+                That’s not just messy, it’s a structural disaster. It reduces flexibility, slows down development, and
+                makes debugging painful.
+            </p>
+        </section>
+
+        <section>
+            <h2>Composition over Inheritance</h2>
+            <p>
+                Instead of creating nested hierarchies, build your architecture around composition, using small, reusable
+                helpers, delegates, and extension functions that can be combined however you need.
+
+                Think of it as building bridges between components rather than stacking them vertically.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre>
+                <code class="language-kotlin">
+import android.app.Activity
+import android.view.View
+import android.widget.Toast
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import android.util.Log
+import androidx.core.view.isVisible
+import com.google.android.material.snackbar.Snackbar
+
+class UiHelper(private val activity: Activity) {
+
+    fun showToast(message: String) {
+        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
+    }
+
+    fun showSnackbar(view: View, message: String) {
+        Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show()
+    }
+
+    fun showLoading() {
+        // Show loading indicator dialog or overlay
+    }
+
+    fun hideLoading() {
+        // Hide it
+    }
+}
+
+
+class NetworkHelper(private val context: Context) {
+
+    private val _isConnected = MutableLiveData&lt;Boolean&gt;()
+    val isConnected: LiveData&lt;Boolean&gt; = _isConnected
+
+    fun checkNetwork() {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = cm.activeNetwork ?: return _isConnected.postValue(false)
+        val caps = cm.getNetworkCapabilities(network) ?: return _isConnected.postValue(false)
+        _isConnected.postValue(
+            caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                    caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+        )
+    }
+}
+
+
+interface AnalyticsTracker {
+    fun logEvent(eventName: String, properties: Map&lt;String, String> = emptyMap())
+}
+
+class AnalyticsDelegate(private val screenName: String) : AnalyticsTracker {
+
+    override fun logEvent(eventName: String, properties: Map&lt;String, String>) {
+        Log.d("Analytics", "[$screenName] Event: $eventName, Props: $properties")
+        // Logic for sending data to remote database
+    }
+}
+
+
+fun View.show() {
+    this.isVisible = true
+}
+
+fun View.hide() {
+    this.isVisible = false
+}
+
+fun View.enableIf(condition: Boolean) {
+    this.isEnabled = condition
+}
+                </code>
+                </pre>
+            </div>
+
+            <p>
+                With this approach, you can freely compose behavior without forcing everything into a base class.
+            </p>
+
+            <ul>
+                <li>Need to observe network state? Just create an instance of NetworkHelper in the class that needs it.</li>
+                <li>Need to show a toast or a loading indicator? Use UiHelper or an extension function.</li>
+                <li>Need analytics? Add an AnalyticsDelegate via delegation.</li>
+            </ul>
+
+            <p>
+                Each part is modular, testable, and replaceable, and changes in one area won’t break unrelated screens.
+            </p>
+        </section>
+
+        <section>
+            <h2>Conclusion</h2>
+            <p>
+                Design patterns are powerful tools that every engineer should have in their toolkit.
+                But there’s always a balance. Just because something can be abstracted doesn’t mean it should be.
+            </p>
+
+            <p>
+                In some cases, inheritance is a valid and elegant solution. In others, composition provides better flexibility,
+                testability, and long-term maintainability.
+            </p>
+
+            <p>
+                We can’t predict every future requirement, and over-engineering in advance usually hurts more than it helps.
+                Instead, aim for pragmatic design, focused solutions that solve today’s problem while keeping
+                tomorrow’s options open whenever possible.
+            </p>
+        </section>
+    </main>
+</article>
