@@ -120,4 +120,11 @@ export const blogData = [
         "path": "composition-over-inheritance",
         "date": "26 October 2025"
     },
+    {
+        "title": "Fail Fast and Don't Be Afraid",
+        "summary": "Design software to catch critical issues early.",
+        "type": PostType.ComputerScience,
+        "path": "fail-fast-and-dont-be-afraid",
+        "date": "01 November 2025"
+    },
 ]

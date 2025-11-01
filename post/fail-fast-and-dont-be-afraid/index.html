@@ -1,0 +1,399 @@
+<article class="post">
+    <header class="post-header">
+        <h1>Fail Fast and Don't Be Afraid</h1>
+        <time datetime="2025-11-01">01 November 2025</time>
+    </header>
+
+    <main class="post-content">
+        <section class="post-section">
+            <p>
+                Software operates under specific conditions, states, and assumptions. As software engineers, how we design
+                and structure our applications directly determines their resilience and reliability.
+            </p>
+
+            <p>
+                You’ve probably heard the advice “don't crash the app.”
+            </p>
+
+            <p>
+                But is that always the right approach?
+                Let’s question that idea and explore when and why, crashing might actually be the best thing you can do.
+            </p>
+
+            <section class="post-section">
+                <h2>Crashes...</h2>
+                <p>
+                    Applications can crash for countless reasons:
+                </p>
+
+                <p>
+                    Null references, unhandled exceptions, array index errors, infinite loops, memory leaks, the list goes on.
+                </p>
+
+                <p>
+                    For many of these, the fix is straightforward. But for others, the correct handling is debatable,
+                    and you’ll see different approaches across projects. Let’s look at a few examples to understand
+                    the difference between graceful handling and dangerous silence.
+                </p>
+            </section>
+
+            <section class="post-section">
+                <h2>Nullability and Default Values</h2>
+                <p>
+                    Take the example of storing and retrieving a passphrase. Following code may look simple, but it hides a
+                    fundamental flaw. During saving and retrieval, multiple things can go wrong.
+                </p>
+
+                <div class="code-container">
+                    <button class="copy-button" title="Copy">Copy</button>
+                    <pre><code class="language-kotlin">
+import android.content.Context
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
+import androidx.core.content.edit
+
+class UserStorage(context: Context) {
+
+    companion object {
+        private const val PREFS_NAME = "secure_user_prefs"
+        private const val KEY_PASSPHRASE = "user_passphrase"
+    }
+
+    private val masterKeyAlias: String = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+
+    private val securePrefs = EncryptedSharedPreferences.create(
+        PREFS_NAME,
+        masterKeyAlias,
+        context,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    )
+
+    fun savePassphrase(passphrase: String?) {
+        securePrefs.edit {
+            putString(KEY_PASSPHRASE, passphrase)
+        }
+    }
+
+    fun getPassphrase(): String {
+        return securePrefs.getString(KEY_PASSPHRASE, "") ?: ""
+    }
+}
+</code></pre>
+                </div>
+
+                <p>
+                    You could pass a null or empty passphrase, or you might assume that getPassphrase()
+                    will always return a non-null value. If that assumption fails, you could end up passing invalid data
+                    into a cryptographic function, resulting in corrupted or meaningless output.
+                </p>
+
+                <p>
+                    In small projects, this might seem harmless, but in real-world systems where modules interact and
+                    dependencies grow, such assumptions can lead to nightmare debugging sessions. A single unchecked null
+                    can propagate silently and cause hard-to-trace failures later on.
+                </p>
+
+                <p>
+                    We must ensure robustness at the boundaries of our code. The code above “works,” but it’s dangerous. It
+                    silently allows invalid states, saving an empty or null passphrase and pretending everything is fine.
+                    This false sense of stability is what makes systems fragile.
+                </p>
+
+                <div class="code-container">
+                    <button class="copy-button" title="Copy">Copy</button>
+                    <pre><code class="language-kotlin">
+import android.content.Context
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
+import androidx.core.content.edit
+
+class UserStorage(context: Context) {
+
+    companion object {
+        private const val PREFS_NAME = "secure_user_prefs"
+        private const val KEY_PASSPHRASE = "user_passphrase"
+    }
+
+    private val masterKeyAlias: String = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+
+    private val securePrefs = EncryptedSharedPreferences.create(
+        PREFS_NAME,
+        masterKeyAlias,
+        context,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    )
+
+    /**
+     * Throws IllegalArgumentException if passphrase is null or empty.
+     */
+    fun savePassphrase(passphrase: String?) {
+        require(!passphrase.isNullOrBlank()) { "Passphrase must not be null or empty." }
+
+        securePrefs.edit {
+            putString(KEY_PASSPHRASE, passphrase)
+        }
+    }
+
+    fun getPassphrase(): String? {
+        return securePrefs.getString(KEY_PASSPHRASE, null)
+    }
+}
+</code></pre>
+                </div>
+
+                <p>
+                    Now, if someone tries to save an invalid passphrase, the app will crash immediately, revealing the issue
+                    at its source. Failing fast here isn’t a bug, it’s a safeguard. In production, the passphrase should
+                    never be null. Silently ignoring the issue only delays the inevitable.
+                </p>
+
+                <p>
+                    And whenever another part of the code uses the passphrase, it must explicitly handle nullability.
+                    If the value is missing, we stop the user from proceeding. This approach guarantees that invalid states
+                    are never silently tolerated. You immediately see when something that should never happen.
+                </p>
+
+                <div class="code-container">
+                    <button class="copy-button" title="Copy">Copy</button>
+                    <pre><code class="language-kotlin">
+fun encryptData(plainText: String): ByteArray {
+   val passphrase = userStorage.getPassphrase()
+            ?: throw IllegalStateException("Passphrase is missing! Cannot perform encryption.")
+
+   val key = deriveKeyFromPassphrase(passphrase)
+
+   val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+   val iv = ByteArray(16).also { Random.nextBytes(it) }
+   val ivSpec = IvParameterSpec(iv)
+
+   cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec)
+
+   val encrypted = cipher.doFinal(plainText.toByteArray(Charsets.UTF_8))
+
+   return iv + encrypted
+}
+</code></pre>
+                </div>
+            </section>
+
+            <section class="post-section">
+                <h2>Exceptions and States</h2>
+                <p>
+                    Exception handling is another crucial aspect of building reliable software. The key question is not
+                    how to catch an exception, but when it should be caught, and when it should be allowed to crash the
+                    application.
+                </p>
+
+                <p>
+                    In some parts of your system, exceptions can be warnings or temporary issues. In others, they are
+                    critical failures that must never be ignored.
+                </p>
+
+                <p>
+                    For example, if your encryption or decryption process fails, that’s not a recoverable error, it’s a
+                    critical breach of system integrity. Pretending it didn’t happen is dangerous.
+                </p>
+
+                <p>
+                    Previous encryption code that ignores the exception while still failing fast for the argument.
+                    Failing fast here ensures that when something truly unexpected happens, it gets your attention
+                    immediately.
+                </p>
+
+                <div class="code-container">
+                    <button class="copy-button" title="Copy">Copy</button>
+                    <pre><code class="language-kotlin">
+fun encryptData(plainText: String): ByteArray {
+     val passphrase = userStorage.getPassphrase()
+           ?: throw IllegalStateException("Passphrase is missing! Cannot perform encryption.")
+
+     return try {
+          val key = deriveKeyFromPassphrase(passphrase)
+
+          val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+          val iv = ByteArray(16).also { Random.nextBytes(it) }
+          val ivSpec = IvParameterSpec(iv)
+
+          cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec)
+          val encrypted = cipher.doFinal(plainText.toByteArray(Charsets.UTF_8))
+
+          // Prepend IV for decryption
+          iv + encrypted
+      } catch (e: Exception) {
+          Log.e(TAG, "Encryption failed: ${e.message}", e)
+          throw IllegalStateException("Encryption failed", e)
+      }
+}
+</code></pre>
+                </div>
+
+                <p>
+                    Now imagine you’re dealing with a payment system. You need to handle different exceptions
+                    (network issues, invalid cards, insufficient funds, etc.) while keeping the UI responsive and meaningful.
+                </p>
+
+                <p>
+                    Not every error is fatal, some require user feedback, some can be retried, and others should crash
+                    and alert engineers.
+                </p>
+
+                <p>
+                    Imagine you are making a network call, and an internal function may also throw an exception.
+                    You need to handle different backend results appropriately. If the issue is critical, crash the app
+                    and send the log. If it’s a warning, update the UI state and inform the user.
+                    If something goes wrong temporarily, update the UI state again and notify the user accordingly.
+                </p>
+
+                <p>
+                    Let’s examine the following example to illustrate this.
+                </p>
+
+                <p>
+                    In this code, we have a sealed class that represents potential exceptions, as well as different UI
+                    states that reflect all possible scenarios. As you can see, the ViewModel communicates with the view
+                    through the <code>onEvent</code> method using <code>PaymentEvent</code>, which is responsible for
+                    user actions and will be used with UI elements interactions.
+                </p>
+
+                <div class="code-container">
+                    <button class="copy-button" title="Copy">Copy</button>
+                    <pre><code class="language-kotlin">
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+sealed interface Result&lt;out T&gt; {
+    data class Success&lt;T&gt;(val data: T) : Result&lt;T&gt;
+    data class Error(val exception: PaymentException) : Result&lt;Nothing&gt;
+}
+
+sealed class PaymentException(message: String) : Exception(message) {
+    data object NetworkError :
+        PaymentException("Unable to connect. Please check your internet connection.")
+
+    data object InsufficientFunds :
+        PaymentException("You don't have enough funds for this transaction.")
+
+    data object InvalidCard :
+        PaymentException("Card details are invalid. Please check and try again.")
+
+    data class Unknown(val reason: String) :
+        PaymentException("An unexpected error occurred: $reason")
+}
+
+sealed interface PaymentUiState {
+    data object Idle : PaymentUiState
+    data object Loading : PaymentUiState
+
+    data class Success(
+        val transactionId: String,
+        val amount: Double
+    ) : PaymentUiState
+
+    data class Error(
+        val message: String,
+        val exception: PaymentException,
+        val canRetry: Boolean = true
+    ) : PaymentUiState
+}
+
+sealed interface PaymentEvent {
+    data class ProcessPayment(val amount: Double) : PaymentEvent
+    data object RetryPayment : PaymentEvent
+    data object DismissError : PaymentEvent
+    data object Reset : PaymentEvent
+}
+
+class PaymentViewModel(
+    private val paymentService: PaymentService
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow&lt;PaymentUiState&gt;(PaymentUiState.Idle)
+    val uiState: StateFlow&lt;PaymentUiState&gt; = _uiState.asStateFlow()
+
+    private var lastPaymentAmount: Double? = null
+
+    fun onEvent(event: PaymentEvent) {
+        when (event) {
+            is PaymentEvent.ProcessPayment -> processPayment(event.amount)
+            is PaymentEvent.RetryPayment -> lastPaymentAmount?.let { processPayment(it) }
+            is PaymentEvent.DismissError -> _uiState.value = PaymentUiState.Idle
+            is PaymentEvent.Reset -> reset()
+        }
+    }
+
+    private fun processPayment(amount: Double) {
+        if (amount <= 0) {
+            _uiState.value = PaymentUiState.Error(
+                message = "Invalid payment amount",
+                exception = PaymentException.Unknown("Amount must be greater than 0"),
+                canRetry = false
+            )
+            return
+        }
+
+        lastPaymentAmount = amount
+
+        viewModelScope.launch {
+            _uiState.value = PaymentUiState.Loading
+
+            when (val result = paymentService.makePayment(amount)) {
+                is Result.Success -> {
+                    _uiState.value = PaymentUiState.Success(
+                        transactionId = result.data.transactionId,
+                        amount = amount
+                    )
+                }
+
+                is Result.Error -> {
+                    _uiState.value = PaymentUiState.Error(
+                        message = result.exception.message ?: "Unknown error",
+                        exception = result.exception,
+                        canRetry = result.exception !is PaymentException.InvalidCard
+                    )
+                }
+            }
+        }
+    }
+
+    private fun reset() {
+        _uiState.value = PaymentUiState.Idle
+        lastPaymentAmount = null
+    }
+}
+</code></pre>
+                </div>
+
+            </section>
+
+            <section>
+                <h2>Conclusion</h2>
+                <p>
+                    A fail-fast system means you design it to surface critical issues early, rather than hiding them
+                    under false stability, it doesn't mean crashing the program, it means detecting
+                    and stopping invalid states as soon as they appear, at the right boundary of your system.
+                </p>
+
+                <p>
+                    The goal isn’t to make your program fragile, it’s to make it robust. A fail-fast design gives you
+                    visibility into what’s truly happening, so you can fix problems at their source instead of chasing
+                    unpredictable side effects later.
+                </p>
+
+                <p>
+                    By asking “What could go wrong?” and designing for the unexpected, we build systems that are easier to
+                    debug, maintain, and trust.
+                </p>
+
+                <p>
+                    The result is software that’s not only resilient, but also transparent and predictable in how it fails and recovers.
+                </p>
+            </section>
+        </section>
+    </main>
+</article>
