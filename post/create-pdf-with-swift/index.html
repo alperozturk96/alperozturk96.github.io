@@ -248,7 +248,9 @@ struct InvoiceGenerator {
             <div class="code-container">
                 <button class="copy-button" title="Copy">Copy</button>
                 <pre><code class="language-swift">
-func generateAndSavePDF() {
+private let generator = InvoiceGenerator()
+
+func generateInvoice() {
     let invoice = Invoice(
         id: UUID(),
         title: "INVOICE #1",
@@ -261,21 +263,23 @@ func generateAndSavePDF() {
         ]
     )
 
-    let generator = InvoiceGenerator()
     guard let pdfData = generator.generate(for: invoice) else {
-        print("❌ Failed to generate PDF")
+        print("❌ Failed to generate invoice")
         return
     }
 
-    let fileName = "invoice.pdf"
-    let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-    let fileURL = documentsURL.appendingPathComponent(fileName)
+    guard let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+        print("❌ Documents directory URL is nil")
+        return
+    }
+
+    let fileURL = documentsURL.appendingPathComponent(invoice.title)
 
     do {
         try pdfData.write(to: fileURL, options: .atomic)
-        print("✅ PDF saved at: \(fileURL.path)")
+        print("✅ Invoice saved at: \(fileURL.path)")
     } catch {
-        print("❌ Error saving PDF: \(error)")
+        print("❌ Error saving invoice: \(error)")
     }
 }
     </code></pre>
