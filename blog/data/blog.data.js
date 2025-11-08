@@ -128,7 +128,7 @@ export const blogData = [
         "date": "01 November 2025"
     },
     {
-        "title": "Creating PDFs in Swift Using UIGraphicsPDFRenderer",
+        "title": "Creating PDFs Using UIGraphicsPDFRenderer",
         "summary": "",
         "type": PostType.iOS,
         "path": "create-pdf-with-swift",
