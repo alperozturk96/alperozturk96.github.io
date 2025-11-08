@@ -127,4 +127,11 @@ export const blogData = [
         "path": "fail-fast-and-dont-be-afraid",
         "date": "01 November 2025"
     },
+    {
+        "title": "Creating PDFs in Swift Using UIGraphicsPDFRenderer",
+        "summary": "",
+        "type": PostType.iOS,
+        "path": "create-pdf-with-swift",
+        "date": "08 November 2025"
+    },
 ]
