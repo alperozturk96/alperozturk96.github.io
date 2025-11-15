@@ -134,4 +134,11 @@ export const blogData = [
         "path": "create-pdf-with-swift",
         "date": "08 November 2025"
     },
+    {
+        "title": "Model-View-ViewModel Architectural Pattern",
+        "summary": "What is MVVM, how to implement it in mobile apps, and the common challenges and solutions for building maintainable, testable, and scalable applications.",
+        "type": PostType.ComputerScience,
+        "path": "mvvm",
+        "date": "15 November 2025"
+    },
 ]

@@ -1,0 +1,522 @@
+<article class="post">
+    <header class="post-header">
+        <h1>Model-View-ViewModel Architectural Pattern</h1>
+        <time datetime="2025-11-15">15 November 2025</time>
+    </header>
+
+    <main class="post-content">
+        <section class="post-section">
+            <h2>Introduction to MVVM</h2>
+            <p>
+                In this article, I will explain the MVVM (Model-View-ViewModel) architectural pattern, a widely
+                used approach in mobile app development. I will also provide practical examples to demonstrate how it
+                can be applied effectively.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-none">
+        ┌─────────────────┐
+        │      Model      │
+        └────────┬────────┘
+                 │
+        ┌────────▼────────┐
+        │    Repository   │
+        │  (Local&Remote) │
+        └────────┬────────┘
+                 │
+        ┌────────▼────────┐
+        │   ViewModel     │
+        └────────┬────────┘
+                 │
+        ┌────────▼────────┐
+        │      View       │
+        └─────────────────┘
+    </code></pre>
+            </div>
+
+        </section>
+
+        <section class="post-section">
+            <h3>Model</h3>
+            <p>
+                The Model represents the data your application works with. Typically, this data comes from APIs, which
+                may return JSON or XML. We then map this response to data structures, such as a Codable struct in iOS or
+                a data class in Android, that the ViewModel can use to supply information to the View.
+            </p>
+
+            <h3>View</h3>
+            <p>
+                The View defines the user interface. In Android, this might be an XML layout or a Composable function.
+                On iOS, it could be a SwiftUI View, a Storyboard, or a programmatically created UI. The View’s
+                responsibility is strictly to display data and handle user interactions, without containing business
+                logic.
+            </p>
+
+            <h3>ViewModel</h3>
+            <p>
+                The ViewModel prepares and manages data for the View. It handles state management, receives data from
+                source, and transforms it into a format suitable for the View. The View observes the ViewModel,
+                keeping the UI reactive and in sync with the underlying data.
+            </p>
+
+            <h3>UI State</h3>
+            <p>
+                UI state defines what the View should display at any given time. It can represent a successfully loaded
+                content, an error state, or partial content. Modeling UI state explicitly helps make the View reactive,
+                predictable, and easier to test.
+            </p>
+
+            <h3>Repository</h3>
+            <p>
+                The Repository serves as the single source of truth for your data. It is responsible for fetching data
+                from remote APIs or local storage. The ViewModel interacts with repositories to retrieve or persist data,
+                allowing you to decouple data access from the UI logic.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Why MVVM?</h2>
+            <p>
+                MVC was popular, but engineers often found that controllers became bloated with complex logic.
+                MVVM gained traction because it allows better separation of concerns, keeping Views clean while moving logic
+                into the ViewModel. This approach prevents bloated Views or Controllers that mix presentation and
+                business logic.
+            </p>
+
+            <h3>Common Challenges</h3>
+            <p>
+                I saw some projects suffer from overly large ViewModels, making it difficult to understand application
+                flow. Over-engineering and strict adherence to the pattern can sometimes make things worse, especially
+                if engineers feel compelled to create a ViewModel for every screen without considering the actual need.
+            </p>
+
+            <h3>Solution</h3>
+            <p>
+                You don’t have to create a ViewModel for every component or screen blindly. It’s perfectly fine to break
+                down complex logic into smaller classes or helper files that the ViewModel can use. The goal is maintainable,
+                testable, and loosely coupled architecture.
+            </p>
+
+            <h3>Alternative Approach to MVVM</h3>
+            <p>
+                Suppose we want a tiny component that displays a user’s profile status. Using MVVM here is optional.
+                You can simply inject a <code>ProfileAPI</code> into the View and let it handle the state. This approach
+                is not wrong, it keeps the component modular, maintainable, and easy to test.
+            </p>
+
+            <p>
+                The key is context: if your View is simple and only performs a single task, introducing a full MVVM stack
+                may be overkill. The team’s productivity and maintainability should guide your decision.
+            </p>
+
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+struct ProfileStatusView: View {
+    @Environment(ProfileAPI.self) private var api
+
+    var body: some View {
+        VStack(spacing: 12) {
+            if api.isLoading {
+                ProgressView("Loading...")
+            } else {
+                HStack {
+                    Circle()
+                        .fill(api.isOnline ? .green : .gray)
+                        .frame(width: 12, height: 12)
+
+                    VStack(alignment: .leading) {
+                        Text(api.username)
+                            .font(.headline)
+
+                        Text(api.isOnline ? "Online" : "Offline")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+        .padding()
+        .task {
+            await api.fetchProfile()
+        }
+    }
+}
+
+@Observable
+final class ProfileAPI {
+    var username: String = ""
+    var isOnline: Bool = false
+    var isLoading: Bool = false
+
+    func fetchProfile() async {
+        isLoading = true
+        try? await Task.sleep(nanoseconds: 1_000_000_000)
+
+        username = "John Doe"
+        isOnline = true
+
+        isLoading = false
+    }
+}
+</code></pre>
+            </div>
+
+            <h3>Mocking Environment Objects for Previews</h3>
+            <p>
+                Using protocols is the way to mock dependencies. By creating a <code>ProfileAPIProtocol</code> and a
+                custom EnvironmentKey, you can inject mock implementations into Previews or tests without affecting
+                the real API.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+@main
+struct PlaygroundProjectApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ProfileStatusView()
+                .environment(\.profileAPI, ProfileAPI())
+        }
+    }
+}
+
+struct ProfileStatusView: View {
+    @Environment(\.profileAPI) private var api
+
+    var body: some View {
+        VStack(spacing: 12) {
+            if api.isLoading {
+                ProgressView("Loading...")
+            } else {
+                HStack {
+                    Circle()
+                        .fill(api.isOnline ? .green : .gray)
+                        .frame(width: 12, height: 12)
+
+                    VStack(alignment: .leading) {
+                        Text(api.username)
+                            .font(.headline)
+
+                        Text(api.isOnline ? "Online" : "Offline")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+        .padding()
+        .task {
+            await api.fetchProfile()
+        }
+    }
+}
+
+#Preview("Mocked API Preview") {
+    ProfileStatusView()
+        .environment(\.profileAPI, MockProfileAPI())
+}
+
+private struct ProfileAPIKey: EnvironmentKey {
+    static var defaultValue: ProfileAPIProtocol = ProfileAPI()
+}
+
+extension EnvironmentValues {
+    var profileAPI: ProfileAPIProtocol {
+        get { self[ProfileAPIKey.self] }
+        set { self[ProfileAPIKey.self] = newValue }
+    }
+}
+
+
+protocol ProfileAPIProtocol: AnyObject {
+    var username: String { get set }
+    var isOnline: Bool { get set }
+    var isLoading: Bool { get set }
+
+    func fetchProfile() async
+}
+
+
+@Observable
+final class ProfileAPI: ProfileAPIProtocol {
+    var username: String = ""
+    var isOnline: Bool = false
+    var isLoading: Bool = false
+
+    func fetchProfile() async {
+        isLoading = true
+        try? await Task.sleep(nanoseconds: 1_000_000_000)
+
+        username = "John Doe"
+        isOnline = true
+        isLoading = false
+    }
+}
+
+@Observable
+final class MockProfileAPI: ProfileAPIProtocol {
+    var username: String = "Preview User"
+    var isOnline: Bool = true
+    var isLoading: Bool = false
+
+    func fetchProfile() async {}
+}
+</code></pre>
+            </div>
+
+            <h3>When to Consider MVVM?</h3>
+            <p>
+                Over-engineering for hypothetical future scenarios can cause unnecessary complexity. For a small component
+                like <code>ProfileStatusView</code>, you may not need MVVM initially. If the View later requires caching,
+                complex UI states, or advanced interactions, you can introduce a ViewModel at that point.
+            </p>
+            <p>
+                The right choice depends on context: project size, team preferences, maintainability, and scalability.
+                There’s no single “correct” approach, use MVVM where it adds value, and keep components lightweight
+                when appropriate.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>MVVM and Repository Pattern Implementation</h2>
+            <p>
+                To demonstrate a full MVVM setup, let’s implement a Comment screen. The View observes a ViewModel,
+                which gets data from repositories (local or remote), while the Model holds the data.
+                Protocols allow us to mock dependencies for Previews and testing.
+            </p>
+
+            <h3>Model Implementation</h3>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+struct Comment: Identifiable, Codable, Equatable {
+    let id: Int
+    let text: String
+}
+</code></pre>
+            </div>
+
+            <h3>Repository Implementation</h3>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+protocol CommentLocalRepository {
+    mutating func saveComments(_ comments: [Comment]) async
+    func loadCachedComments() async -> [Comment]
+}
+
+protocol CommentRemoteRepository {
+    func fetchComments() async throws -> [Comment]
+}
+
+struct CommentLocalRepositoryImpl: CommentLocalRepository {
+    private var storage: [Comment] = []
+
+    func loadCachedComments() async -> [Comment] {
+        // Returns from local database...
+        return storage
+    }
+
+    mutating func saveComments(_ comments: [Comment]) async {
+        // Saves to your local database...
+        storage = comments
+    }
+}
+
+struct CommentRemoteRepositoryImpl: CommentRemoteRepository {
+    func fetchComments() async throws -> [Comment] {
+        try await Task.sleep(nanoseconds: 800_000_000)
+
+        return [
+            Comment(id: 1, text: "Hello world!"),
+            Comment(id: 2, text: "This is a remote comment.")
+        ]
+    }
+}
+</code></pre>
+            </div>
+
+            <h3>ViewModel Implementation</h3>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+enum CommentUIState: Equatable {
+    case loading
+    case loaded([Comment])
+    case error(String)
+    case empty
+}
+
+@Observable
+final class CommentViewModel {
+    private var localRepo: CommentLocalRepository
+    private let remoteRepo: CommentRemoteRepository
+    var state: CommentUIState = .loading
+
+    init(localRepo: CommentLocalRepository, remoteRepo: CommentRemoteRepository) {
+        self.localRepo = localRepo
+        self.remoteRepo = remoteRepo
+    }
+
+    @MainActor
+    func load() async {
+        state = .loading
+
+        // Load cached comments
+        let cached = await localRepo.loadCachedComments()
+        if !cached.isEmpty {
+            state = .loaded(cached)
+        }
+
+        // Fetch remote comments
+        do {
+            let fresh = try await remoteRepo.fetchComments()
+            if fresh.isEmpty {
+                state = .empty
+            } else {
+                state = .loaded(fresh)
+                await localRepo.saveComments(fresh)
+            }
+        } catch {
+            state = .error("Failed loading comments.")
+        }
+    }
+}
+</code></pre>
+            </div>
+
+            <h3>View Implementation</h3>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+struct CommentView: View {
+    @State private var vm: CommentViewModel
+
+    init(vm: CommentViewModel) {
+        _vm = State(initialValue: vm)
+    }
+
+    var body: some View {
+        content
+            .task { await vm.load() }
+            .navigationTitle("Comments")
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        switch vm.state {
+        case .loading:
+            ProgressView("Loading…")
+
+        case let .loaded(comments):
+            List(comments) { comment in
+                Text(comment.text)
+            }
+
+        case let .error(message):
+            Text(message)
+                .foregroundStyle(.red)
+
+        case .empty:
+            Text("No comments available.")
+                .foregroundStyle(.secondary)
+        }
+    }
+}
+</code></pre>
+            </div>
+
+            <h3>View Previews & Mocking</h3>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+struct MockLocalRepository: CommentLocalRepository {
+    private var storage: [Comment] = []
+
+    func loadCachedComments() async -> [Comment] {
+        storage
+    }
+
+    mutating func saveComments(_ comments: [Comment]) async {
+        storage = comments
+    }
+}
+
+struct MockRemoteRepository: CommentRemoteRepository {
+    private let comments: [Comment]
+    private let shouldFail: Bool
+
+    init(comments: [Comment] = [], shouldFail: Bool = false) {
+        self.comments = comments
+        self.shouldFail = shouldFail
+    }
+
+    func fetchComments() async throws -> [Comment] {
+        try await Task.sleep(nanoseconds: 200_000_000)
+        if shouldFail {
+            throw URLError(.badServerResponse)
+        }
+        return comments
+    }
+}
+
+#Preview("Loaded") {
+    let local = MockLocalRepository()
+    let remote = MockRemoteRepository(comments: [
+        Comment(id: 1, text: "Preview remote comment 1"),
+        Comment(id: 2, text: "Preview remote comment 2")
+    ])
+
+    let vm = CommentViewModel(localRepo: local, remoteRepo: remote)
+    vm.state = .loaded([
+        Comment(id: 1, text: "Preview cached comment")
+    ])
+
+    return CommentView(vm: vm)
+}
+
+#Preview("Error") {
+    let local = MockLocalRepository()
+    let remote = MockRemoteRepository(shouldFail: true)
+
+    let vm = CommentViewModel(localRepo: local, remoteRepo: remote)
+    vm.state = .error("Preview error")
+
+    return CommentView(vm: vm)
+}
+
+#Preview("Empty") {
+    let local = MockLocalRepository()
+    let remote = MockRemoteRepository(comments: [])
+
+    let vm = CommentViewModel(localRepo: local, remoteRepo: remote)
+    vm.state = .empty
+
+    return CommentView(vm: vm)
+}
+</code></pre>
+            </div>
+
+            <p>
+                This setup provides a scalable, maintainable, and testable architecture. Each layer has a clear
+                responsibility, making it easy to trace bugs and extend functionality. Repositories handle data,
+                the ViewModel manages state and the View handles display.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Conclusion</h2>
+            <p>
+                There is no single “best” architectural pattern. MVVM, MVC, MVI, or other variations can all be used to
+                build robust applications. The key is creating a system that is maintainable, testable, loosely coupled,
+                and scalable.
+            </p>
+
+            <p>
+                With a clear separation of concerns, your team can develop confidently, maintain consistency, and adapt
+                as your project grows.
+            </p>
+        </section>
+    </main>
+</article>
