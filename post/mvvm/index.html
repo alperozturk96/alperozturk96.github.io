@@ -430,19 +430,23 @@ struct CommentView: View {
 </code></pre>
             </div>
 
-            <h3>View Previews & Mocking</h3>
+            <h3>Preview Mocks</h3>
             <div class="code-container">
                 <button class="copy-button" title="Copy">Copy</button>
                 <pre><code class="language-swift">
 final class MockLocalRepository: CommentLocalRepository {
-    private var storage: [Comment] = []
+    private var comments: [Comment]
+
+    init(comments: [Comment]) {
+        self.comments = comments
+    }
 
     func loadCachedComments() async -> [Comment] {
-        storage
+        comments
     }
 
     func saveComments(_ comments: [Comment]) async {
-        storage = comments
+        self.comments = comments
     }
 }
 
@@ -463,38 +467,44 @@ struct MockRemoteRepository: CommentRemoteRepository {
         return comments
     }
 }
+</code></pre>
+            </div>
 
+            <h3>View Previews</h3>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
 #Preview("Loaded") {
-    let local = MockLocalRepository()
+    let local = MockLocalRepository(comments: [
+        .init(id: 1, text: "Hello"),
+        .init(id: 2, text: "World")
+    ])
     let remote = MockRemoteRepository(comments: [
         Comment(id: 1, text: "Preview remote comment 1"),
         Comment(id: 2, text: "Preview remote comment 2")
     ])
 
     let vm = CommentViewModel(localRepo: local, remoteRepo: remote)
-    vm.state = .loaded([
-        Comment(id: 1, text: "Preview cached comment")
-    ])
-
     return CommentView(vm: vm)
 }
 
 #Preview("Error") {
-    let local = MockLocalRepository()
+    let local = MockLocalRepository(comments: .init())
     let remote = MockRemoteRepository(shouldFail: true)
 
     let vm = CommentViewModel(localRepo: local, remoteRepo: remote)
-    vm.state = .error("Preview error")
 
     return CommentView(vm: vm)
 }
 
 #Preview("Empty") {
-    let local = MockLocalRepository()
+    let local = MockLocalRepository(comments: [
+        .init(id: 1, text: "Hello"),
+        .init(id: 2, text: "World")
+    ])
     let remote = MockRemoteRepository(comments: [])
 
     let vm = CommentViewModel(localRepo: local, remoteRepo: remote)
-    vm.state = .empty
 
     return CommentView(vm: vm)
 }
