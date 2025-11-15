@@ -302,7 +302,7 @@ struct Comment: Identifiable, Codable, Equatable {
                 <button class="copy-button" title="Copy">Copy</button>
                 <pre><code class="language-swift">
 protocol CommentLocalRepository {
-    mutating func saveComments(_ comments: [Comment]) async
+    func saveComments(_ comments: [Comment]) async
     func loadCachedComments() async -> [Comment]
 }
 
@@ -310,7 +310,7 @@ protocol CommentRemoteRepository {
     func fetchComments() async throws -> [Comment]
 }
 
-struct CommentLocalRepositoryImpl: CommentLocalRepository {
+final class CommentLocalRepositoryImpl: CommentLocalRepository {
     private var storage: [Comment] = []
 
     func loadCachedComments() async -> [Comment] {
@@ -318,7 +318,7 @@ struct CommentLocalRepositoryImpl: CommentLocalRepository {
         return storage
     }
 
-    mutating func saveComments(_ comments: [Comment]) async {
+    func saveComments(_ comments: [Comment]) async {
         // Saves to your local database...
         storage = comments
     }
@@ -434,14 +434,14 @@ struct CommentView: View {
             <div class="code-container">
                 <button class="copy-button" title="Copy">Copy</button>
                 <pre><code class="language-swift">
-struct MockLocalRepository: CommentLocalRepository {
+final class MockLocalRepository: CommentLocalRepository {
     private var storage: [Comment] = []
 
     func loadCachedComments() async -> [Comment] {
         storage
     }
 
-    mutating func saveComments(_ comments: [Comment]) async {
+    func saveComments(_ comments: [Comment]) async {
         storage = comments
     }
 }
