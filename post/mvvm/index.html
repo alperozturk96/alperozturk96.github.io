@@ -372,11 +372,14 @@ final class CommentViewModel {
         // Fetch remote comments
         do {
             let fresh = try await remoteRepo.fetchComments()
+
+            // refresh caches
+            await localRepo.saveComments(fresh)
+
             if fresh.isEmpty {
                 state = .empty
             } else {
                 state = .loaded(fresh)
-                await localRepo.saveComments(fresh)
             }
         } catch {
             state = .error("Failed loading comments.")
