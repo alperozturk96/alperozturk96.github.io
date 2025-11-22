@@ -176,6 +176,14 @@ import com.example.mvvmdemo.xml.BookAdapter
 
 class FirstFragment : Fragment(), BookClickListener {
 
+    private val books = listOf(
+        Book(1, "Book 1", "Author 1", 2008),
+        Book(2, "Book 2", "Author 2", 2018),
+        Book(3, "Book 3", "Author 3", 2017),
+        Book(4, "Book 4", "Author 4", 2019),
+        Book(5, "Book 5", "Author 5", 1994)
+    )
+
     private var _binding: FragmentFirstBinding? = null
 
     private val binding get() = _binding!!
@@ -196,14 +204,6 @@ class FirstFragment : Fragment(), BookClickListener {
     }
 
     private fun setupAdapter() {
-        val books = listOf(
-            Book(1, "Book 1", "Author 1", 2008),
-            Book(2, "Book 2", "Author 2", 2018),
-            Book(3, "Book 3", "Author 3", 2017),
-            Book(4, "Book 4", "Author 4", 2019),
-            Book(5, "Book 5", "Author 5", 1994)
-        )
-
         val adapter = BookAdapter(
             books = books,
             this
@@ -282,6 +282,14 @@ import UIKit
 
 final class FirstViewController: UIViewController {
 
+    private let books: [Book] = [
+        Book(id: 1, title: "Book 1", author: "Author 1", year: 2008),
+        Book(id: 2, title: "Book 2", author: "Author 2", year: 2018),
+        Book(id: 3, title: "Book 3", author: "Author 3", year: 2017),
+        Book(id: 4, title: "Book 4", author: "Author 4", year: 2019),
+        Book(id: 5, title: "Book 5", author: "Author 5", year: 1994),
+    ]
+
     @IBOutlet private weak var tableView: UITableView!
 
     override func viewDidLoad() {
@@ -321,6 +329,7 @@ extension FirstViewController: UIGestureRecognizerDelegate {
             }
         }
     }
+
 }
 
 // MARK: - TableView Delegate
