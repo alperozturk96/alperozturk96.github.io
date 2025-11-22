@@ -1,0 +1,621 @@
+<article class="post">
+    <header class="post-header">
+        <h1>Side-by-Side Implementation: Creating a List</h1>
+        <time datetime="2025-11-22">22 November 2025</time>
+    </header>
+
+    <main class="post-content">
+        <section class="post-section">
+            <h2>Side-by-Side Implementation</h2>
+            <p>
+                In this blog post series, I will demonstrate how to achieve the same functionality on both Android and
+                iOS. Today’s topic is creating a simple list natively on each platform.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Early Era: XML & UIKit</h2>
+            <p>
+                Before declarative UI frameworks, both platforms relied on imperative approaches to building interfaces.
+            </p>
+
+            <h3>Android Implementation</h3>
+            <p>
+                To create a list in Android, you need an item layout file (<code>item_book.xml</code>), a layout file
+                containing the RecyclerView (representing a Fragment or Activity), an Adapter class, and of course,
+                the Fragment or Activity class that initializes and configures the adapter.
+            </p>
+
+            <p><strong>item_book.xml</strong></p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-xml">
+&lt;androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    card_view:cardElevation="4dp"
+    card_view:cardCornerRadius="8dp"&gt;
+
+    &lt;LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"&gt;
+
+        &lt;TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Book Title"
+            android:textStyle="bold"
+            android:textSize="18sp" /&gt;
+
+        &lt;TextView
+            android:id="@+id/tvAuthor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Author"
+            android:layout_marginTop="4dp" /&gt;
+
+        &lt;TextView
+            android:id="@+id/tvYear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2024"
+            android:layout_marginTop="4dp" /&gt;
+
+    &lt;/LinearLayout&gt;
+
+&lt;/androidx.cardview.widget.CardView&gt;
+    </code></pre>
+            </div>
+
+            <p>
+                Next, this layout must be connected somewhere. Let’s also look at the Fragment layout XML file:
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-xml">
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
+    android:id="@+id/root"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FirstFragment"&gt;
+
+    &lt;androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewBooks"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" /&gt;
+
+&lt;/LinearLayout&gt;
+    </code></pre>
+            </div>
+
+            <p>
+                The Adapter is the core component, it determines how each item binds to the UI.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-kotlin">
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.example.mvvmdemo.Book
+import com.example.mvvmdemo.BookClickListener
+import com.example.mvvmdemo.databinding.ItemBookBinding
+
+class BookAdapter(
+    private val books: List&lt;Book&gt;,
+    private val listener: BookClickListener
+) : RecyclerView.Adapter&lt;BookAdapter.BookViewHolder&gt;() {
+
+    inner class BookViewHolder(
+        private val binding: ItemBookBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(book: Book) {
+            binding.run {
+                tvTitle.text = book.title
+                tvAuthor.text = book.author
+                tvYear.text = book.year.toString()
+
+                root.setOnClickListener { listener.onBookClick(book) }
+                root.setOnLongClickListener {
+                    listener.onBookLongClick(book)
+                    true
+                }
+            }
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+        BookViewHolder(
+            ItemBookBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+        )
+
+    override fun onBindViewHolder(holder: BookViewHolder, position: Int) =
+        holder.bind(books[position])
+
+    override fun getItemCount() = books.size
+}
+    </code></pre>
+            </div>
+
+            <p>
+                Notice that the click listeners are handled via an interface passed into the ViewHolder.
+                This keeps the adapter logic clean and optimized. Otherwise, placing all click logic inside
+                <code>onBindViewHolder</code> can make the adapter complex and hard to maintain.
+            </p>
+
+            <p>
+                Finally, we integrate everything in the Fragment class:
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-kotlin">
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.mvvmdemo.databinding.FragmentFirstBinding
+import com.example.mvvmdemo.xml.BookAdapter
+
+class FirstFragment : Fragment(), BookClickListener {
+
+    private var _binding: FragmentFirstBinding? = null
+
+    private val binding get() = _binding!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+
+        _binding = FragmentFirstBinding.inflate(inflater, container, false)
+        return binding.root
+
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupAdapter()
+    }
+
+    private fun setupAdapter() {
+        val books = listOf(
+            Book(1, "Book 1", "Author 1", 2008),
+            Book(2, "Book 2", "Author 2", 2018),
+            Book(3, "Book 3", "Author 3", 2017),
+            Book(4, "Book 4", "Author 4", 2019),
+            Book(5, "Book 5", "Author 5", 1994)
+        )
+
+        val adapter = BookAdapter(
+            books = books,
+            this
+        )
+
+        binding.recyclerViewBooks.adapter = adapter
+        binding.recyclerViewBooks.layoutManager = LinearLayoutManager(requireContext())
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    override fun onBookClick(book: Book) {
+        Toast.makeText(requireContext(), "Clicked: ${book.title}", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onBookLongClick(book: Book) {
+        Toast.makeText(requireContext(), "Long clicked: ${book.title}", Toast.LENGTH_SHORT).show()
+    }
+}
+    </code></pre>
+            </div>
+
+            <p>
+                We pass the initial data to the adapter's constructor. Based on the item count, IDs, and view types,
+                the adapter prepares and binds each item. After creating the adapter, we must assign a layout manager
+                to determine how the list is displayed, whether as a vertical list, horizontal list, or grid.
+            </p>
+
+            <p>
+                Adapter operations must always run on the main thread and should only handle data that is ready for rendering.
+                Heavy operations, such as database queries or complex calculations, can slow down the UI if executed
+                directly.
+            </p>
+
+            <p>
+                In real-world applications, data typically comes from a database or a remote API, so these
+                operations should be performed on background thread. Once the data is ready, it can then be passed to the
+                adapter for rendering.
+            </p>
+
+            <h3>iOS Implementation</h3>
+            <p>
+                On iOS, we can use either <code>UITableView</code> or <code>UICollectionView</code> for creating lists.
+                For this comparison, I chose <code>UITableView</code>. I won’t dive into the detailed differences between
+                <code>UITableView</code> and <code>UICollectionView</code> in this blog post.
+            </p>
+
+            <p>
+                For building the UI, multiple approaches can be followed: Storyboards, XIB files, or programmatically
+                creating the interface. All are valid options.
+            </p>
+
+            <p>
+                In this example, I created a single XIB file and set its
+                File Owner to <code>FirstViewController</code>. This is similar to Android, where we have XML layout
+                files that define the UI and Fragment or Activity classes that control it.
+            </p>
+
+            <p>
+                In other words: XML → Fragment/Activity on Android, XIB/Storyboard → ViewController on iOS.
+            </p>
+
+            <p>XIB Setup</p>
+            <img class="post-img" src="/post/side-by-side-implementation-creating-a-list/xib.png" alt="XIB screenshot">
+
+            <p>
+                The ViewController gets the UITableView and implements the required protocols to display the list.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+import UIKit
+
+final class FirstViewController: UIViewController {
+
+    @IBOutlet private weak var tableView: UITableView!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupTableView()
+        addLongPressGesture()
+    }
+
+    private func setupTableView() {
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "BookCell")
+    }
+
+    private func addLongPressGesture() {
+        let longPressGesture = UILongPressGestureRecognizer(
+            target: self,
+            action: #selector(handleLongPress(_:))
+        )
+        longPressGesture.minimumPressDuration = 1.0
+        longPressGesture.delegate = self
+        tableView.addGestureRecognizer(longPressGesture)
+    }
+}
+
+// MARK: - LongPressGesture
+extension FirstViewController: UIGestureRecognizerDelegate {
+    @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        let location = gesture.location(in: tableView)
+        let indexPath = tableView.indexPathForRow(at: location)
+
+        if gesture.state == .began {
+            if let indexPath = indexPath {
+                print("Long press on row \(indexPath.row)")
+            } else {
+                print("Long press on empty area")
+            }
+        }
+    }
+}
+
+// MARK: - TableView Delegate
+extension FirstViewController: UITableViewDataSource, UITableViewDelegate {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        books.count
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "BookCell", for: indexPath)
+        let book = books[indexPath.row]
+
+        cell.textLabel?.text = "\(book.title) — \(book.author)"
+        cell.selectionStyle = .none
+
+        return cell
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let book = books[indexPath.row]
+        print("Press on row: \(book.title)")
+    }
+}
+</code></pre>
+            </div>
+
+            <p>
+                The ViewController implements <code>UITableViewDataSource</code> and <code>UITableViewDelegate</code>
+                protocols to control cell display (<code>cellForRowAt</code> similar to Android's <code>onBindViewHolder</code>),
+                number of items (<code>numberOfRowsInSection</code> similar to <code>getItemCount</code>), and selection
+                behavior (<code>didSelectRowAt</code>).
+            </p>
+
+            <p>
+                Long-press functionality is handled via a UIGestureRecognizerDelegate, providing behavior consistent
+                with the Android version.
+            </p>
+
+            <p>
+                In iOS, if we want to implement a custom cell, we need to create a new Swift file that extends from the
+                <code>UITableViewCell</code> class. Programmatically, I added my views to the cell.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+import UIKit
+
+final class BookTableViewCell: UITableViewCell {
+
+    static let identifier = "BookTableViewCell"
+
+    // MARK: - UI Elements
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .boldSystemFont(ofSize: 18)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    private let authorLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 16)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    private let yearLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 14)
+        label.textColor = .secondaryLabel
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    private let containerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemBackground
+        view.layer.cornerRadius = 8
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOpacity = 0.1
+        view.layer.shadowOffset = CGSize(width: 0, height: 2)
+        view.layer.shadowRadius = 4
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+
+    // MARK: - Init
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setupLayout()
+        selectionStyle = .none
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: - Layout
+    private func setupLayout() {
+        contentView.addSubview(containerView)
+        containerView.addSubview(titleLabel)
+        containerView.addSubview(authorLabel)
+        containerView.addSubview(yearLabel)
+
+        NSLayoutConstraint.activate([
+            // Container View
+            containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
+            containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+            containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
+            containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+
+            // Title Label
+            titleLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 16),
+            titleLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
+            titleLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
+
+            // Author Label
+            authorLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
+            authorLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
+            authorLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
+
+            // Year Label
+            yearLabel.topAnchor.constraint(equalTo: authorLabel.bottomAnchor, constant: 4),
+            yearLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
+            yearLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
+            yearLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16)
+        ])
+    }
+
+    // MARK: - Configure
+    func configure(with book: Book) {
+        titleLabel.text = book.title
+        authorLabel.text = book.author
+        yearLabel.text = "\(book.year)"
+    }
+}
+</code></pre>
+            </div>
+
+            <p>
+                To use it in our table view, the following code changes need to be made:
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+private func setupTableView() {
+    tableView.delegate = self
+    tableView.dataSource = self
+    tableView.register(BookTableViewCell.self, forCellReuseIdentifier: BookTableViewCell.identifier)
+}
+
+func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+     guard let cell = tableView.dequeueReusableCell(withIdentifier: BookTableViewCell.identifier, for: indexPath) as? BookTableViewCell else {
+            fatalError("Cell not registered")
+     }
+     cell.configure(with: books[indexPath.row])
+     return cell
+}
+</code></pre>
+            </div>
+
+        </section>
+
+        <section class="post-section">
+            <h2>New Era: Declarative UI with Jetpack Compose & SwiftUI</h2>
+            <p>
+                SwiftUI was introduced in 2019. Android adopted a similar approach in 2021 with Jetpack Compose 1.0.
+                Both frameworks allow for fully declarative UI development, simplifying UI management compared to
+                traditional imperative approaches.
+            </p>
+
+            <p>
+                Let’s start with the SwiftUI implementation of our book list.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+import SwiftUI
+
+struct SecondView: View {
+    private let books: [Book]
+
+    init(books: [Book]) {
+        self.books = books
+    }
+
+    var body: some View {
+        ZStack {
+            Color.clear
+                .contentShape(Rectangle())
+
+            List(books) { book in
+                Text("\(book.title) — \(book.author)")
+                    .onTapGesture {
+                        print("Press on row: \(book.title)")
+                    }
+                    .onLongPressGesture(minimumDuration: 1.0) {
+                        print("Long press on row: \(book.title)")
+                    }
+            }
+            .listStyle(.plain)
+        }
+    }
+}
+</code></pre>
+            </div>
+
+            <p>
+                SwiftUI allows us to implement the same functionality with just a few Views and modifiers, while
+                maintaining clarity and conciseness. UIKit still provides fine-grained control over complex UI behaviors,
+                however, SwiftUI is an essential tool for modern iOS development.
+            </p>
+
+            <p>
+                And the Jetpack Compose implementation.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-kotlin">
+@Composable
+fun BookListScreen(
+    books: List&lt;Book&gt;,
+    listener: BookClickListener
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(8.dp)
+    ) {
+        items(books) { book ->
+            BookItem(book, listener)
+        }
+    }
+}
+
+@Composable
+fun BookItem(
+    book: Book,
+    listener: BookClickListener
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .combinedClickable(
+                onClick = { listener.onBookClick(book) },
+                onLongClick = { listener.onBookLongClick(book) }
+            ),
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = book.title,
+                style = MaterialTheme.typography.titleLarge
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = book.author,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = book.year.toString(),
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+    }
+}
+</code></pre>
+            </div>
+
+            <p>
+                Again, it’s a very simple and straightforward implementation. I passed the interface here, but that’s not
+                strictly necessary, you can customize it however you like.
+            </p>
+
+            <p>
+                No more RecyclerView adapters, no more XML item layouts, no more layout manager setup. Everything is
+                handled with clean, simple Composable functions.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Conclusion</h2>
+            <p>
+                XML, UIKit, Jetpack Compose, and SwiftUI all exist in many projects, and some projects even use both
+                approaches together or are already migrating to declarative UIs. With curiosity and dedication, you can
+                learn both platforms. Of course, they’re not the same, and each has its own uniqueness.
+            </p>
+
+            <p>
+                Implementing background tasks is another example: on Android, you use Workers, and on iOS, you use
+                Background Tasks. Most APIs aren’t directly comparable like the examples in this post. But the main point
+                is, if you enjoy exploring these APIs and different paradigms, why not try learning more?
+            </p>
+        </section>
+    </main>
+</article>
