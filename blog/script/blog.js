@@ -16,23 +16,36 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function getExistingBlogTypes() {
-    const knownTypes = new Set(Object.values(BlogType).filter(t => t !== BlogType.All));
+    const knownTypes = new Set(
+        Object.values(BlogType).filter(t => t !== BlogType.All)
+    );
+
     const foundTypes = new Set();
 
     for (let i = 0; i < blogData.length; i++) {
+
         const type = blogData[i].type;
-        if (knownTypes.has(type)) {
-            foundTypes.add(type);
+
+        if (Array.isArray(type)) {
+            for (const t of type) {
+                if (knownTypes.has(t)) {
+                    foundTypes.add(t);
+                }
+            }
+        } else {
+            if (knownTypes.has(type)) {
+                foundTypes.add(type);
+            }
         }
 
         if (foundTypes.size === knownTypes.size) {
-            // All found, exit early
             break;
         }
     }
 
     return Array.from(foundTypes);
 }
+
 
 function addSubNavBar(filterNav, types) {
     filterNav.innerHTML = `<li><a href="#" class="active" data-filter=${BlogType.All}>${BlogType.All}</a></li>`;
@@ -96,7 +109,14 @@ function filterPosts(filterLinks, blogData, container, renderPosts) {
         Array.from(newNav.querySelectorAll('a')).forEach(l => l.classList.remove('active'));
         link.classList.add('active');
         const type = link.dataset.filter;
-        const filtered = type === BlogType.All ? blogData : blogData.filter(p => p.type === type);
+
+        const filtered = type === BlogType.All
+            ? blogData
+            : blogData.filter(p =>
+                Array.isArray(p.type)
+                    ? p.type.includes(type)
+                    : p.type === type
+            );
         renderPosts(filtered, container);
     }, {passive: true});
 }

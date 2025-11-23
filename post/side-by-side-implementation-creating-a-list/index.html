@@ -605,6 +605,22 @@ fun BookItem(
                 No more RecyclerView adapters, no more XML item layouts, no more layout manager setup. Everything is
                 handled with clean, simple Composable functions.
             </p>
+
+            <p>
+                In SwiftUI, List reuses and discards rows as they move on and off the screen. It also loads
+                content lazily, meaning only the visible items are rendered at any given time.
+            </p>
+
+            <p>
+                Similarly, Jetpack Compose’s LazyColumn renders items lazily, creating only the components that are
+                currently visible. Providing stable keys using the key parameter helps Compose track item identity,
+                preserve state, and avoid unnecessary recompositions.
+            </p>
+
+            <p>
+                Both frameworks offer these optimizations out of the box, giving developers smooth scrolling performance
+                with minimal setup.
+            </p>
         </section>
 
         <section class="post-section">

@@ -144,7 +144,7 @@ export const blogData = [
     {
         "title": "Side-by-Side Implementation: Creating a List",
         "summary": "You can learn how to create lists using XML and Jetpack Compose on Android, as well as UIKit and SwiftUI on iOS.",
-        "type": PostType.ComputerScience,
+        "type": [PostType.Android, PostType.iOS],
         "path": "side-by-side-implementation-creating-a-list",
         "date": "22 November 2025"
     },
