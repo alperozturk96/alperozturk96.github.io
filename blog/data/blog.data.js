@@ -148,4 +148,11 @@ export const blogData = [
         "path": "side-by-side-implementation-creating-a-list",
         "date": "22 November 2025"
     },
+    {
+        "title": "Pipeline Pattern",
+        "summary": "",
+        "type": PostType.ComputerScience,
+        "path": "pipeline-pattern",
+        "date": "06 December 2025"
+    },
 ]
