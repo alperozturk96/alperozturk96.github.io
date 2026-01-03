@@ -155,4 +155,11 @@ export const blogData = [
         "path": "pipeline-pattern",
         "date": "06 December 2025"
     },
+    {
+        "title": "Strategy Pattern",
+        "summary": "",
+        "type": PostType.ComputerScience,
+        "path": "strategy-pattern",
+        "date": "03 January 2026"
+    },
 ]

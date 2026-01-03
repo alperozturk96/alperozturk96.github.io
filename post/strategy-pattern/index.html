@@ -1,0 +1,347 @@
+<article class="post">
+    <header class="post-header">
+        <h1>Strategy Pattern</h1>
+        <time datetime="2026-01-03">03 January 2026</time>
+    </header>
+
+    <main class="post-content">
+        <section class="post-section">
+            <p>
+                Don’t repeat yourself, copy-paste code, complexity, and over-engineering. Are these connected, related?
+
+                As software engineers, our job is to write code that is clean, easy to understand, and maintainable over time.
+                In this post, we’ll look at the Strategy design pattern and see how it helps us solve a real-world
+                problem in a clean and scalable way.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Domain</h2>
+            <p>
+                Imagine we have a list of items that need to be displayed under different conditions.
+                For this example, our use case is displaying contracts.
+
+                Each contract can have multiple participants, a signing date, a due date, and other related information,
+                as shown below.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+struct Contract {
+    let id: UUID
+    let title: String
+    let content: String
+    let participants: [Person]
+    let signDate: Date
+    let dueDate: Date
+}
+
+struct Person {
+    let name: String
+    let surname: String
+    let birthDate: Date
+    let signature: String
+}
+    </code></pre>
+            </div>
+
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+struct ContractStore {
+
+    private let calendar = Calendar.current
+    private let now = Date()
+
+    var contracts: [Contract] = .init()
+
+    private func monthsFromNow(_ months: Int) -> Date {
+        calendar.date(byAdding: .month, value: months, to: now)!
+    }
+
+    init() {
+        let john = Person(
+            name: "John",
+            surname: "Doe",
+            birthDate: calendar.date(from: DateComponents(year: 1990, month: 5, day: 10))!,
+            signature: "J.Doe"
+        )
+
+        let anna = Person(
+            name: "Anna",
+            surname: "Smith",
+            birthDate: calendar.date(from: DateComponents(year: 1988, month: 9, day: 3))!,
+            signature: "A.Smith"
+        )
+
+        let michael = Person(
+            name: "Michael",
+            surname: "Brown",
+            birthDate: calendar.date(from: DateComponents(year: 1995, month: 2, day: 18))!,
+            signature: "M.Brown"
+        )
+
+        let emily = Person(
+            name: "Emily",
+            surname: "Johnson",
+            birthDate: calendar.date(from: DateComponents(year: 1992, month: 11, day: 22))!,
+            signature: "E.Johnson"
+        )
+
+        self.contracts = [
+            Contract(
+                id: UUID(),
+                title: "Consulting Agreement",
+                content: "Backend development consulting.",
+                participants: [john, anna],
+                signDate: now,
+                dueDate: monthsFromNow(2)
+            ),
+            Contract(
+                id: UUID(),
+                title: "NDA",
+                content: "Confidentiality agreement.",
+                participants: [anna, michael],
+                signDate: now,
+                dueDate: monthsFromNow(1)
+            ),
+            Contract(
+                id: UUID(),
+                title: "Employment Contract",
+                content: "Full-time employment terms.",
+                participants: [michael],
+                signDate: now,
+                dueDate: monthsFromNow(6)
+            ),
+            Contract(
+                id: UUID(),
+                title: "Freelance Contract",
+                content: "UI/UX design services.",
+                participants: [emily, john],
+                signDate: now,
+                dueDate: monthsFromNow(4)
+            ),
+            Contract(
+                id: UUID(),
+                title: "Maintenance Agreement",
+                content: "System maintenance.",
+                participants: [john, anna, michael],
+                signDate: now,
+                dueDate: monthsFromNow(8)
+            ),
+            Contract(
+                id: UUID(),
+                title: "Short-Term License",
+                content: "Temporary software license.",
+                participants: [emily],
+                signDate: now,
+                dueDate: monthsFromNow(3)
+            )
+        ]
+    }
+}
+    </code></pre>
+            </div>
+        </section>
+
+        <section class="post-section">
+            <h2>Requirements</h2>
+            <p>
+                Suppose we want to display contracts whose due date is within the next four months.
+                A simple function like the following would solve that problem.
+            </p>
+
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+func contractsDueWithinFourMonths() -> [Contract] {
+     let fourMonthsFromNow = calendar.date(byAdding: .month, value: 4, to: now)!
+     return contracts.filter { $0.dueDate <= fourMonthsFromNow }
+}
+    </code></pre>
+            </div>
+
+            <p>
+                However, what if the next requirement is to show contracts within six months instead?
+                We could add a parameter and move on, right?
+            </p>
+
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+func contractsDueWithin(_ givenMonths: Int) -> [Contract] {
+     let dueWithinMonths = calendar.date(byAdding: .month, value: givenMonths, to: now)!
+     return contracts.filter { $0.dueDate <= dueWithinMonths }
+}
+    </code></pre>
+            </div>
+
+            <p>
+                This works, for now.
+
+                But what happens when the next requirement says:
+                “Show contracts due within five months and involving Michael.”
+            </p>
+
+            <p>
+                Do we create yet another function?
+                Or do we keep extending the same one with more conditions and flags?
+            </p>
+
+            <p>
+                This often leads to a single, giant function full of optional parameters and branching logic.
+                I’ve seen this kind of code in production many times, it’s fragile, hard to read, and almost always grows
+                through copy-paste.
+            </p>
+
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+func filterContracts(_ givenMonths: Int?, _ name: String?) -> [Contract] {
+        guard givenMonths != nil || name != nil else {
+            return []
+        }
+
+        return contracts.filter { contract in
+            var matches = true
+
+            if let months = givenMonths {
+                let limitDate = calendar.date(byAdding: .month, value: months, to: now)!
+                matches = matches && contract.dueDate <= limitDate
+            }
+
+            if let name = name {
+                matches = matches && contract.participants.contains { person in
+                    person.name.caseInsensitiveCompare(name) == .orderedSame
+                }
+            }
+
+            return matches
+        }
+}
+    </code></pre>
+            </div>
+        </section>
+
+        <section class="post-section">
+            <h2>Solution</h2>
+            <p>
+                The core problem here is simple: we want to filter data based on different criteria.
+                What we really need is: one filtering function, no internal conditional, logic behavior that changes based
+                on the requirement, not the function itself.
+            </p>
+
+            <p>
+                The function should stay simple, readable, and stable. This is where the Strategy pattern fits perfectly.
+                We define a protocol that represents a filtering rule. Then, for each requirement, we create a small,
+                focused type that implements that rule. The filtering function doesn’t care how the filtering is done,
+                it simply applies the given strategies.
+            </p>
+
+            <p>
+                This approach gives us: better readability, less fragile code, easy extensibility, testable, isolated logic.
+                If a new requirement appears in the future, we don’t modify the filtering logic, we extend behavior
+                by composing new strategies.
+            </p>
+
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+protocol ContractFilterStrategy {
+    func matches(_ contract: Contract) -> Bool
+}
+
+struct DueDateFilterStrategy: ContractFilterStrategy {
+    let monthsFromNow: Int
+    let calendar: Calendar
+    let referenceDate: Date
+
+    init(monthsFromNow: Int,
+         calendar: Calendar = .current,
+         referenceDate: Date = Date()) {
+        self.monthsFromNow = monthsFromNow
+        self.calendar = calendar
+        self.referenceDate = referenceDate
+    }
+
+    func matches(_ contract: Contract) -> Bool {
+        guard let limitDate = calendar.date(byAdding: .month,
+                                             value: monthsFromNow,
+                                             to: referenceDate) else {
+            return false
+        }
+        return contract.dueDate <= limitDate
+    }
+}
+
+struct ParticipantFilterStrategy: ContractFilterStrategy {
+    let name: String
+
+    func matches(_ contract: Contract) -> Bool {
+        contract.participants.contains {
+            $0.name.caseInsensitiveCompare(name) == .orderedSame
+        }
+    }
+}
+    </code></pre>
+            </div>
+
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre>
+<code class="language-swift">
+func filterContracts(
+    using strategies: [ContractFilterStrategy],
+    from contracts: [Contract]
+) -> [Contract] {
+    guard !strategies.isEmpty else {
+        return contracts
+    }
+
+    return contracts.filter { contract in
+        strategies.allSatisfy { $0.matches(contract) }
+    }
+}
+
+// Usage example
+
+let store = ContractStore()
+let contracts = store.contracts
+
+let dueDateFilter = DueDateFilterStrategy(monthsFromNow: 8)
+let participantFilter = ParticipantFilterStrategy(name: "John")
+
+let filteredContracts = filterContracts(
+    using: [dueDateFilter, participantFilter],
+    from: contracts
+)
+
+filteredContracts.forEach { contract in
+    print("\(contract.title) - \(contract.dueDate)")
+
+    /// prints
+    Consulting Agreement - 2026-03-03 18:44:28 +0000
+    Freelance Contract - 2026-05-03 17:44:28 +0000
+    Maintenance Agreement - 2026-09-03 17:44:28 +0000
+}
+</code>
+    </pre>
+            </div>
+        </section>
+
+        <section class="post-section">
+            <h2>Conclusion</h2>
+            <p>
+                For simple or fixed filtering, the built-in capabilities of the programming language (like Swift’s filter)
+                are often enough, but when multiple independent, dynamic, or reusable rules are needed, the Strategy
+                pattern provides a clean, extensible solution.
+            </p>
+
+            <p>
+                Design patterns are language and platform independent ideas that help us build better systems. The Strategy
+                pattern is a great example of this. It allows us to replace conditional complexity with composition,
+                making our code easier to reason about and safer to change.
+            </p>
+        </section>
+    </main>
+</article>
