@@ -162,4 +162,11 @@ export const blogData = [
         "path": "strategy-pattern",
         "date": "03 January 2026"
     },
+    {
+        "title": "Bloom Filter",
+        "summary": "",
+        "type": PostType.ComputerScience,
+        "path": "bloom-filter",
+        "date": "15 February 2026"
+    },
 ]

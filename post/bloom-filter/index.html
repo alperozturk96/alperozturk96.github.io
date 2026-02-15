@@ -1,0 +1,256 @@
+<article class="post">
+    <header class="post-header">
+        <h1>Bloom Filter</h1>
+        <time datetime="2026-02-15">15 February 2026</time>
+    </header>
+
+    <main class="post-content">
+        <section class="post-section">
+            <p>
+                Sometimes we need to check existence of data inside a dataset. In many cases correctness is critical.
+                But what if the dataset is huge and absolute correctness is not mandatory? What if a very small
+                probability of error is acceptable, and performance and memory efficiency matter more?
+            </p>
+
+            <p>
+                In those situations, traditional data structures may not be the best choice. This is where probabilistic
+                data structures like Bloom filters become very useful.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Problem</h2>
+            <p>
+                Recently I needed to check the existence of a <code>String</code> inside a very large list of
+                <code>String</code> values (around 300K elements). Approach like this, simply
+                store them in an array and check not going to be good.
+            </p>
+
+            <ul>
+                <li>Lookup with <code>array.contains</code> is <strong>O(n)</strong>.</li>
+                <li>Storing all strings consumes noticeable memory.</li>
+            </ul>
+
+            <p>
+                In my case, correctness of this check was not critical. A rare false positive would not negatively
+                affect the
+                user experience. So instead of insisting on 100% accuracy, I preferred a faster and more
+                space-efficient solution.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Solution</h2>
+            <p>
+                During my research I came across the Bloom filter data structure.
+            </p>
+
+            <p>
+                A Bloom filter is a probabilistic data structure used to test whether an element is a member of a set.
+                It can tell you:
+            </p>
+
+            <ul>
+                <li><strong>Not in the set</strong></li>
+                <li><strong>Possibly in the set</strong></li>
+            </ul>
+
+            <p>
+                The key idea is simple:
+            </p>
+
+            <ol>
+                <li>Take the hash of an item multiple times.</li>
+                <li>Each hash maps to an index in a bit array.</li>
+                <li>Set those indexes to <code>true</code>.</li>
+            </ol>
+
+            <p>
+                A bit array (bitset) is essentially an array of booleans. For example, if the calculated hashes for an
+                item are 85, 63 and 11, then we set those indexes to <code>true</code>.
+            </p>
+
+            <p>
+                When checking for existence, instead of scanning the whole list, we:
+            </p>
+
+            <ul>
+                <li>Recalculate the same hashes.</li>
+                <li>Check whether all corresponding indexes are <code>true</code>.</li>
+            </ul>
+
+            <p>
+                If any of them is <code>false</code>, the item is not in the set.
+                If all are <code>true</code>, the item is probably in the set.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Implementation</h2>
+            <p>
+                Below is a simple Swift implementation. For simplicity, I used a boolean array as a bitset.
+            </p>
+
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+import Foundation
+
+class BloomFilter {
+    private let size: Int
+    private let hashCount: Int
+    private var bitArray: [Bool]
+
+    init(size: Int, hashCount: Int) {
+        self.size = size
+        self.hashCount = hashCount
+        self.bitArray = [Bool](repeating: false, count: size)
+    }
+
+    func add(_ value: String) {
+        for i in 0..<hashCount {
+            let hashValue = hash(value, seed: i)
+            bitArray[hashValue] = true
+        }
+    }
+
+    func mightContain(_ value: String) -> Bool {
+        for i in 0..<hashCount {
+            let hashValue = hash(value, seed: i)
+            if !bitArray[hashValue] {
+                return false
+            }
+        }
+        return true
+    }
+
+    private func hash(_ value: String, seed: Int) -> Int {
+        var result = seed
+        for char in value {
+            result = 31 &* result &+ char.asciiValueInt()
+        }
+        return abs(result % size)
+    }
+}
+
+private extension Character {
+    func asciiValueInt() -> Int {
+        return Int(self.asciiValue ?? 0)
+    }
+}
+</code></pre>
+            </div>
+
+            <p>
+                During checking we simply verify whether the calculated hash indexes are set to <code>true</code>.
+                We never compare full strings again and do not store the original data.
+                That is where the performance gain comes from.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h2>Test</h2>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+func test() {
+    let bloom = BloomFilter(size: 1000, hashCount: 3)
+
+    bloom.add("apple")
+    bloom.add("banana")
+    bloom.add("cherry")
+
+    assert(bloom.mightContain("apple") == true, "Error: apple should be present")
+    assert(bloom.mightContain("banana") == true, "Error: banana should be present")
+    assert(bloom.mightContain("cherry") == true, "Error: cherry should be present")
+    assert(bloom.mightContain("durian") == false, "Error: durian should NOT be present")
+}
+</code></pre>
+            </div>
+        </section>
+
+
+        <section class="post-section">
+            <h2>Measure</h2>
+            <p>
+                I ran the following benchmark to compare a normal array lookup with a Bloom filter lookup.
+            </p>
+
+            <p>
+                Results on my machine:
+            </p>
+
+            <p>
+                Array lookup time: 212.65s<br/>
+                Bloom filter lookup time: 0.12s<br/>
+                Array memory estimate: 2430 KB<br/>
+                Bloom filter memory estimate: 976 KB
+            </p>
+
+             <p>
+                The difference is significant. The array lookup is linear and repeatedly scans the list.
+                The Bloom filter performs a fixed number of hash operations and bit checks.
+            </p>
+
+            <p>
+                If we had used a <code>Set&lt;String&gt;</code> instead of an array,
+                lookup would also be approximately <strong>O(1)</strong>. However, a set still stores
+                the full strings in memory, while a Bloom filter only stores bits.
+                So the real advantage appears when memory footprint matters.
+            </p>
+
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">
+func benchmark() {
+    let n = 100_000
+    let bloomSize = 1_000_000
+    let hashCount = 5
+
+    var array = [String]()
+    let bloom = BloomFilter(size: bloomSize, hashCount: hashCount)
+
+    for i in 0..<n {
+        let item = "item\(i)"
+        array.append(item)
+        bloom.add(item)
+    }
+
+    let arrayStart = CFAbsoluteTimeGetCurrent()
+    for i in 0..<n {
+        _ = array.contains("item\(i)")
+    }
+    let arrayTime = CFAbsoluteTimeGetCurrent() - arrayStart
+
+    let bloomStart = CFAbsoluteTimeGetCurrent()
+    for i in 0..<n {
+        _ = bloom.mightContain("item\(i)")
+    }
+    let bloomTime = CFAbsoluteTimeGetCurrent() - bloomStart
+
+    let arrayMemory = memoryUsedByArray(array)
+    let bloomMemory = bloom.bitArray.count * MemoryLayout<Bool>.size
+
+    print("Array lookup time: \(arrayTime)s")
+    print("Bloom filter lookup time: \(bloomTime)s")
+    print("Array memory estimate: \(arrayMemory / 1024) KB")
+    print("Bloom filter memory estimate: \(bloomMemory / 1024) KB")
+}
+</code></pre>
+            </div>
+        </section>
+
+        <section class="post-section">
+            <h2>Conclusion</h2>
+            <p>
+                If the result of checking does not need to be perfectly accurate and you prioritize speed and memory
+                efficiency, a Bloom filter is a very practical choice.
+            </p>
+
+            <p>
+                It is especially useful when dealing with very large datasets and when eliminating unnecessary full
+                lookups can significantly improve responsiveness.
+            </p>
+        </section>
+    </main>
+</article>
