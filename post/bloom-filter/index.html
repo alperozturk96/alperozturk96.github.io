@@ -94,13 +94,11 @@
             <div class="code-container">
                 <button class="copy-button" title="Copy">Copy</button>
                 <pre><code class="language-swift">
-import Foundation
-
 class BloomFilter {
     private let size: Int
     private let hashCount: Int
-    private var bitArray: [Bool]
-
+    fileprivate var bitArray: [Bool]
+    
     init(size: Int, hashCount: Int) {
         self.size = size
         self.hashCount = hashCount
