@@ -97,7 +97,7 @@
 class BloomFilter {
     private let size: Int
     private let hashCount: Int
-    fileprivate var bitArray: [Bool]
+    var bitArray: [Bool]
     
     init(size: Int, hashCount: Int) {
         self.size = size
