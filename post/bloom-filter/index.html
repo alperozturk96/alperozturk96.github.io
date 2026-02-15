@@ -106,14 +106,14 @@ class BloomFilter {
     }
 
     func add(_ value: String) {
-        for i in 0..<hashCount {
+        for i in 0..&lt;hashCount {
             let hashValue = hash(value, seed: i)
             bitArray[hashValue] = true
         }
     }
 
-    func mightContain(_ value: String) -> Bool {
-        for i in 0..<hashCount {
+    func mightContain(_ value: String) -&gt; Bool {
+        for i in 0..&lt;hashCount {
             let hashValue = hash(value, seed: i)
             if !bitArray[hashValue] {
                 return false
@@ -122,18 +122,16 @@ class BloomFilter {
         return true
     }
 
-    private func hash(_ value: String, seed: Int) -> Int {
+    private func hash(_ value: String, seed: Int) -&gt; Int {
         var result = seed
         for char in value {
-            result = 31 &* result &+ char.asciiValueInt()
+            result = 31 &amp;* result &amp;+ asciiValueInt(char)
         }
         return abs(result % size)
     }
-}
 
-private extension Character {
-    func asciiValueInt() -> Int {
-        return Int(self.asciiValue ?? 0)
+    private func asciiValueInt(_ char: Character) -&gt; Int {
+        return Int(char.asciiValue ?? 0)
     }
 }
 </code></pre>
@@ -179,13 +177,13 @@ func test() {
             </p>
 
             <p>
-                Array lookup time: 212.65s<br/>
-                Bloom filter lookup time: 0.12s<br/>
-                Array memory estimate: 2430 KB<br/>
+                Array lookup time: 212.65s<br />
+                Bloom filter lookup time: 0.12s<br />
+                Array memory estimate: 2430 KB<br />
                 Bloom filter memory estimate: 976 KB
             </p>
 
-             <p>
+            <p>
                 The difference is significant. The array lookup is linear and repeatedly scans the list.
                 The Bloom filter performs a fixed number of hash operations and bit checks.
             </p>
@@ -208,26 +206,26 @@ func benchmark() {
     var array = [String]()
     let bloom = BloomFilter(size: bloomSize, hashCount: hashCount)
 
-    for i in 0..<n {
+    for i in 0..&lt;n {
         let item = "item\(i)"
         array.append(item)
         bloom.add(item)
     }
 
     let arrayStart = CFAbsoluteTimeGetCurrent()
-    for i in 0..<n {
+    for i in 0..&lt;n {
         _ = array.contains("item\(i)")
     }
     let arrayTime = CFAbsoluteTimeGetCurrent() - arrayStart
 
     let bloomStart = CFAbsoluteTimeGetCurrent()
-    for i in 0..<n {
+    for i in 0..&lt;n {
         _ = bloom.mightContain("item\(i)")
     }
     let bloomTime = CFAbsoluteTimeGetCurrent() - bloomStart
 
     let arrayMemory = memoryUsedByArray(array)
-    let bloomMemory = bloom.bitArray.count * MemoryLayout<Bool>.size
+    let bloomMemory = bloom.bitArray.count * MemoryLayout&lt;Bool&gt;.size
 
     print("Array lookup time: \(arrayTime)s")
     print("Bloom filter lookup time: \(bloomTime)s")
