@@ -232,6 +232,12 @@ func benchmark() {
     print("Array memory estimate: \(arrayMemory / 1024) KB")
     print("Bloom filter memory estimate: \(bloomMemory / 1024) KB")
 }
+
+func memoryUsedByArray(_ arr: [String]) -&gt; Int {
+    let stringSize = arr.reduce(0) { $0 + $1.utf8.count }
+    let pointerOverhead = arr.count * MemoryLayout&lt;String&gt;.size
+    return stringSize + pointerOverhead
+}
 </code></pre>
             </div>
         </section>
