@@ -169,4 +169,11 @@ export const blogData = [
         "path": "bloom-filter",
         "date": "15 February 2026"
     },
+    {
+        "title": "Core Animation CATransform3D",
+        "summary": "",
+        "type": PostType.iOS,
+        "path": "core-animation-ca-transform-3d",
+        "date": "22 March 2026"
+    },
 ]
