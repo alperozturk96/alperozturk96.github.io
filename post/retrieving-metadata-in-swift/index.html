@@ -8,7 +8,7 @@
         <section class="post-section">
             <p>
                 There are different ways to retrieve metadata from an audio file
-                in Swift. Some methods are deprecated and some are based on C
+                in Swift. You can come across deprecated methods or Audio Toolbox framework
                 calls, so achieving this in an efficient way is not
                 straightforward at first glance.
             </p>
@@ -22,8 +22,7 @@
                     >'commonMetadata' was deprecated in macOS 13.0: Use
                     load(.commonMetadata) instead</code
                 >
-                warning, and this did not work correctly to retrieve all
-                metadata during my tests.
+                warning.
             </p>
             <div class="code-container">
                 <button class="copy-button" title="Copy">Copy</button>
@@ -56,7 +55,7 @@
 
             <h3>AudioFileOpenURL</h3>
             <p>
-                Another way is to use C calls from the Audio Toolbox framework.
+                Another way is to use calls from the Audio Toolbox framework.
                 This way I was able to retrieve metadata, however I encountered
                 an
                 <code
