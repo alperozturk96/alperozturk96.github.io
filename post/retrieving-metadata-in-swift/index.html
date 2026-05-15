@@ -1,0 +1,193 @@
+<article class="post">
+    <header class="post-header">
+        <h1>Retrieving Metadata of an Audio File in Swift</h1>
+        <time datetime="2026-05-15">15 May 2026</time>
+    </header>
+
+    <main class="post-content">
+        <section class="post-section">
+            <h2>Ways</h2>
+            <p>
+                There are different ways to retrieve metadata from an audio file
+                in Swift. Some methods are deprecated and some are based on C
+                calls, so achieving this in an efficient way is not
+                straightforward at first glance.
+            </p>
+        </section>
+
+        <section class="post-section">
+            <h3>AVAsset.commonMetadata</h3>
+            <p>
+                If you run the following code you will get a
+                <code
+                    >'commonMetadata' was deprecated in macOS 13.0: Use
+                    load(.commonMetadata) instead</code
+                >
+                warning, and this did not work correctly to retrieve all
+                metadata during my tests.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">func getMetadata(from fileURL: URL) {
+    let asset = AVAsset(url: fileURL)
+
+    let title = AVMetadataItem.metadataItems(
+        from: asset.commonMetadata,
+        filteredByIdentifier: .commonIdentifierTitle
+    ).first?.stringValue
+
+    let artist = AVMetadataItem.metadataItems(
+        from: asset.commonMetadata,
+        filteredByIdentifier: .commonIdentifierArtist
+    ).first?.stringValue
+
+    let album = AVMetadataItem.metadataItems(
+        from: asset.commonMetadata,
+        filteredByIdentifier: .commonIdentifierAlbumName
+    ).first?.stringValue
+
+    let duration = CMTimeGetSeconds(asset.duration)
+
+    print("Title:", title ?? "N/A")
+    print("Artist:", artist ?? "N/A")
+    print("Album:", album ?? "N/A")
+    print("Duration:", duration)
+}</code></pre>
+            </div>
+
+            <h3>AudioFileOpenURL</h3>
+            <p>
+                Another way is to use C calls from the Audio Toolbox framework.
+                This way I was able to retrieve metadata, however I encountered
+                an
+                <code
+                    >Expression uses unsafe constructs but is not marked with
+                    'unsafe'</code
+                >
+                warning that you have to handle, or insert
+                <code>unsafe</code> explicitly.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">private func toTrack(_ url: URL) async throws -> Track? {
+    let asset = AVURLAsset(url: url)
+    let (artist, album) = getArtistAndAlbum(asset, url)
+    let resourceValues = try? url.resourceValues(forKeys: [.contentModificationDateKey])
+    let dateModified: Date? = resourceValues?.contentModificationDate
+    let nameWithoutExtension = url.deletingPathExtension().lastPathComponent
+
+    let duration: Double
+    do {
+        let assetDuration = try await asset.load(.duration)
+        duration = assetDuration.isValid ? CMTimeGetSeconds(assetDuration) : 0
+    } catch {
+        duration = 0
+    }
+
+    return Track(
+        title: nameWithoutExtension,
+        artist: artist,
+        album: album,
+        url: url.standardizedFileURL,
+        pathExtension: url.pathExtension,
+        timestamp: dateModified,
+        duration: duration
+    )
+}
+
+private func getArtistAndAlbum(_ asset: AVAsset, _ url: URL) -> (artist: String, album: String) {
+    let formats = [
+        kAudioFileFLACType,
+        kAudioFilePropertyID3Tag,
+        kAudioFileM4AType,
+        kAudioFileMP3Type,
+        kAudioFileWAVEType
+    ]
+
+    for format in formats {
+        let (artist, album) = audioFileInfo(metadata: format, url: url) ?? ("", "")
+        if !artist.isEmpty && !album.isEmpty {
+            return (artist, album)
+        }
+    }
+
+    return ("", "")
+}
+
+private func audioFileInfo(metadata: AudioFileTypeID, url: URL) -> (String, String)? {
+    var fileID: AudioFileID? = nil
+    var status: OSStatus = AudioFileOpenURL(url as CFURL, .readPermission, metadata, &fileID)
+
+    guard status == noErr else { return nil }
+
+    var dict: CFDictionary? = nil
+    var dataSize = UInt32(MemoryLayout&lt;CFDictionary?&gt;.size(ofValue: dict))
+
+    guard let audioFile = fileID else { return nil }
+
+    let (unsafeDataSize, unsafeDict) = withUnsafeMutablePointer(to: &dataSize) { unsafeDataSize in
+        withUnsafeMutablePointer(to: &dict) { unsafeDict in
+            return (unsafeDataSize, unsafeDict)
+        }
+    }
+
+    status = AudioFileGetProperty(audioFile, kAudioFilePropertyInfoDictionary, unsafeDataSize, unsafeDict)
+    guard status == noErr else { return nil }
+
+    AudioFileClose(audioFile)
+
+    guard let cfDict = dict else { return nil }
+
+    let tagsDict = NSDictionary(dictionary: cfDict)
+
+    let artist = tagsDict["artist"] as? String
+    let album = tagsDict["album"] as? String
+    return (artist ?? "", album ?? "")
+}</code></pre>
+            </div>
+
+            <h3>AVAsset load</h3>
+            <p>
+                With the async approach I was able to retrieve all metadata
+                correctly and ended up with much safer code.
+            </p>
+            <div class="code-container">
+                <button class="copy-button" title="Copy">Copy</button>
+                <pre><code class="language-swift">extension URL {
+    func toTrack() async -> Track {
+        let asset = AVAsset(url: self)
+        let title  = await asset.loadMetadataValue(for: .commonIdentifierTitle)
+        let artist = await asset.loadMetadataValue(for: .commonIdentifierArtist)
+        let album  = await asset.loadMetadataValue(for: .commonIdentifierAlbumName)
+        let dateModified = (try? resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
+
+        return Track(
+            title: title.isEmpty ? lastPathComponent : title,
+            artist: artist,
+            album: album,
+            path: self,
+            pathExtension: pathExtension,
+            dateModified: dateModified
+        )
+    }
+}
+
+private extension AVAsset {
+    func loadMetadataValue(for identifier: AVMetadataIdentifier) async -> String {
+        guard let formats = try? await load(.availableMetadataFormats) else { return "" }
+
+        for format in formats {
+            guard let metadata = try? await loadMetadata(for: format) else { continue }
+            let items = AVMetadataItem.metadataItems(from: metadata, filteredByIdentifier: identifier)
+            if let value = try? await items.first?.load(.stringValue), !value.isEmpty {
+                return value
+            }
+        }
+
+        return ""
+    }
+}</code></pre>
+            </div>
+        </section>
+    </main>
+</article>
