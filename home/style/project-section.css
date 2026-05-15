@@ -4,6 +4,8 @@
     padding: 2.2rem 2.2rem 1.7rem 2.2rem;
     margin-bottom: 2.7rem;
     margin-top: 0.7rem;
+    content-visibility: auto;
+    contain-intrinsic-size: 0 400px;
 }
 
 .project-header-row {
@@ -46,6 +48,8 @@
     padding-bottom: 0.7rem;
     margin-top: 2rem;
     scrollbar-color: #6B6B6B #2D2D2D;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
 }
 
 .screenshots:hover {
