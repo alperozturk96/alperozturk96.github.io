@@ -1,17 +1,40 @@
+.project-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.2rem;
+    padding-top: 0.5rem;
+}
+
 .project-link-btn {
     text-decoration: none;
     font-weight: bold;
-    margin-bottom: 0.5rem;
-    padding-left: 0.55rem;
-    font-size: 1rem;
-    margin-right: 0.7rem;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.95rem;
+    border-radius: 0.35rem;
+    border: 1.5px solid transparent;
+    transition: opacity 0.2s;
 }
+
 .project-link-btn.iOS {
     color: #2897FF;
+    border-color: #2897FF33;
 }
+
 .project-link-btn.Android {
     color: #3DDC84;
+    border-color: #3DDC8433;
 }
-.project-link-btn:hover, .project-link-btn:focus {
+
+.project-link-btn:hover,
+.project-link-btn:focus {
     text-decoration: underline;
+    opacity: 0.85;
+}
+
+@media (max-width: 600px) {
+    .project-link-btn {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.75rem;
+    }
 }

@@ -1,13 +1,22 @@
 main.about-page {
     max-width: 50rem;
-    margin-top: 2rem;
-    padding: 0 1rem;
+    margin: 2rem auto;
+    padding: 0 2rem;
     background-color: #000000;
 }
 
+/* Tablet */
+@media (max-width: 900px) {
+    main.about-page {
+        padding: 0 1.5rem;
+    }
+}
+
+/* Mobile */
 @media (max-width: 600px) {
     main.about-page {
-        max-width: 20rem;
+        padding: 0 1rem;
+        margin: 1rem auto;
     }
 }
 
@@ -22,19 +31,24 @@ main.about-page {
     align-items: center;
     justify-content: center;
     margin-top: 2rem;
+    gap: 0.9rem;
     width: 100%;
 }
 
 .tech-stack .tech-icon {
     width: 2.2rem;
     height: 2.2rem;
-    margin-right: 1rem;
 }
 
 @media (max-width: 600px) {
     .tech-stack .tech-icon {
-        width: 1.5rem;
-        height: 1.5rem;
+        width: 1.6rem;
+        height: 1.6rem;
+    }
+
+    .tech-stack {
+        gap: 0.75rem;
+        margin-top: 1.5rem;
     }
 }
 
@@ -42,32 +56,41 @@ main.about-page {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 2.5rem;
+    gap: 1.5rem;
     margin: 2.5rem 0 2rem 0;
+    flex-wrap: wrap;
 }
 
 .contact-link {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 120px;
-    padding: 0.85rem 1.2rem;
+    min-width: 100px;
+    padding: 0.75rem 1.4rem;
     color: #2897FF;
     text-decoration: none;
     letter-spacing: 0.01em;
+    border: 1.5px solid #2897FF44;
+    border-radius: 0.4rem;
+    transition: opacity 0.2s;
 }
 
 .contact-link:hover,
 .contact-link:focus {
     text-decoration: underline;
+    opacity: 0.85;
 }
 
 @media (max-width: 600px) {
     .contact-link {
         min-width: 0;
-        width: 100%;
-        font-size: 1rem;
-        padding: 0.7rem 0.5rem;
+        padding: 0.65rem 1rem;
+        font-size: 0.95rem;
+    }
+
+    .external-link {
+        gap: 0.75rem;
+        margin: 2rem 0 1.5rem 0;
     }
 }
 

@@ -13,6 +13,7 @@
     justify-content: center;
     width: 100%;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .nav-base a {
@@ -34,19 +35,21 @@
     display: inline-block;
 }
 
-@media (max-width: 600px) {
-    .nav-base {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
+/* Tablet: keep horizontal, tighten padding */
+@media (max-width: 900px) {
     .nav-base a {
-        padding: 1rem;
-        font-size: 1rem;
+        padding: 0.85rem 1.2rem;
+    }
+}
+
+/* Mobile: compact horizontal row */
+@media (max-width: 600px) {
+    .nav-base a {
+        padding: 0.75rem 0.9rem;
+        font-size: 0.95rem;
     }
 
     .nav-base li {
-        display: block;
-        width: 100%;
+        display: inline-block;
     }
 }
