@@ -1,5 +1,3 @@
-# Retrieving Metadata of an Audio File in Swift
-
 There are different ways to retrieve metadata from an audio file in Swift. You can come across deprecated methods or Audio Toolbox framework calls, so achieving this in an efficient way is not straightforward at first glance.
 
 ### AVAsset.commonMetadata (deprecated)
