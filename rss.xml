@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Alper Öztürk - Blog</title>
+    <link>https://alperozturk.me/blog</link>
+    <description>Latest posts from Alper Öztürk</description>
+    <language>en-US</language>
+    <lastBuildDate>2026-05-25T00:00:00Z</lastBuildDate>
+
+    <item>
+      <title>Retrieving Metadata of an Audio File in Swift</title>
+      <link>https://alperozturk.me/post/?id=retrieving-metadata-in-swift.md</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=retrieving-metadata-in-swift.md</guid>
+      <pubDate>2026-05-15T00:00:00Z</pubDate>
+      <description></description>
+    </item>
+
+    <item>
+      <title>Core Animation CATransform3D</title>
+      <link>https://alperozturk.me/post/?id=core-animation-ca-transform-3d</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=core-animation-ca-transform-3d</guid>
+      <pubDate>2026-03-22T00:00:00Z</pubDate>
+      <description></description>
+    </item>
+
+    <item>
+      <title>Bloom Filter</title>
+      <link>https://alperozturk.me/post/?id=bloom-filter</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=bloom-filter</guid>
+      <pubDate>2026-02-15T00:00:00Z</pubDate>
+      <description></description>
+    </item>
+
+    <item>
+      <title>Strategy Pattern</title>
+      <link>https://alperozturk.me/post/?id=strategy-pattern</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=strategy-pattern</guid>
+      <pubDate>2026-01-03T00:00:00Z</pubDate>
+      <description></description>
+    </item>
+
+    <item>
+      <title>Pipeline Pattern</title>
+      <link>https://alperozturk.me/post/?id=pipeline-pattern</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=pipeline-pattern</guid>
+      <pubDate>2025-12-06T00:00:00Z</pubDate>
+      <description></description>
+    </item>
+
+    <item>
+      <title>Side-by-Side Implementation: Creating a List</title>
+      <link>https://alperozturk.me/post/?id=side-by-side-implementation-creating-a-list</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=side-by-side-implementation-creating-a-list</guid>
+      <pubDate>2025-11-22T00:00:00Z</pubDate>
+      <description>You can learn how to create lists using XML and Jetpack Compose on Android, as well as UIKit and SwiftUI on iOS.</description>
+    </item>
+
+    <item>
+      <title>Model-View-ViewModel Architectural Pattern</title>
+      <link>https://alperozturk.me/post/?id=mvvm</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=mvvm</guid>
+      <pubDate>2025-11-15T00:00:00Z</pubDate>
+      <description>What is MVVM, how to implement it in mobile apps, and the common challenges and solutions for building maintainable, testable, and scalable applications.</description>
+    </item>
+
+    <item>
+      <title>Creating PDFs Using UIGraphicsPDFRenderer</title>
+      <link>https://alperozturk.me/post/?id=create-pdf-with-swift</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=create-pdf-with-swift</guid>
+      <pubDate>2025-11-08T00:00:00Z</pubDate>
+      <description></description>
+    </item>
+
+    <item>
+      <title>Fail Fast and Don't Be Afraid</title>
+      <link>https://alperozturk.me/post/?id=fail-fast-and-dont-be-afraid</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=fail-fast-and-dont-be-afraid</guid>
+      <pubDate>2025-11-01T00:00:00Z</pubDate>
+      <description>Design software to catch critical issues early.</description>
+    </item>
+
+    <item>
+      <title>Composition over Inheritance</title>
+      <link>https://alperozturk.me/post/?id=composition-over-inheritance</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=composition-over-inheritance</guid>
+      <pubDate>2025-10-26T00:00:00Z</pubDate>
+      <description>Understanding when to use inheritance and when to favor composition can define how maintainable your codebase becomes.</description>
+    </item>
+
+    <item>
+      <title>Understanding FileManager API</title>
+      <link>https://alperozturk.me/post/?id=understanding-file-manager-api</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=understanding-file-manager-api</guid>
+      <pubDate>2025-10-18T00:00:00Z</pubDate>
+      <description>Lets explore, one of the most powerful and essential tools provided by the Foundation framework.</description>
+    </item>
+
+    <item>
+      <title>Automatic Reference Counting in Swift</title>
+      <link>https://alperozturk.me/post/?id=automatic-reference-counting-in-swift</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=automatic-reference-counting-in-swift</guid>
+      <pubDate>2025-10-03T00:00:00Z</pubDate>
+      <description>In this blogpost you can learn about ARC, strong, weak, unowned references, memory leaks, and common memory leak scenarios.</description>
+    </item>
+
+    <item>
+      <title>Creating a Launcher with Tile Layouts</title>
+      <link>https://alperozturk.me/post/?id=creating-a-launcher-with-tile-layouts</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=creating-a-launcher-with-tile-layouts</guid>
+      <pubDate>2025-09-07T00:00:00Z</pubDate>
+      <description></description>
+    </item>
+
+    <item>
+      <title>Integrating an Interval Timer into the Music Player</title>
+      <link>https://alperozturk.me/post/?id=integrating-an-interval-timer-into-the-music-player</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=integrating-an-interval-timer-into-the-music-player</guid>
+      <pubDate>2025-08-31T00:00:00Z</pubDate>
+      <description></description>
+    </item>
+
+    <item>
+      <title>GraphQL &amp; Apollo Client</title>
+      <link>https://alperozturk.me/post/?id=graphql-and-apollo-client</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=graphql-and-apollo-client</guid>
+      <pubDate>2025-08-24T00:00:00Z</pubDate>
+      <description></description>
+    </item>
+
+    <item>
+      <title>Android runtime and Dalvik</title>
+      <link>https://alperozturk.me/post/?id=android-runtime-and-dalvik</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=android-runtime-and-dalvik</guid>
+      <pubDate>2025-08-10T00:00:00Z</pubDate>
+      <description></description>
+    </item>
+
+    <item>
+      <title>Concurrency with Swift 6</title>
+      <link>https://alperozturk.me/post/?id=concurrency-with-swift-6</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=concurrency-with-swift-6</guid>
+      <pubDate>2025-08-02T00:00:00Z</pubDate>
+      <description></description>
+    </item>
+
+    <item>
+      <title>Using A Locally Hosted Large Language Model with MapKit</title>
+      <link>https://alperozturk.me/post/?id=using-language-model-with-map-kit</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=using-language-model-with-map-kit</guid>
+      <pubDate>2025-07-27T00:00:00Z</pubDate>
+      <description></description>
+    </item>
+
+    <item>
+      <title>End-to-End Encryption with CryptoKit</title>
+      <link>https://alperozturk.me/post/?id=end-to-end-encryption-with-crypto-kit</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=end-to-end-encryption-with-crypto-kit</guid>
+      <pubDate>2025-07-19T00:00:00Z</pubDate>
+      <description>Using Apple’s CryptoKit, this post demonstrates how to implement end-to-end encryption with Diffie-Hellman key exchange to securely transmit data over an insecure channel. It also includes digital signature verification to ensure the authenticity and integrity of the messages.</description>
+    </item>
+
+    <item>
+      <title>Kotlin Flows</title>
+      <link>https://alperozturk.me/post/?id=kotlin-flows</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=kotlin-flows</guid>
+      <pubDate>2025-07-13T00:00:00Z</pubDate>
+      <description></description>
+    </item>
+
+    <item>
+      <title>SwiftUI Navigation Problems</title>
+      <link>https://alperozturk.me/post/?id=swiftui-navigation-problems</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=swiftui-navigation-problems</guid>
+      <pubDate>2025-07-05T00:00:00Z</pubDate>
+      <description></description>
+    </item>
+
+    <item>
+      <title>Managing App Lifecycle with UIApplicationDelegate &amp; UISceneDelegate</title>
+      <link>https://alperozturk.me/post/?id=managing-app-life-cycle</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=managing-app-life-cycle</guid>
+      <pubDate>2025-06-22T00:00:00Z</pubDate>
+      <description></description>
+    </item>
+
+    <item>
+      <title>UIKit Dynamics</title>
+      <link>https://alperozturk.me/post/?id=uikit-dynamics</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=uikit-dynamics</guid>
+      <pubDate>2025-06-15T00:00:00Z</pubDate>
+      <description>Hidden gem of UIKit since iOS 7.</description>
+    </item>
+
+    <item>
+      <title>Concurrency</title>
+      <link>https://alperozturk.me/post/?id=concurrency</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=concurrency</guid>
+      <pubDate>2025-06-14T00:00:00Z</pubDate>
+      <description>You've probably heard this hundreds of times before, but let me explain also ...</description>
+    </item>
+
+    <item>
+      <title>Migrating from Gson to Kotlinx Serialization</title>
+      <link>https://alperozturk.me/post/?id=migrating-from-gson-to-kotlinx-serialization</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=migrating-from-gson-to-kotlinx-serialization</guid>
+      <pubDate>2025-06-01T00:00:00Z</pubDate>
+      <description>Migrating from Gson to Kotlinx Serialization for easier and faster JSON handling in Android apps. Let’s dive into the story ...</description>
+    </item>
+
+    <item>
+      <title>Customizing the Navigation Bar in SwiftUI</title>
+      <link>https://alperozturk.me/post/?id=customizing-the-navigation-bar-in-swiftui</link>
+      <guid isPermaLink="false">https://alperozturk.me/post/?id=customizing-the-navigation-bar-in-swiftui</guid>
+      <pubDate>2025-05-30T00:00:00Z</pubDate>
+      <description>Let’s take a quick look at why customizing SwiftUI’s navigation bar isn’t as simple as it should be and how you can fix it with a clean, reusable solution that works across iOS versions. Despite improvements in iOS 16, full control still needs some UIKit magic.</description>
+    </item>
+
+  </channel>
+</rss>

@@ -87,6 +87,15 @@ li {
     margin-top: 1rem;
 }
 
+.footer .rss-icon {
+    vertical-align: middle;
+    margin-left: 0.5rem;
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+    opacity: 0.95;
+}
+
 .footer .no-ai {
     color: #ffffff;
 }
