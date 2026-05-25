@@ -190,7 +190,7 @@ export const blogData = [
     title: "Retrieving Metadata of an Audio File in Swift",
     summary: "",
     type: PostType.iOS,
-    path: "retrieving-metadata-in-swift",
+    path: "retrieving-metadata-in-swift.md",
     date: "15 May 2026",
   },
 ];

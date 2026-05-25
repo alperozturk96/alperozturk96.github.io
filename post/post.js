@@ -1,5 +1,6 @@
 import { blogData } from "../blog/data/blog.data.js";
 import {UnicodeIcons} from "../assets/icons/unicode.icons.js";
+import { markdownToHtml } from "./markdown.renderer.js";
 
 const params = new URLSearchParams(window.location.search);
 const path = params.get("id");
@@ -20,11 +21,22 @@ function init() {
                 }
                 return response.text();
             })
-            .then(html => {
+            .then(text => {
                 contentEl.innerHTML = "";
-                const postBody = document.createElement("div");
-                postBody.innerHTML = html;
-                contentEl.appendChild(postBody);
+
+                // If the fetched content looks like markdown (or path ends with .md) render as markdown
+                const isMarkdown = post.path.endsWith('.md') || /^\s*#/.test(text);
+                if (isMarkdown) {
+                    const html = markdownToHtml(text, post);
+                    const postBody = document.createElement("div");
+                    postBody.innerHTML = html;
+                    contentEl.appendChild(postBody);
+                } else {
+                    // legacy HTML posts: keep previous behaviour
+                    const postBody = document.createElement("div");
+                    postBody.innerHTML = text;
+                    contentEl.appendChild(postBody);
+                }
 
                 Prism.highlightAll();
                 setCopyButtonEvents();
@@ -76,7 +88,6 @@ function makeExpandableImages() {
         }
     };
 }
-
 
 function setCopyButtonEvents() {
     document.querySelectorAll(".copy-button").forEach(button => {

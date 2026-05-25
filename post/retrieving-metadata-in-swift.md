@@ -1,32 +1,13 @@
-<article class="post">
-    <header class="post-header">
-        <h1>Retrieving Metadata of an Audio File in Swift</h1>
-        <time datetime="2026-05-15">15 May 2026</time>
-    </header>
+# Retrieving Metadata of an Audio File in Swift
 
-    <main class="post-content">
-        <section class="post-section">
-            <p>
-                There are different ways to retrieve metadata from an audio file
-                in Swift. You can come across deprecated methods or Audio Toolbox framework
-                calls, so achieving this in an efficient way is not
-                straightforward at first glance.
-            </p>
-        </section>
+There are different ways to retrieve metadata from an audio file in Swift. You can come across deprecated methods or Audio Toolbox framework calls, so achieving this in an efficient way is not straightforward at first glance.
 
-        <section class="post-section">
-            <h3>AVAsset.commonMetadata (deprecated)</h3>
-            <p>
-                If you run the following code you will get a
-                <code
-                    >'commonMetadata' was deprecated in macOS 13.0: Use
-                    load(.commonMetadata) instead</code
-                >
-                warning.
-            </p>
-            <div class="code-container">
-                <button class="copy-button" title="Copy">Copy</button>
-                <pre><code class="language-swift">func getMetadata(from fileURL: URL) {
+### AVAsset.commonMetadata (deprecated)
+
+If you run the following code you will get a `'commonMetadata' was deprecated in macOS 13.0: Use load(.commonMetadata) instead` warning.
+
+```swift
+func getMetadata(from fileURL: URL) {
     let asset = AVAsset(url: fileURL)
 
     let title = AVMetadataItem.metadataItems(
@@ -50,24 +31,15 @@
     print("Artist:", artist ?? "N/A")
     print("Album:", album ?? "N/A")
     print("Duration:", duration)
-}</code></pre>
-            </div>
+}
+```
 
-            <h3>AudioFileOpenURL</h3>
-            <p>
-                Another way is to use calls from the Audio Toolbox framework.
-                This way I was able to retrieve metadata, however I encountered
-                an
-                <code
-                    >Expression uses unsafe constructs but is not marked with
-                    'unsafe'</code
-                >
-                warning that you have to handle, or insert
-                <code>unsafe</code> explicitly.
-            </p>
-            <div class="code-container">
-                <button class="copy-button" title="Copy">Copy</button>
-                <pre><code class="language-swift">private func toTrack(_ url: URL) async throws -> Track? {
+### AudioFileOpenURL
+
+Another way is to use calls from the Audio Toolbox framework. This way I was able to retrieve metadata, however I encountered an `Expression uses unsafe constructs but is not marked with 'unsafe'` warning that you have to handle, or insert `unsafe` explicitly.
+
+```swift
+private func toTrack(_ url: URL) async throws -> Track? {
     let asset = AVURLAsset(url: url)
     let (artist, album) = getArtistAndAlbum(asset, url)
     let resourceValues = try? url.resourceValues(forKeys: [.contentModificationDateKey])
@@ -119,7 +91,7 @@ private func audioFileInfo(metadata: AudioFileTypeID, url: URL) -> (String, Stri
     guard status == noErr else { return nil }
 
     var dict: CFDictionary? = nil
-    var dataSize = UInt32(MemoryLayout&lt;CFDictionary?&gt;.size(ofValue: dict))
+    var dataSize = UInt32(MemoryLayout<CFDictionary?>.size(ofValue: dict))
 
     guard let audioFile = fileID else { return nil }
 
@@ -141,17 +113,15 @@ private func audioFileInfo(metadata: AudioFileTypeID, url: URL) -> (String, Stri
     let artist = tagsDict["artist"] as? String
     let album = tagsDict["album"] as? String
     return (artist ?? "", album ?? "")
-}</code></pre>
-            </div>
+}
+```
 
-            <h3>AVAsset load</h3>
-            <p>
-                With the async approach I was able to retrieve all metadata
-                correctly and ended up with much safer code.
-            </p>
-            <div class="code-container">
-                <button class="copy-button" title="Copy">Copy</button>
-                <pre><code class="language-swift">extension URL {
+### AVAsset load
+
+With the async approach I was able to retrieve all metadata correctly and ended up with much safer code.
+
+```swift
+extension URL {
     func toTrack() async -> Track {
         let asset = AVAsset(url: self)
         let title  = await asset.loadMetadataValue(for: .commonIdentifierTitle)
@@ -184,8 +154,5 @@ private extension AVAsset {
 
         return ""
     }
-}</code></pre>
-            </div>
-        </section>
-    </main>
-</article>
+}
+```
