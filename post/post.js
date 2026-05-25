@@ -1,5 +1,5 @@
 import { blogData } from "../blog/data/blog.data.js";
-import {UnicodeIcons} from "../assets/icons/unicode.icons.js";
+import { UnicodeIcons } from "../assets/icons/unicode.icons.js";
 import { markdownToHtml } from "./markdown.renderer.js";
 
 const params = new URLSearchParams(window.location.search);
@@ -7,49 +7,44 @@ const path = params.get("id");
 const contentEl = document.getElementById("post-element");
 const post = blogData.find(p => p.path === path);
 
-
-init()
+init();
 
 function init() {
-    if (post) {
-        document.title = post.title;
-
-        fetch(post.path)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Failed to load post content.");
-                }
-                return response.text();
-            })
-            .then(text => {
-                contentEl.innerHTML = "";
-
-                // If the fetched content looks like markdown (or path ends with .md) render as markdown
-                const isMarkdown = post.path.endsWith('.md') || /^\s*#/.test(text);
-                if (isMarkdown) {
-                    const html = markdownToHtml(text, post);
-                    const postBody = document.createElement("div");
-                    postBody.innerHTML = html;
-                    contentEl.appendChild(postBody);
-                } else {
-                    // legacy HTML posts: keep previous behaviour
-                    const postBody = document.createElement("div");
-                    postBody.innerHTML = text;
-                    contentEl.appendChild(postBody);
-                }
-
-                Prism.highlightAll();
-                setCopyButtonEvents();
-                makeAllCodeContainersCollapsibleAndExpandable();
-                makeExpandableImages();
-            })
-            .catch(error => {
-                contentEl.textContent = "Error loading post: " + error.message;
-            });
+    if (!post) {
+        contentEl.textContent = "Post not found.";
         return;
     }
 
-    contentEl.textContent = "Post not found.";
+    document.title = post.title;
+
+    fetch(post.path)
+        .then(response => {
+            if (!response.ok) throw new Error("Failed to load post content.");
+            return response.text();
+        })
+        .then(text => {
+            contentEl.innerHTML = "";
+
+            const isMarkdown = post.path.endsWith('.md') || /^\s*#/.test(text);
+            if (isMarkdown) {
+                const html = markdownToHtml(text, post);
+                const postBody = document.createElement("div");
+                postBody.innerHTML = html;
+                contentEl.appendChild(postBody);
+            } else {
+                const postBody = document.createElement("div");
+                postBody.innerHTML = text;
+                contentEl.appendChild(postBody);
+            }
+
+            makeAllCodeContainersCollapsibleAndExpandable();
+            Prism.highlightAll();
+            setCopyButtonEvents();
+            makeExpandableImages();
+        })
+        .catch(error => {
+            contentEl.textContent = "Error loading post: " + error.message;
+        });
 }
 
 function makeExpandableImages() {
@@ -58,7 +53,7 @@ function makeExpandableImages() {
 
     if (!document.getElementById('modal-div')) {
         const modalHtml = `
-        <div id="modal-div" class="modal">
+        <div id="modal-div" class="modal" style="display:none;">
             <span class="close">&times;</span>
             <img class="modal-content" id="img01" alt="">
         </div>
@@ -68,7 +63,7 @@ function makeExpandableImages() {
 
     const modal = document.getElementById("modal-div");
     const modalImg = document.getElementById("img01");
-    const span = document.getElementsByClassName("close")[0];
+    const span = modal.querySelector(".close");
 
     images.forEach(img => {
         img.style.cursor = 'pointer';
@@ -78,24 +73,21 @@ function makeExpandableImages() {
         };
     });
 
-    span.onclick = function() {
-        modal.style.display = "none";
-    };
-
-    modal.onclick = function(event) {
-        if (event.target === modal) {
-            modal.style.display = "none";
-        }
+    span.onclick = () => modal.style.display = "none";
+    modal.onclick = (event) => {
+        if (event.target === modal) modal.style.display = "none";
     };
 }
 
 function setCopyButtonEvents() {
     document.querySelectorAll(".copy-button").forEach(button => {
         button.addEventListener("click", async () => {
-            const code = button.parentElement.querySelector("code");
+            const container = button.closest(".code-container");
+            const code = container ? container.querySelector("code") : null;
             if (!code) return;
 
-            await navigator.clipboard.writeText(code.innerText);
+            const textToCopy = code.dataset.rawFull || code.innerText;
+            await navigator.clipboard.writeText(textToCopy);
 
             const originalText = button.innerText;
             button.innerText = "Copied";
@@ -111,21 +103,17 @@ function makeAllCodeContainersCollapsibleAndExpandable() {
         const pre = container.querySelector('pre');
         if (!pre) return;
 
-        const buttonElement = document.createElement('button');
-        const toggleBtn = Object.assign(buttonElement, {
+        const toggleBtn = document.createElement('button');
+        Object.assign(toggleBtn, {
             className: 'toggle-code',
             type: 'button',
             textContent: UnicodeIcons.DownArrow
         });
 
-        const divElement = document.createElement('div');
-        const codeContent = Object.assign(divElement, {
-            className: 'code-content'
-        });
+        const codeContent = document.createElement('div');
+        codeContent.className = 'code-content';
 
-        // Move all children into codeContent
         Array.from(container.children).forEach(child => codeContent.appendChild(child));
-
         container.replaceChildren(toggleBtn, codeContent);
 
         setupCodePreview(pre, toggleBtn);
@@ -137,13 +125,13 @@ function setupCodePreview(pre, toggleBtn) {
     const code = pre.querySelector('code');
     if (!code) return;
 
-    const lines = code.innerHTML.split('\n');
+    const rawText = code.textContent;
+    const lines = rawText.split('\n');
+
     if (lines.length > 5) {
-        Object.assign(code.dataset, {
-            full: code.innerHTML,
-            preview: lines.slice(0, 5).join('\n')
-        });
-        code.innerHTML = code.dataset.preview + '\n...';
+        code.dataset.rawFull = rawText;
+        code.dataset.rawPreview = lines.slice(0, 5).join('\n') + '\n...';
+        code.textContent = code.dataset.rawPreview; // Show shortened text initially
         return;
     }
 
@@ -157,7 +145,11 @@ function setupToggleEvent(toggleBtn, codeContent) {
         if (!code) return;
 
         expanded = !expanded;
-        code.innerHTML = expanded ? code.dataset.full : code.dataset.preview + '\n...';
+        code.textContent = expanded ? code.dataset.rawFull : code.dataset.rawPreview;
         toggleBtn.textContent = expanded ? UnicodeIcons.UpArrow : UnicodeIcons.DownArrow;
+
+        if (window.Prism) {
+            Prism.highlightElement(code);
+        }
     });
 }

@@ -45,6 +45,7 @@ export function markdownToHtml(markdown, post) {
     while (i < lines.length) {
         const line = lines[i];
 
+        // Code Fences
         const fenceMatch = line.match(/^```\s*([\w\-+#.]*)\s*$/);
         if (fenceMatch) {
             flushParagraph();
@@ -66,25 +67,27 @@ export function markdownToHtml(markdown, post) {
             continue;
         }
 
+        // Headings
         const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
         if (headingMatch) {
             flushParagraph();
             const level = headingMatch[1].length;
             const text  = headingMatch[2];
-            // Map # → h2 (h1 is reserved for the post title in the article header)
             const tag   = level === 1 ? 'h2' : `h${level + 1}`;
             sections.push(`<${tag}>${inlineFormat(text)}</${tag}>`);
             i++;
             continue;
         }
 
-        if (/^(\*{3,}|-{3,}|_{3,})\s*$/.test(line.trim())) {
+        // Horizontal Rule
+        if (/^\s*(\*{3,}|-{3,}|_{3,})\s*$/.test(line.trim())) {
             flushParagraph();
             sections.push('<hr>');
             i++;
             continue;
         }
 
+        // Images
         const imageMatch = line.match(/^!\[(.*?)\]\((.*?)\)\s*$/);
         if (imageMatch) {
             flushParagraph();
@@ -95,6 +98,7 @@ export function markdownToHtml(markdown, post) {
             continue;
         }
 
+        // Blockquotes
         if (/^\s*>\s?/.test(line)) {
             flushParagraph();
             const quoteLines = [];
@@ -106,6 +110,7 @@ export function markdownToHtml(markdown, post) {
             continue;
         }
 
+        // Unordered Lists
         if (/^\s*[-*+]\s+/.test(line)) {
             flushParagraph();
             const items = [];
@@ -117,6 +122,7 @@ export function markdownToHtml(markdown, post) {
             continue;
         }
 
+        // Ordered Lists
         if (/^\s*\d+\.\s+/.test(line)) {
             flushParagraph();
             const items = [];
@@ -128,6 +134,7 @@ export function markdownToHtml(markdown, post) {
             continue;
         }
 
+        // Empty Blank Line
         if (/^\s*$/.test(line)) {
             flushParagraph();
             i++;
