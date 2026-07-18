@@ -1,8 +1,137 @@
-<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" viewBox="0 0 24 24" id="uikit">
-    <polygon fill="#218EEE" points="16.099 2.302 12.088 0 7.896 2.568 11.965 4.786 16.099 2.302"></polygon>
-    <polygon fill="#218EEE"
-             points="1.5 7.955 1.5 18 11.814 24 22.5 18 22.5 6 17.745 3.286 13.602 5.776 18.385 8.474 18.385 15.552 11.96 19.092 5.643 15.552 5.643 10.068 1.5 7.955"></polygon>
-    <polygon fill="#1D7CCF" points="12 .053 7.896 2.568 11.965 4.786 12 4.765 12 .053"></polygon>
-    <polygon fill="#1D7CCF"
-             points="1.5 7.955 1.5 18 11.814 24 12 23.896 12 19.07 11.96 19.092 5.643 15.552 5.643 10.068 1.5 7.955"></polygon>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <!-- Top Face Surface Gradient -->
+    <linearGradient id="top-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2DA5FF" />
+      <stop offset="100%" stop-color="#0E8AF0" />
+    </linearGradient>
+
+    <!-- Inner Screen & Button Gradient -->
+    <linearGradient id="inner-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#73BFF9" />
+      <stop offset="100%" stop-color="#4AA5F4" />
+    </linearGradient>
+
+    <!-- Reflection Fade Mask -->
+    <linearGradient id="fade-grad" gradientUnits="userSpaceOnUse" x1="0" y1="80" x2="0" y2="180">
+      <stop offset="0%" stop-color="white" stop-opacity="1" />
+      <stop offset="100%" stop-color="white" stop-opacity="0" />
+    </linearGradient>
+    <mask id="fade">
+      <rect x="-400" y="80" width="800" height="200" fill="url(#fade-grad)" />
+    </mask>
+
+    <!-- Reflection Blur Filter -->
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10" />
+    </filter>
+
+    <!-- Base Isometric Plane -->
+    <g id="iso-plane">
+      <g transform="scale(1, 0.577) rotate(45)">
+        <rect x="-160" y="-160" width="320" height="320" rx="55" />
+      </g>
+    </g>
+
+    <!-- H-Mark Detail -->
+    <g id="h-mark">
+      <rect x="-10" y="-5" width="20" height="3" fill="#0C2F52" />
+      <rect x="-10" y="2" width="20" height="3" fill="#0C2F52" />
+      <rect x="-1.5" y="-5" width="3" height="10" fill="#0C2F52" />
+    </g>
+  </defs>
+
+  <!-- Main 3D Icon Group -->
+  <g transform="translate(400, 370)">
+    
+    <!-- Reflection/Shadow -->
+    <g transform="translate(0, 160) scale(1, -1)" opacity="0.4" filter="url(#blur)" mask="url(#fade)">
+      <use href="#iso-plane" y="40" fill="#045C9E" />
+      <use href="#iso-plane" y="50" fill="#045C9E" />
+      <use href="#iso-plane" y="60" fill="#045C9E" />
+      <use href="#iso-plane" y="70" fill="#045C9E" />
+      <use href="#iso-plane" y="80" fill="#045C9E" />
+    </g>
+
+    <!-- Bottom Layer Extrusion (Dark Blue) -->
+    <g fill="#045C9E">
+      <use href="#iso-plane" y="80" /><use href="#iso-plane" y="79" />
+      <use href="#iso-plane" y="78" /><use href="#iso-plane" y="77" />
+      <use href="#iso-plane" y="76" /><use href="#iso-plane" y="75" />
+      <use href="#iso-plane" y="74" /><use href="#iso-plane" y="73" />
+      <use href="#iso-plane" y="72" /><use href="#iso-plane" y="71" />
+      <use href="#iso-plane" y="70" /><use href="#iso-plane" y="69" />
+      <use href="#iso-plane" y="68" /><use href="#iso-plane" y="67" />
+      <use href="#iso-plane" y="66" /><use href="#iso-plane" y="65" />
+      <use href="#iso-plane" y="64" /><use href="#iso-plane" y="63" />
+      <use href="#iso-plane" y="62" /><use href="#iso-plane" y="61" />
+      <use href="#iso-plane" y="60" /><use href="#iso-plane" y="59" />
+      <use href="#iso-plane" y="58" /><use href="#iso-plane" y="57" />
+      <use href="#iso-plane" y="56" /><use href="#iso-plane" y="55" />
+      <use href="#iso-plane" y="54" /><use href="#iso-plane" y="53" />
+      <use href="#iso-plane" y="52" /><use href="#iso-plane" y="51" />
+      <use href="#iso-plane" y="50" />
+    </g>
+
+    <!-- Middle Layer Extrusion (Mid Teal-Blue) -->
+    <g fill="#0C80E3">
+      <use href="#iso-plane" y="49" /><use href="#iso-plane" y="48" />
+      <use href="#iso-plane" y="47" /><use href="#iso-plane" y="46" />
+      <use href="#iso-plane" y="45" /><use href="#iso-plane" y="44" />
+      <use href="#iso-plane" y="43" /><use href="#iso-plane" y="42" />
+      <use href="#iso-plane" y="41" /><use href="#iso-plane" y="40" />
+      <use href="#iso-plane" y="39" /><use href="#iso-plane" y="38" />
+      <use href="#iso-plane" y="37" /><use href="#iso-plane" y="36" />
+      <use href="#iso-plane" y="35" /><use href="#iso-plane" y="34" />
+      <use href="#iso-plane" y="33" /><use href="#iso-plane" y="32" />
+      <use href="#iso-plane" y="31" /><use href="#iso-plane" y="30" />
+      <use href="#iso-plane" y="29" /><use href="#iso-plane" y="28" />
+      <use href="#iso-plane" y="27" /><use href="#iso-plane" y="26" />
+      <use href="#iso-plane" y="25" /><use href="#iso-plane" y="24" />
+      <use href="#iso-plane" y="23" /><use href="#iso-plane" y="22" />
+      <use href="#iso-plane" y="21" /><use href="#iso-plane" y="20" />
+    </g>
+
+    <!-- Top Layer Extrusion (Bright Blue) -->
+    <g fill="#1895FC">
+      <use href="#iso-plane" y="19" /><use href="#iso-plane" y="18" />
+      <use href="#iso-plane" y="17" /><use href="#iso-plane" y="16" />
+      <use href="#iso-plane" y="15" /><use href="#iso-plane" y="14" />
+      <use href="#iso-plane" y="13" /><use href="#iso-plane" y="12" />
+      <use href="#iso-plane" y="11" /><use href="#iso-plane" y="10" />
+      <use href="#iso-plane" y="9" /><use href="#iso-plane" y="8" />
+      <use href="#iso-plane" y="7" /><use href="#iso-plane" y="6" />
+      <use href="#iso-plane" y="5" /><use href="#iso-plane" y="4" />
+      <use href="#iso-plane" y="3" /><use href="#iso-plane" y="2" />
+      <use href="#iso-plane" y="1" />
+    </g>
+
+    <!-- Top Cap Surface & Elements -->
+    <g transform="scale(1, 0.577) rotate(45)">
+      <!-- Main Face Background -->
+      <rect x="-160" y="-160" width="320" height="320" rx="55" fill="url(#top-grad)" />
+
+      <!-- Outer Dashed Line -->
+      <rect x="-125" y="-125" width="250" height="250" rx="30" fill="none" stroke="white" stroke-width="3" stroke-dasharray="14 14" />
+
+      <!-- Inner Screen Solid Fill -->
+      <rect x="-95" y="-95" width="190" height="140" rx="15" fill="url(#inner-grad)" />
+
+      <!-- Lower Pill Button Solid Fill -->
+      <rect x="20" y="65" width="75" height="30" rx="10" fill="url(#inner-grad)" />
+
+      <!-- 4 White Corner Markers -->
+      <path d="M -135 -105 L -135 -135 L -105 -135" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M 135 -105 L 135 -135 L 105 -135" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M -135 105 L -135 135 L -105 135" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M 135 105 L 135 135 L 105 135" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+
+      <!-- 4 Dark Navy "I" or "H" Markers -->
+      <use href="#h-mark" x="0" y="-125" />
+      <use href="#h-mark" x="0" y="125" />
+      <use href="#h-mark" x="-125" y="0" transform="rotate(90, -125, 0)" />
+      <use href="#h-mark" x="125" y="0" transform="rotate(90, 125, 0)" />
+    </g>
+
+  </g>
 </svg>

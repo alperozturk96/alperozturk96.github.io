@@ -6,6 +6,23 @@
     padding-top: 0.5rem;
 }
 
+.project-title {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+}
+
+.project-title h2 {
+    margin: 0;
+}
+
+.project-duration {
+    font-size: 0.9rem;
+    color: #888;
+    font-weight: 400;
+}
+
 .project-link-btn {
     text-decoration: none;
     font-weight: bold;
