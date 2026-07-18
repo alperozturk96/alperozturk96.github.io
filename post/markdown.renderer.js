@@ -134,22 +134,27 @@ export function markdownToHtml(markdown, post) {
             continue;
         }
 
-        // Empty Blank Line
+        // Empty Blank Line (UPDATED LOGIC)
         if (/^\s*$/.test(line)) {
-            flushParagraph();
+            if (curr.length > 0) {
+                // If there's pending text, close the paragraph
+                flushParagraph();
+            } else if (i > 0 && /^\s*$/.test(lines[i - 1])) {
+                // If the previous line was ALSO empty, add a visible break
+                sections.push('<br>');
+            }
             i++;
             continue;
         }
 
+        // Normal text lines get collected to form a paragraph
         curr.push(line);
         i++;
     }
 
     flushParagraph();
 
-    const sectionHtml = sections
-        .map(s => `<section class="post-section">${s}</section>`)
-        .join('\n');
+    const sectionHtml = sections.join('\n');
 
     const timeHtml = post?.date
         ? `<time datetime="${formatDateForDatetime(post.date)}">${escapeHtml(post.date)}</time>`

@@ -193,4 +193,11 @@ export const blogData = [
     path: "retrieving-metadata-in-swift.md",
     date: "15 May 2026",
   },
+  {
+      title: "~Copyable, consuming and consume",
+      summary: "",
+      type: PostType.iOS,
+      path: "copyable-consuming-and-consume.md",
+      date: "18 July 2026",
+    },
 ];
