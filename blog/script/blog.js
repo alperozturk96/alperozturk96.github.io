@@ -82,6 +82,7 @@ function renderPosts(posts, container) {
         card.innerHTML = `
             <div class="card-content">
                 <h2>${post.title}</h2>
+                <span class="blog-date">${post.date}</span>
                 <p>${post.summary}</p>
                 <div class="external-link">
                    <a href="/post?id=${post.path}">
