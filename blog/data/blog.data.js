@@ -200,4 +200,11 @@ export const blogData = [
       path: "copyable-consuming-and-consume.md",
       date: "18 July 2026",
     },
+    {
+        title: "Inline functions and function call over-head",
+        summary: "",
+        type: PostType.ComputerScience,
+        path: "inline-functions-and-function-call-overhead.md",
+        date: "12 September 2026",
+      },
 ];
