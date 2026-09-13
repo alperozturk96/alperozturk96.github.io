@@ -207,4 +207,11 @@ export const blogData = [
         path: "inline-functions-and-function-call-overhead.md",
         date: "12 September 2026",
       },
+      {
+          title: "Implementing a Linked List in Swift",
+          summary: "",
+          type: PostType.ComputerScience,
+          path: "implementing-linked-list-in-swift.md",
+          date: "13 September 2026",
+        },
 ];
