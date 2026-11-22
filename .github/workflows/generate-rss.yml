@@ -20,6 +20,9 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Verify Markdown posts
+        run: node --test
+
       - name: Generate rss.xml
         run: node scripts/generate-rss.mjs
 

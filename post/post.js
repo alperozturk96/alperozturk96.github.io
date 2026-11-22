@@ -1,11 +1,12 @@
-import { blogData } from "../blog/data/blog.data.js";
+import { blogData } from "../blog/data/blog.data.js?v=20261122-markdown";
 import { UnicodeIcons } from "../assets/icons/unicode.icons.js";
-import { markdownToHtml } from "./markdown.renderer.js";
+import { markdownToHtml } from "./markdown.renderer.js?v=20261122-markdown";
 
 const params = new URLSearchParams(window.location.search);
 const path = params.get("id");
 const contentEl = document.getElementById("post-element");
-const post = blogData.find(p => p.path === path);
+const slug = path?.replace(/(?:\/index\.html|\.md|\/)$/, '');
+const post = blogData.find(p => p.path.replace(/\.md$/, '') === slug);
 
 init();
 
@@ -17,25 +18,13 @@ function init() {
 
     document.title = post.title;
 
-    fetch(post.path)
+    fetch(`/post/${post.path}`)
         .then(response => {
             if (!response.ok) throw new Error("Failed to load post content.");
             return response.text();
         })
         .then(text => {
-            contentEl.innerHTML = "";
-
-            const isMarkdown = post.path.endsWith('.md') || /^\s*#/.test(text);
-            if (isMarkdown) {
-                const html = markdownToHtml(text, post);
-                const postBody = document.createElement("div");
-                postBody.innerHTML = html;
-                contentEl.appendChild(postBody);
-            } else {
-                const postBody = document.createElement("div");
-                postBody.innerHTML = text;
-                contentEl.appendChild(postBody);
-            }
+            contentEl.innerHTML = markdownToHtml(text, post);
 
             makeAllCodeContainersCollapsibleAndExpandable();
             configureSwiftHighlighting();

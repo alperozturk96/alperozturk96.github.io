@@ -37,6 +37,10 @@
     text-decoration: underline;
 }
 
+.post-content embed {
+    max-width: 100%;
+}
+
 .post-section {
     margin-bottom: 4rem;
 }

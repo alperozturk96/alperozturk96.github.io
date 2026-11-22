@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Page not found</title>
+    <link rel="stylesheet" href="/style/base.css">
+</head>
+<body>
+    <main>
+        <h1>Page not found</h1>
+        <p><a href="/blog/">Return to the blog</a></p>
+    </main>
+    <script type="module">
+        import { blogData } from '/blog/data/blog.data.js?v=20261122-markdown';
+
+        function redirectLegacyPost() {
+            const match = /^\/post\/([^/]+)(?:\/(?:index\.html)?)?$/.exec(location.pathname);
+            if (!match) return;
+            const slug = decodeURIComponent(match[1]);
+            const post = blogData.find(post => post.path.replace(/\.md$/, '') === slug);
+            if (!post) return;
+
+            location.replace(`/post/?id=${encodeURIComponent(post.path)}${location.hash}`);
+        }
+
+        redirectLegacyPost();
+    </script>
+</body>
+</html>

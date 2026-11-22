@@ -17,9 +17,11 @@ const MONTHS = {
 
 function formatPubDate(dateString) {
   const [day, month, year] = (dateString || "").split(" ");
-  const d = new Date(Date.UTC(+year, MONTHS[month], +day));
-  if (isNaN(d)) return new Date().toUTCString();
-  return d.toUTCString();
+  const monthIndex = MONTHS[month?.slice(0, 3)];
+  const date = new Date(Date.UTC(Number(year), monthIndex, Number(day)));
+  if (Number.isNaN(date.getTime())) throw new Error(`Invalid post date: ${dateString}`);
+
+  return date.toUTCString();
 }
 
 function escapeXml(str) {
@@ -31,19 +33,38 @@ function escapeXml(str) {
     .replace(/'/g, "&apos;");
 }
 
-function makeItem(post) {
+function existingFeedGuids() {
+  const rssPath = path.resolve(__dirname, "..", "rss.xml");
+  if (!fs.existsSync(rssPath)) return new Map();
+  const previousFeed = fs.readFileSync(rssPath, "utf8");
+  const guids = new Map();
+  for (const [, guid] of previousFeed.matchAll(/<guid\b[^>]*>([^<]+)<\/guid>/g)) {
+    const id = new URL(guid.replace(/&amp;/g, "&")).searchParams.get("id");
+    if (id) guids.set(id.replace(/\.md$/, ""), guid);
+  }
+
+  return guids;
+}
+
+function makeItem(post, previousGuids) {
   const url = `${SITE_URL}/post/?id=${encodeURIComponent(post.path)}`;
+  const guid = previousGuids.get(post.path.replace(/\.md$/, "")) || url;
+
   return `    <item>
       <title>${escapeXml(post.title)}</title>
       <link>${url}</link>
-      <guid isPermaLink="true">${url}</guid>
+      <guid isPermaLink="true">${guid}</guid>
       <pubDate>${formatPubDate(post.date)}</pubDate>
       <description>${escapeXml(post.summary)}</description>
     </item>`;
 }
 
 async function generate() {
-  const items = blogData.map(makeItem).join("\n");
+  const previousGuids = existingFeedGuids();
+  const items = [...blogData]
+    .sort((first, second) => Date.parse(formatPubDate(second.date)) - Date.parse(formatPubDate(first.date)))
+    .map(post => makeItem(post, previousGuids))
+    .join("\n");
 
   const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">

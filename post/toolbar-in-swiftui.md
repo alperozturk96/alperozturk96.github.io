@@ -75,7 +75,7 @@ NavigationStack {
 
 ## Output
 
-![Five calendar buttons and an overflow button in an iPhone toolbar.](/post/toolbar-in-swiftui/ToolbarItem_1.png)
+![Five calendar buttons and an overflow button in an iPhone toolbar.](/asset/toolbar-in-swiftui/ToolbarItem_1.png)
 
 In my test, tapping the overflow button did not open a menu.
 
@@ -113,9 +113,9 @@ NavigationStack {
 
 ## Output
 
-![An open overflow menu](/post/toolbar-in-swiftui/ToolbarItem_before_2.png)
+![An open overflow menu](/asset/toolbar-in-swiftui/ToolbarItem_before_2.png)
 
-![An open overflow menu containing calendar buttons 6 and 7.](/post/toolbar-in-swiftui/ToolbarItem_2.png)
+![An open overflow menu containing calendar buttons 6 and 7.](/asset/toolbar-in-swiftui/ToolbarItem_2.png)
 
 # ToolbarItemPlacement
 
@@ -140,21 +140,21 @@ SwiftUI also adjusts these automatically for the platform and available space.
 
 For example, in my portrait test, assigning `.navigation`, `.cancellationAction`, or `.principal` to the `4.calendar` button appeared to produce a similar layout:
 
-![Calendar button 4 separated from the other toolbar buttons in portrait.](/post/toolbar-in-swiftui/ToolbarItem_3.png)
+![Calendar button 4 separated from the other toolbar buttons in portrait.](/asset/toolbar-in-swiftui/ToolbarItem_3.png)
 
 When I assigned [.topBarPinnedTrailing](https://developer.apple.com/documentation/swiftui/toolbaritemplacement/topbarpinnedtrailing) to the same button, it moved after the overflow button:
 
-![Calendar button 4 pinned after the overflow button at the trailing edge.](/post/toolbar-in-swiftui/ToolbarItem_4.png)
+![Calendar button 4 pinned after the overflow button at the trailing edge.](/asset/toolbar-in-swiftui/ToolbarItem_4.png)
 
 When I rotated the device to landscape, I could clearly see the [.principal](https://developer.apple.com/documentation/swiftui/toolbaritemplacement/principal) item in the center:
 
-![Calendar button 4 centered in the navigation bar in landscape.](/post/toolbar-in-swiftui/ToolbarItem_5.png)
+![Calendar button 4 centered in the navigation bar in landscape.](/asset/toolbar-in-swiftui/ToolbarItem_5.png)
 
 On iPhone and iPad, [.navigation](https://developer.apple.com/documentation/swiftui/toolbaritemplacement/navigation) and [.cancellationAction](https://developer.apple.com/documentation/swiftui/toolbaritemplacement/cancellationaction) normally appear at the leading edge.
 
 When I included both placements, the cancellation item appeared before the navigation item in this layout:
 
-![Calendar buttons 4 and 5 at the leading edge, with buttons 1 through 3 trailing.](/post/toolbar-in-swiftui/ToolbarItem_6.png)
+![Calendar buttons 4 and 5 at the leading edge, with buttons 1 through 3 trailing.](/asset/toolbar-in-swiftui/ToolbarItem_6.png)
 
 ## What's the difference between cancellation and destructive actions?
 
@@ -187,7 +187,7 @@ NavigationStack {
 
 ## Output
 
-![Three calendar buttons together in a toolbar.](/post/toolbar-in-swiftui/ToolbarItem_7.png)
+![Three calendar buttons together in a toolbar.](/asset/toolbar-in-swiftui/ToolbarItem_7.png)
 
 # ToolbarRole
 

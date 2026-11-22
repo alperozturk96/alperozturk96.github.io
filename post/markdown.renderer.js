@@ -15,23 +15,115 @@ export function markdownToHtml(markdown, post) {
 
     function inlineFormat(text) {
         if (!text) return '';
-        text = escapeHtml(text);
-        text = text.replace(/`([^`]+)`/g, (_, p1) => `<code>${p1}</code>`);
-        text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
-        text = text.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>');
-        return text;
+        let html = '';
+        let plain = '';
+        let index = 0;
+
+        function flushText() {
+            html += escapeHtml(plain);
+            plain = '';
+        }
+
+        function closingMarker(marker, start) {
+            let position = text.indexOf(marker, start);
+            while (position !== -1) {
+                let escapes = 0;
+                for (let previous = position - 1; previous >= 0 && text[previous] === '\\'; previous--) escapes++;
+                if (escapes % 2 === 0) return position;
+                position = text.indexOf(marker, position + marker.length);
+            }
+
+            return -1;
+        }
+
+        while (index < text.length) {
+            const character = text[index];
+            if (character === '\\' && /[\\`*\[\]()#+.!>|_{}-]/.test(text[index + 1] || '')) {
+                plain += text[index + 1];
+                index += 2;
+                continue;
+            }
+            if (character === '\n') {
+                if (/ {2}$/.test(plain)) {
+                    plain = plain.trimEnd();
+                    flushText();
+                    html += '<br>';
+                } else {
+                    plain += ' ';
+                }
+                index++;
+                continue;
+            }
+            if (character === '`') {
+                const marker = /^`+/.exec(text.slice(index))[0];
+                const end = text.indexOf(marker, index + marker.length);
+                if (end !== -1) {
+                    let code = text.slice(index + marker.length, end).replace(/\n/g, ' ');
+                    if (code.startsWith(' ') && code.endsWith(' ') && /\S/.test(code)) code = code.slice(1, -1);
+                    flushText();
+                    html += `<code>${escapeHtml(code)}</code>`;
+                    index = end + marker.length;
+                    continue;
+                }
+            }
+            if (character === '[') {
+                const labelEnd = closingMarker(']', index + 1);
+                if (labelEnd !== -1 && text[labelEnd + 1] === '(') {
+                    const start = labelEnd + 2;
+                    let end = start;
+                    let destination = '';
+                    if (text[start] === '<') {
+                        const angleEnd = text.indexOf('>', start + 1);
+                        if (angleEnd !== -1 && text[angleEnd + 1] === ')') {
+                            destination = text.slice(start + 1, angleEnd);
+                            end = angleEnd + 1;
+                        }
+                    } else {
+                        let depth = 1;
+                        for (; end < text.length && depth > 0; end++) {
+                            if (text[end] === '\\') { end++; continue; }
+                            if (text[end] === '(') depth++;
+                            if (text[end] === ')') depth--;
+                        }
+                        if (depth === 0) {
+                            end--;
+                            destination = text.slice(start, end).trim();
+                        }
+                    }
+                    if (destination) {
+                        flushText();
+                        html += `<a href="${escapeHtml(destination)}">${inlineFormat(text.slice(index + 1, labelEnd))}</a>`;
+                        index = end + 1;
+                        continue;
+                    }
+                }
+            }
+            if (character === '*') {
+                const marker = text[index + 1] === '*' ? '**' : '*';
+                const end = closingMarker(marker, index + marker.length);
+                if (end > index + marker.length) {
+                    const tag = marker.length === 2 ? 'strong' : 'em';
+                    flushText();
+                    html += `<${tag}>${inlineFormat(text.slice(index + marker.length, end))}</${tag}>`;
+                    index = end + marker.length;
+                    continue;
+                }
+            }
+            plain += character;
+            index++;
+        }
+        flushText();
+
+        return html;
     }
 
     function flushParagraph() {
         if (curr.length === 0) return;
-        sections.push(`<p>${inlineFormat(curr.join(' '))}</p>`);
+        sections.push(`<p>${inlineFormat(curr.join('\n'))}</p>`);
         curr = [];
     }
 
     function formatDateForDatetime(dateStr) {
-        const parsed = Date.parse(dateStr);
-        if (!isNaN(parsed)) return new Date(parsed).toISOString().split('T')[0];
         const m = dateStr.match(/(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/);
         if (m) {
             const months = {jan:'01',feb:'02',mar:'03',apr:'04',may:'05',jun:'06',
@@ -39,20 +131,23 @@ export function markdownToHtml(markdown, post) {
             const month = months[m[2].slice(0, 3).toLowerCase()] || '01';
             return `${m[3]}-${month}-${m[1].padStart(2, '0')}`;
         }
-        return dateStr;
+        const parsed = Date.parse(dateStr);
+
+        return Number.isNaN(parsed) ? dateStr : new Date(parsed).toISOString().split('T')[0];
     }
 
     while (i < lines.length) {
         const line = lines[i];
 
         // Code Fences
-        const fenceMatch = line.match(/^```\s*([\w\-+#.]*)\s*$/);
+        const fenceMatch = line.match(/^(`{3,})\s*([\w\-+#.]*)\s*$/);
         if (fenceMatch) {
             flushParagraph();
-            const lang = fenceMatch[1] || '';
+            const fence = fenceMatch[1];
+            const lang = fenceMatch[2] || '';
             i++;
             const codeLines = [];
-            while (i < lines.length && !lines[i].startsWith('```')) {
+            while (i < lines.length && lines[i].trim() !== fence) {
                 codeLines.push(lines[i]);
                 i++;
             }
@@ -67,13 +162,29 @@ export function markdownToHtml(markdown, post) {
             continue;
         }
 
+        // Native media embeds remain valid inside Markdown posts.
+        if (/^\s*<video\b/.test(line)) {
+            flushParagraph();
+            const mediaLines = [line];
+            while (!mediaLines.at(-1).includes('</video>') && ++i < lines.length) mediaLines.push(lines[i]);
+            sections.push(mediaLines.join('\n'));
+            i++;
+            continue;
+        }
+        if (/^\s*<(?:img|embed)\b[^>]*>\s*$/.test(line)) {
+            flushParagraph();
+            sections.push(line.trim());
+            i++;
+            continue;
+        }
+
         // Headings
         const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
         if (headingMatch) {
             flushParagraph();
             const level = headingMatch[1].length;
             const text  = headingMatch[2];
-            const tag   = level === 1 ? 'h2' : `h${level + 1}`;
+            const tag = `h${Math.min(level + 1, 6)}`;
             sections.push(`<${tag}>${inlineFormat(text)}</${tag}>`);
             i++;
             continue;
@@ -118,7 +229,7 @@ export function markdownToHtml(markdown, post) {
                 items.push(`<li>${inlineFormat(lines[i].replace(/^\s*[-*+]\s+/, ''))}</li>`);
                 i++;
             }
-            sections.push(`<ul>${items.join('')}</ul>`);
+            sections.push(`<ul>${items.join('\n')}</ul>`);
             continue;
         }
 
@@ -130,7 +241,7 @@ export function markdownToHtml(markdown, post) {
                 items.push(`<li>${inlineFormat(lines[i].replace(/^\s*\d+\.\s+/, ''))}</li>`);
                 i++;
             }
-            sections.push(`<ol>${items.join('')}</ol>`);
+            sections.push(`<ol>${items.join('\n')}</ol>`);
             continue;
         }
 
@@ -159,7 +270,7 @@ export function markdownToHtml(markdown, post) {
     const timeHtml = post?.date
         ? `<time datetime="${formatDateForDatetime(post.date)}">${escapeHtml(post.date)}</time>`
         : '';
-    const title = post?.title ? escapeHtml(post.title) : '';
+    const title = escapeHtml(post?.heading || post?.title || '');
 
     return (
         `<article class="post">` +

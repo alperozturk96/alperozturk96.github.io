@@ -1,0 +1,187 @@
+There are several ways to implement similar functionality in an application. When designing app architecture, we often rely on patterns and techniques that are widely adopted or recommended by the official guidelines and community. However, it's important to apply these practices thoughtfully what works well in one context might introduce unnecessary complexity in another. For reactive and asynchronous programming, Kotlin Flows offer a clean and powerful way to manage data streams.
+
+# Use Case
+
+Imagine a scenario where we want to display real-time data updates without requiring any user interaction. Our goal is to implement this behavior in an efficient and maintainable way.
+
+By "efficient," I mean minimizing manual data handling in the codebase. Take, for example, a common feature like displaying posts on a home screen. A typical approach might involve fetching a fixed number of posts from the backend and loading more as the user scrolls. This works well when updates are driven by user actions.
+
+However, some scenarios involve data that can change at any moment, independent of user input. Consider something like a live "like count" on a post. While a user could manually refresh the screen to see the latest count, it’s more seamless and user-friendly to update this information automatically, in real-time.
+
+# Reactive Programming
+
+This approach is known as reactive programming. There are multiple ways to implement it. One simple method is to create a loop that triggers every few seconds, fetches the latest data, and updates the UI accordingly. However, this requires a well-designed cancellation mechanism, especially on mobile platforms, where additional edge cases need to be considered such as handling when app in background, screen rotations, or lifecycle events.
+
+RxJava and Kotlin Flows are providing solution. While RxJava is powerful, many developers find it complex and error prone. In this article, we’ll focus on Kotlin Flows a modern, concise, that integrates seamlessly with Kotlin coroutines.
+
+# What is Flow?
+
+A Flow represents an asynchronous stream of data that can emit multiple values over time. Built on top of Kotlin coroutines, it is specifically designed to handle reactive streams efficiently. For example, when using Room with Flow, any changes to the databases such as inserts, updates, or deletions are automatically emitted to all active collectors, ensuring they receive the latest data without manual intervention. Similarly, Flows can be used to emit updates from network calls.
+
+# Producers & Collectors
+
+In the context of Flows, the producer is responsible for emitting data, while the collector consumes or receives that data. Consider the example below where a function creates a Flow as the producer. Although this function can be called from a non-suspending context, the Flow will not emit any values unless it is actively collected. Collecting a Flow requires a coroutine scope for execution.
+
+```kotlin
+
+fun produceNumbers(): Flow<Int> = flow {
+        for (i in 1..100) {
+            delay(500)
+            emit(i)
+        }
+    }
+
+```
+
+You can collect a Flow as demonstrated in the example below, typically from within a ViewModel.
+
+```kotlin
+
+viewModelScope.launch {
+    produceNumbers().collect {
+        Log.d("Flows", "Collected value: $it")
+    }
+}
+
+```
+
+# Reactive Networking
+
+In this section, we demonstrate a reactive data stream using the JsonPlaceholderAPI, with Ktor serving as the HTTP client.
+
+## PostsScreen
+
+The PostsScreen composable receives a ViewModel as a parameter and collects the random post within its scope. Whenever the post data changes, the UI updates automatically. The UI in this example is intentionally kept minimal for demonstration purposes.
+
+```kotlin
+
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+
+@Composable
+fun PostsScreen(modifier: Modifier, viewModel: PostsViewModel) {
+    val post by viewModel.post.collectAsState()
+
+    Scaffold(modifier = modifier) {
+        post?.let { post ->
+            Text("${post.title}\n${post.body}", modifier = Modifier.padding(it))
+        }
+    }
+}
+  
+```
+
+## PostsViewModel
+
+The PostsViewModel accepts a `PostsRepository` interface as a dependency. This approach enables dependency injection and promotes flexibility by allowing different implementations of the repository, such as mock versions for UI previews or tests.
+
+ViewModel directly exposes a `StateFlow` that reflects the repository’s `postFlow`. This `StateFlow` is created using the `stateIn` operator within the ViewModel's `viewModelScope`, which scopes the lifecycle of the flow collection to the ViewModel.
+
+The `SharingStarted.WhileSubscribed(2000)` strategy governs the flow's active collection lifecycle. It begins collecting when the first subscriber appears and continues for 2 seconds after the last subscriber disappears, helping optimize resource usage by stopping collection when no UI is observing.
+
+```kotlin
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.liontech.exampleapp.ui.post.model.Post
+import com.liontech.exampleapp.ui.post.repository.PostsRepository
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
+
+class PostsViewModel(repository: PostsRepository) : ViewModel() {
+    val post: StateFlow<Post?> = repository.postFlow
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(2000),
+            null
+        )
+}
+  
+```
+
+## PostsRemoteRepository
+
+In this implementation, an infinite loop with a delay is used to periodically fetch random post. It’s important to note that this loop continues to operate only as long as there is an active collector. Once the collector stops, the flow collection terminates accordingly.
+
+Caution is required when working with Flows, as they are not lifecycle-aware. This means that even when the app is in the background or the view is inactive, the flow may continue collecting data unless managed properly. To address this, flows should be handled in accordance with the lifecycle of the associated UI component. In our example, the collection occurs inside the ViewModel, ensuring that when the ViewModel is cleared, the flow collection stops automatically.
+
+```kotlin
+
+import android.util.Log
+import com.liontech.exampleapp.api.JsonPlaceHolderAPI
+import com.liontech.exampleapp.ktor.ktorClient
+import com.liontech.exampleapp.ui.post.model.Post
+import io.ktor.client.request.get
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
+
+class PostsRemoteRepository(
+    private val refreshIntervalMs: Long = 5000L
+) : PostsRepository {
+    override val postFlow: Flow<Post?> = flow {
+        while (true) {
+            try {
+                val posts = fetchPost()
+                emit(posts)
+                Log.d("PostsRemoteRepository", "✅ Random post fetched")
+            } catch (e: Exception) {
+                Log.e("PostsRemoteRepository", "❌ Error fetching post: ${e.message}", e)
+                emit(null)
+            }
+            delay(refreshIntervalMs)
+        }
+    }
+
+    private suspend fun fetchPost(): Post {
+        val randomPostId = (0..100).random()
+        val response: HttpResponse =
+            ktorClient.get(JsonPlaceHolderAPI.baseURL + "/posts/$randomPostId")
+        val json = Json { ignoreUnknownKeys = true }
+        val body = response.bodyAsText()
+        return json.decodeFromString(Post.serializer(), body)
+    }
+}
+  
+```
+
+## KtorClient & JsonPlaceholderAPI
+
+```kotlin
+
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
+
+val ktorClient = HttpClient(CIO) {
+    install(ContentNegotiation) {
+        json(Json {
+            ignoreUnknownKeys = true
+            prettyPrint = true
+            isLenient = true
+        })
+    }
+}
+
+object JsonPlaceHolderAPI {
+    val baseURL = "https://jsonplaceholder.typicode.com"
+}
+
+```
+
+This implementation supports reactive data streaming by continuously fetching a random post at fixed intervals and emitting it to the UI. The UI automatically updates as new data becomes available, without requiring any manual user action. Since the flow is scoped to the ViewModel's lifecycle, data collection stops when the ViewModel is cleared, preventing unnecessary resource usage. Although this example fetches a random post for demonstration purposes, the same approach can be applied to APIs that return frequently changing data, enabling real-time updates in the client.
+
+# Conclusion
+
+Kotlin Flow is a robust and elegant alternative to RxJava, offering a modern approach to reactive programming in Kotlin. While not every scenario requires a reactive solution, Kotlin Flows provide a highly effective option when asynchronous, event-driven data streams are needed. Working with Flows can be enjoyable and productive, making them a valuable addition to any Kotlin developer’s toolkit.

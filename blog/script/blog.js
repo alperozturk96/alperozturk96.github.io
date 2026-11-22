@@ -1,4 +1,4 @@
-import {blogData} from "../data/blog.data.js";
+import {blogData} from "../data/blog.data.js?v=20261122-markdown";
 import {BlogType} from "../data/blog.type.js";
 
 document.addEventListener("DOMContentLoaded", () => {

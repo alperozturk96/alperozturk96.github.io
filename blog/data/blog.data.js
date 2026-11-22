@@ -6,7 +6,7 @@ export const blogData = [
     summary:
       "Let’s take a quick look at why customizing SwiftUI’s navigation bar isn’t as simple as it should be and how you can fix it with a clean, reusable solution that works across iOS versions. Despite improvements in iOS 16, full control still needs some UIKit magic.",
     type: PostType.iOS,
-    path: "customizing-the-navigation-bar-in-swiftui",
+    path: "customizing-the-navigation-bar-in-swiftui.md",
     date: "30 May 2025",
   },
   {
@@ -14,22 +14,23 @@ export const blogData = [
     summary:
       "Migrating from Gson to Kotlinx Serialization for easier and faster JSON handling in Android apps. Let’s dive into the story ...",
     type: PostType.Android,
-    path: "migrating-from-gson-to-kotlinx-serialization",
+    path: "migrating-from-gson-to-kotlinx-serialization.md",
     date: "1 June 2025",
   },
   {
     title: "Concurrency",
+    heading: "Words That Often Get Overlooked",
     summary:
       "You've probably heard this hundreds of times before, but let me explain also ...",
     type: PostType.ComputerScience,
-    path: "concurrency",
+    path: "concurrency.md",
     date: "14 June 2025",
   },
   {
     title: "UIKit Dynamics",
     summary: "Hidden gem of UIKit since iOS 7.",
     type: PostType.iOS,
-    path: "uikit-dynamics",
+    path: "uikit-dynamics.md",
     date: "15 June 2025",
   },
   {
@@ -37,21 +38,21 @@ export const blogData = [
       "Managing App Lifecycle with UIApplicationDelegate & UISceneDelegate",
     summary: "",
     type: PostType.iOS,
-    path: "managing-app-life-cycle",
+    path: "managing-app-life-cycle.md",
     date: "22 June 2025",
   },
   {
     title: "SwiftUI Navigation Problems",
     summary: "",
     type: PostType.iOS,
-    path: "swiftui-navigation-problems",
+    path: "swiftui-navigation-problems.md",
     date: "05 July 2025",
   },
   {
     title: "Kotlin Flows",
     summary: "",
     type: PostType.Android,
-    path: "kotlin-flows",
+    path: "kotlin-flows.md",
     date: "13 July 2025",
   },
   {
@@ -59,49 +60,49 @@ export const blogData = [
     summary:
       "Using Apple’s CryptoKit, this post demonstrates how to implement end-to-end encryption with Diffie-Hellman key exchange to securely transmit data over an insecure channel. It also includes digital signature verification to ensure the authenticity and integrity of the messages.",
     type: PostType.iOS,
-    path: "end-to-end-encryption-with-crypto-kit",
+    path: "end-to-end-encryption-with-crypto-kit.md",
     date: "19 July 2025",
   },
   {
     title: "Using A Locally Hosted Large Language Model with MapKit",
     summary: "",
     type: PostType.iOS,
-    path: "using-language-model-with-map-kit",
+    path: "using-language-model-with-map-kit.md",
     date: "27 July 2025",
   },
   {
     title: "Concurrency with Swift 6",
     summary: "",
     type: PostType.iOS,
-    path: "concurrency-with-swift-6",
+    path: "concurrency-with-swift-6.md",
     date: "02 August 2025",
   },
   {
     title: "Android runtime and Dalvik",
     summary: "",
     type: PostType.Android,
-    path: "android-runtime-and-dalvik",
+    path: "android-runtime-and-dalvik.md",
     date: "10 August 2025",
   },
   {
     title: "GraphQL & Apollo Client",
     summary: "",
     type: PostType.iOS,
-    path: "graphql-and-apollo-client",
+    path: "graphql-and-apollo-client.md",
     date: "24 August 2025",
   },
   {
     title: "Integrating an Interval Timer into the Music Player",
     summary: "",
     type: PostType.Android,
-    path: "integrating-an-interval-timer-into-the-music-player",
+    path: "integrating-an-interval-timer-into-the-music-player.md",
     date: "31 August 2025",
   },
   {
     title: "Creating a Launcher with Tile Layouts",
     summary: "",
     type: PostType.Android,
-    path: "creating-a-launcher-with-tile-layouts",
+    path: "creating-a-launcher-with-tile-layouts.md",
     date: "7 September 2025",
   },
   {
@@ -109,7 +110,7 @@ export const blogData = [
     summary:
       "In this blogpost you can learn about ARC, strong, weak, unowned references, memory leaks, and common memory leak scenarios.",
     type: PostType.iOS,
-    path: "automatic-reference-counting-in-swift",
+    path: "automatic-reference-counting-in-swift.md",
     date: "3 October 2025",
   },
   {
@@ -117,7 +118,7 @@ export const blogData = [
     summary:
       "Lets explore, one of the most powerful and essential tools provided by the Foundation framework.",
     type: PostType.iOS,
-    path: "understanding-file-manager-api",
+    path: "understanding-file-manager-api.md",
     date: "18 October 2025",
   },
   {
@@ -125,21 +126,21 @@ export const blogData = [
     summary:
       "Understanding when to use inheritance and when to favor composition can define how maintainable your codebase becomes.",
     type: PostType.ComputerScience,
-    path: "composition-over-inheritance",
+    path: "composition-over-inheritance.md",
     date: "26 October 2025",
   },
   {
     title: "Fail Fast and Don't Be Afraid",
     summary: "Design software to catch critical issues early.",
     type: PostType.ComputerScience,
-    path: "fail-fast-and-dont-be-afraid",
+    path: "fail-fast-and-dont-be-afraid.md",
     date: "01 November 2025",
   },
   {
     title: "Creating PDFs Using UIGraphicsPDFRenderer",
     summary: "",
     type: PostType.iOS,
-    path: "create-pdf-with-swift",
+    path: "create-pdf-with-swift.md",
     date: "08 November 2025",
   },
   {
@@ -147,7 +148,7 @@ export const blogData = [
     summary:
       "What is MVVM, how to implement it in mobile apps, and the common challenges and solutions for building maintainable, testable, and scalable applications.",
     type: PostType.ComputerScience,
-    path: "mvvm",
+    path: "mvvm.md",
     date: "15 November 2025",
   },
   {
@@ -155,35 +156,35 @@ export const blogData = [
     summary:
       "You can learn how to create lists using XML and Jetpack Compose on Android, as well as UIKit and SwiftUI on iOS.",
     type: [PostType.Android, PostType.iOS],
-    path: "side-by-side-implementation-creating-a-list",
+    path: "side-by-side-implementation-creating-a-list.md",
     date: "22 November 2025",
   },
   {
     title: "Pipeline Pattern",
     summary: "",
     type: PostType.ComputerScience,
-    path: "pipeline-pattern",
+    path: "pipeline-pattern.md",
     date: "06 December 2025",
   },
   {
     title: "Strategy Pattern",
     summary: "",
     type: PostType.ComputerScience,
-    path: "strategy-pattern",
+    path: "strategy-pattern.md",
     date: "03 January 2026",
   },
   {
     title: "Bloom Filter",
     summary: "",
     type: PostType.ComputerScience,
-    path: "bloom-filter",
+    path: "bloom-filter.md",
     date: "15 February 2026",
   },
   {
     title: "Core Animation CATransform3D",
     summary: "",
     type: PostType.iOS,
-    path: "core-animation-ca-transform-3d",
+    path: "core-animation-ca-transform-3d.md",
     date: "22 March 2026",
   },
   {

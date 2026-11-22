@@ -1,0 +1,253 @@
+# UIGraphicsPDFRenderer
+
+`UIGraphicsPDFRenderer` is a UIKit API introduced in iOS 10 that simplifies PDF creation. You can use it to generate single-page or multi-page PDFs.
+
+The renderer provides a drawing context through  [UIGraphicsRendererContext](<https://developer.apple.com/documentation/uikit/uigraphicsrenderercontext>) , allowing you to use Core Graphics calls. Additionally, you can use some higher-level UIKit methods, such as  [NSString.draw(at:withAttributes:)](<https://developer.apple.com/documentation/foundation/nsstring/draw(at:withattributes:)>)  to draw. This compatibility makes it possible to draw text, shapes in a PDF just as you would in a view.
+
+Even though `NSString.draw` was introduced in iOS 7 and `UIGraphicsPDFRenderer` in iOS 10, they work perfectly together because the drawing APIs operate on the underlying Core Graphics context provided by the renderer. This allows engineers to combine these APIs for flexible and creative PDF layouts.
+
+# Implementation
+
+Let’s walk through an example of generating an invoice PDF. Imagine an application that collects user input and generates invoices dynamically.
+
+## Invoice Data
+
+The invoice consists of a struct with a paper size enum and a collection of invoice items. Each item contains a name, quantity, price, and currency. Using enums for paper size and currency allows for flexible formatting and support for multiple combinations.
+
+While generating invoices in A5, A4, and A3 sizes might not always be practical in a real-world scenario, it serves as a good demonstration of the API’s flexibility thanks to CGRect parameter used in UIGraphicsPDFRenderer.
+
+```swift
+
+struct Invoice {
+    let id: UUID
+    let title: String
+    let paperSize: PaperSize
+    let date: Date
+    let items: [InvoiceItem]
+    let total: Double
+}
+
+struct InvoiceItem {
+    let name: String
+    let quantity: Int
+    let price: Double
+    let currency: Currency
+}
+
+enum PaperSize {
+    case a3
+    case a4
+    case a5
+
+    var rect: CGRect {
+        switch self {
+        case .a3:
+            // 297 × 420 mm → 841.8898 × 1190.5512 points
+            return CGRect(x: 0, y: 0, width: 841.8898, height: 1190.5512)
+        case .a4:
+            // 210 × 297 mm → 595.2756 × 841.8898 points
+            return CGRect(x: 0, y: 0, width: 595.2756, height: 841.8898)
+        case .a5:
+            // 148 × 210 mm → 419.5276 × 595.2756 points
+            return CGRect(x: 0, y: 0, width: 419.5276, height: 595.2756)
+        }
+    }
+}
+
+enum Currency: String {
+    case USD = "$"
+    case EUR = "€"
+}
+
+```
+
+## PDF Generation
+
+The key aspect of PDF generation is managing vertical spacing using `yOffset`. Each drawn element (text, line, or table row) updates the offset, ensuring content does not overlap. This approach allows for flexible layouts that can adapt dynamically to the number of items in the invoice.
+
+```swift
+
+struct InvoiceGenerator {
+    private let format = UIGraphicsPDFRendererFormat()
+
+    func generate(for invoice: Invoice) -> Data? {
+        let renderer = UIGraphicsPDFRenderer(bounds: invoice.paperSize.rect, format: format)
+
+        return renderer.pdfData { context in
+            context.beginPage()
+            let margin: CGFloat = 40
+            var yOffset: CGFloat = margin
+            yOffset = drawHeader(invoice: invoice, yOffset: yOffset, margin: margin)
+            yOffset = drawTable(invoice: invoice, yOffset: yOffset, margin: margin)
+            drawTotal(invoice: invoice, yOffset: yOffset, margin: margin)
+        }
+    }
+
+    // MARK: - Header
+    private func drawHeader(invoice: Invoice, yOffset: CGFloat, margin: CGFloat) -> CGFloat {
+        var offset = yOffset
+
+        // Title
+        let titleAttributes: [NSAttributedString.Key: Any] = [.font: UIFont.boldSystemFont(ofSize: 28)]
+        let titleSize = invoice.title.size(withAttributes: titleAttributes)
+        invoice.title.draw(at: CGPoint(x: margin, y: offset), withAttributes: titleAttributes)
+        offset += titleSize.height + 10
+
+        // ID & Date
+        let idString = "Invoice ID: \(invoice.id.uuidString.prefix(8))"
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .medium
+        let dateString = "Date: \(dateFormatter.string(from: invoice.date))"
+
+        let infoAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 12),
+            .foregroundColor: UIColor.darkGray
+        ]
+
+        idString.draw(at: CGPoint(x: margin, y: offset), withAttributes: infoAttributes)
+        dateString.draw(at: CGPoint(x: margin + 300, y: offset), withAttributes: infoAttributes)
+        offset += 30
+
+        // Divider
+        drawLine(from: CGPoint(x: margin, y: offset),
+                 to: CGPoint(x: invoice.paperSize.rect.width - margin, y: offset))
+        offset += 20
+
+        return offset
+    }
+
+    // MARK: - Table
+    private func drawTable(invoice: Invoice, yOffset: CGFloat, margin: CGFloat) -> CGFloat {
+        var offset = yOffset
+        let contentWidth = invoice.paperSize.rect.width - margin * 2
+        let headers = ["Item", "Qty", "Price", "Total"]
+        let columnWidths: [CGFloat] = [contentWidth * 0.5, contentWidth * 0.15, contentWidth * 0.15, contentWidth * 0.2]
+
+        // Header row
+        var xPos = margin
+        let headerFont = UIFont.boldSystemFont(ofSize: 14)
+        for (index, header) in headers.enumerated() {
+            let rect = CGRect(x: xPos, y: offset, width: columnWidths[index], height: 20)
+            header.draw(in: rect, withAttributes: [.font: headerFont])
+            xPos += columnWidths[index]
+        }
+        offset += 25
+
+        drawLine(from: CGPoint(x: margin, y: offset),
+                 to: CGPoint(x: invoice.paperSize.rect.width - margin, y: offset),
+                 thickness: 0.5)
+        offset += 10
+
+        // Items
+        let bodyFont = UIFont.systemFont(ofSize: 13)
+        for item in invoice.items {
+            xPos = margin
+            let total = Double(item.quantity) * item.price
+
+            let values = [
+                item.name,
+                "\(item.quantity)",
+                "\(item.currency.rawValue)\(String(format: "%.2f", item.price))",
+                "\(item.currency.rawValue)\(String(format: "%.2f", total))"
+            ]
+
+            for (index, text) in values.enumerated() {
+                let rect = CGRect(x: xPos, y: offset, width: columnWidths[index], height: 20)
+                text.draw(in: rect, withAttributes: [.font: bodyFont])
+                xPos += columnWidths[index]
+            }
+            offset += 22
+        }
+
+        offset += 10
+        drawLine(from: CGPoint(x: margin, y: offset),
+                 to: CGPoint(x: invoice.paperSize.rect.width - margin, y: offset))
+        offset += 20
+
+        return offset
+    }
+
+    // MARK: - Total
+    private func drawTotal(invoice: Invoice, yOffset: CGFloat, margin: CGFloat) {
+        let totalLabel = "TOTAL:"
+        let invoiceTotal = invoice.items.reduce(0) { $0 + Double($1.quantity) * $1.price }
+        let totalValue = "\(invoice.items.first?.currency.rawValue ?? "$")\(String(format: "%.2f", invoiceTotal))"
+
+        let totalLabelAttributes: [NSAttributedString.Key: Any] = [.font: UIFont.boldSystemFont(ofSize: 16)]
+        let totalValueAttributes: [NSAttributedString.Key: Any] = [.font: UIFont.boldSystemFont(ofSize: 16)]
+
+        totalLabel.draw(in: CGRect(x: invoice.paperSize.rect.width - margin - 200,
+                                   y: yOffset,
+                                   width: 100,
+                                   height: 20),
+                        withAttributes: totalLabelAttributes)
+
+        totalValue.draw(in: CGRect(x: invoice.paperSize.rect.width - margin - 100,
+                                   y: yOffset,
+                                   width: 100,
+                                   height: 20),
+                        withAttributes: totalValueAttributes)
+    }
+
+    private func drawLine(from start: CGPoint, to end: CGPoint, thickness: CGFloat = 1.0) {
+        guard let ctx = UIGraphicsGetCurrentContext() else { return }
+        ctx.setLineWidth(thickness)
+        ctx.setStrokeColor(UIColor.lightGray.cgColor)
+        ctx.move(to: start)
+        ctx.addLine(to: end)
+        ctx.strokePath()
+    }
+}
+
+```
+
+## Output
+
+Once the PDF is generated, it can be saved to the device’s directory or shared directly via the native share sheet or whatever you want to do with Data.
+
+Example usage for data:
+
+```swift
+
+private let generator = InvoiceGenerator()
+
+func generateInvoice() {
+    let invoice = Invoice(
+        id: UUID(),
+        title: "INVOICE #1",
+        paperSize: .a4,
+        date: Date(),
+        items: [
+            InvoiceItem(name: "MacBook M5", quantity: 1, price: 1199.99, currency: .USD),
+            InvoiceItem(name: "Magic Mouse", quantity: 2, price: 79.99, currency: .USD),
+            InvoiceItem(name: "USB-C Hub", quantity: 1, price: 39.99, currency: .USD)
+        ]
+    )
+
+    guard let pdfData = generator.generate(for: invoice) else {
+        print("❌ Failed to generate invoice")
+        return
+    }
+
+    guard let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+        print("❌ Documents directory URL is nil")
+        return
+    }
+
+    let fileURL = documentsURL.appendingPathComponent(invoice.title)
+
+    do {
+        try pdfData.write(to: fileURL, options: .atomic)
+        print("✅ Invoice saved at: \(fileURL.path)")
+    } catch {
+        print("❌ Error saving invoice: \(error)")
+    }
+}
+    
+```
+
+<embed src="/asset/create-pdf-with-swift/invoice.pdf" width="420" height="600" type="application/pdf">
+
+# Conclusion
+
+UIGraphicsPDFRenderer is a powerful and flexible API for dynamically generating PDFs in Swift or Objective-C without relying on third-party libraries. UIKit still rocks, and it looks like it will continue to do so for a long time.
