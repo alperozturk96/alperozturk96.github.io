@@ -72,7 +72,7 @@ function makeExpandableImages() {
     dialog.setAttribute('aria-label', 'Expanded image');
     dialog.innerHTML = `
         <button type="button" class="post-image-dialog-close" aria-label="Close image">
-            Close <span aria-hidden="true">&times;</span>
+            <span aria-hidden="true">&times;</span>
         </button>
         <img class="post-image-dialog-image" alt="">
     `;

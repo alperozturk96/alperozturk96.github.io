@@ -177,6 +177,7 @@
 }
 
 .post-image-dialog-close {
+    font-size: 1.5rem;
     position: sticky;
     top: 0;
     justify-self: end;

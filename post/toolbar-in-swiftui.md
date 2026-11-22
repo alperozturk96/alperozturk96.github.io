@@ -121,7 +121,21 @@ NavigationStack {
 
 Now we can choose a placement for each toolbar item using `ToolbarItemPlacement`.
 
-The [placement list](https://developer.apple.com/documentation/swiftui/toolbaritemplacement) is long. Some of them looks like easy to understand. 
+```swift
+NavigationStack {
+    ZStack {
+        Color.white
+    }
+    .toolbar {
+        // Try .navigation, .cancellationAction, or .topBarPinnedTrailing.
+        ToolbarItem(placement: .principal) {
+            Button("Calendar 4", systemImage: "4.calendar") {}
+        }
+    }
+}
+```
+
+The [placement list](https://developer.apple.com/documentation/swiftui/toolbaritemplacement) is long. Some of them easy to understand. 
 SwiftUI also adjusts these automatically for the platform and available space.
 
 For example, in my portrait test, assigning `.navigation`, `.cancellationAction`, or `.principal` to the `4.calendar` button appeared to produce a similar layout:
@@ -142,12 +156,9 @@ When I included both placements, the cancellation item appeared before the navig
 
 ![Calendar buttons 4 and 5 at the leading edge, with buttons 1 through 3 trailing.](/post/toolbar-in-swiftui/ToolbarItem_6.png)
 
-That order is specific to this example. For Cancel in an iPhone or iPad sheet, use `.cancellationAction` for leading placement. In macOS sheets, it appears trailing, before confirmation actions. We still implement the button's action.
-
 ## What's the difference between cancellation and destructive actions?
 
-`.cancellationAction` abandons an operation; [.destructiveAction](https://developer.apple.com/documentation/swiftui/toolbaritemplacement/destructiveaction) represents an action such as discarding. In an edited document, Cancel keeps you editing, while desctrutive discards the edits.
-
+For example while editing document cancel should keep your editing and desctrutive should discards the edits.
 
 # ToolbarItemGroup
 
@@ -180,9 +191,11 @@ NavigationStack {
 
 # ToolbarRole
 
-This part is interesting. [.browser](https://developer.apple.com/documentation/swiftui/toolbarrole/browser) describes a toolbar for navigating content; [.editor](https://developer.apple.com/documentation/swiftui/toolbarrole/editor.md) describes one for editing document-like content.
+This part is interesting. I tested both on iPadOS 27.2 and iOS 27.2 but could not see a visual difference. Both looks same on portrait or 
+landscape mode.
 
-I tested both on iPadOS 27.2 and iOS 27.2 but could not see a visual difference. Both looks same.
+[.browser](https://developer.apple.com/documentation/swiftui/toolbarrole/browser)
+[.editor](https://developer.apple.com/documentation/swiftui/toolbarrole/editor)
 
 Here is the comparison view. Feel free to share a case where the difference is visible.
 
