@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex">
     <title>Page not found</title>
-    <link rel="stylesheet" href="/style/base.css">
+    <link rel="stylesheet" href="/style/base.css?v=20261122-design">
 </head>
 <body>
-    <main>
+    <main class="page page--reading">
         <h1>Page not found</h1>
         <p><a href="/blog/">Return to the blog</a></p>
     </main>
     <script type="module">
-        import { blogData } from '/blog/data/blog.data.js?v=20261122-audit';
+        import { blogData } from '/blog/data/blog.data.js?v=20261122-design';
 
         function redirectLegacyPost() {
             const match = /^\/post\/([^/]+)(?:\/(?:index\.html)?)?$/.exec(location.pathname);

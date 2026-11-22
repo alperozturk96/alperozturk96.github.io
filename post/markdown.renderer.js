@@ -263,8 +263,8 @@ export function markdownToHtml(markdown, post) {
 
     return (
         `<article class="post">` +
-            `<header class="post-header"><h1>${title}</h1>${timeHtml}</header>` +
-            `<main class="post-content">${sectionHtml}</main>` +
+            `<header class="post-header page-header"><h1>${title}</h1>${timeHtml}</header>` +
+            `<div class="post-content">${sectionHtml}</div>` +
         `</article>`
     );
 }

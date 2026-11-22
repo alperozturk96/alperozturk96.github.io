@@ -1,6 +1,6 @@
-import { blogData } from '../blog/data/blog.data.js?v=20261122-audit';
+import { blogData } from '../blog/data/blog.data.js?v=20261122-design';
 import { initImagePreview } from '../asset/image-preview.js';
-import { markdownToHtml } from './markdown.renderer.js?v=20261122-audit';
+import { markdownToHtml } from './markdown.renderer.js?v=20261122-design';
 
 const contentEl = document.getElementById('post-element');
 const path = new URLSearchParams(window.location.search).get('id');

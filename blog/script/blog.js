@@ -11,7 +11,7 @@ function renderPosts(posts) {
     const fragment = document.createDocumentFragment();
     for (const post of posts) {
         const card = document.createElement('article');
-        card.className = 'blog-card';
+        card.className = 'blog-card card';
         card.dataset.type = post.type;
         const content = document.createElement('div');
         content.className = 'card-content';

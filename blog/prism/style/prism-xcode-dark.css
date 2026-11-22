@@ -1,14 +1,14 @@
 code[class*=language-], pre[class*=language-] {
-    color: #e0e0e0; /* Default text color - light grey */
+    color: #e0e0e0;
     background: 0 0;
-    font-family: "Intel One Mono", Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 1em;
     text-align: left;
     white-space: pre;
     word-spacing: normal;
     word-break: normal;
     word-wrap: normal;
-    line-height: 1.5;
+    line-height: var(--line-body);
     -moz-tab-size: 4;
     -o-tab-size: 4;
     tab-size: 4;
@@ -19,13 +19,13 @@ code[class*=language-], pre[class*=language-] {
 }
 
 pre[class*=language-] {
-    padding: 1em;
+    padding: var(--space-4);
     margin: .5em 0;
     overflow: auto
 }
 
 :not(pre) > code[class*=language-], pre[class*=language-] {
-    background: #000000; /* Dark background similar to Xcode */
+    background: var(--color-canvas);
 }
 
 :not(pre) > code[class*=language-] {
@@ -39,35 +39,35 @@ pre[class*=language-] {
 .token.comment,
 .token.doctype,
 .token.prolog {
-    color: #7f8c8d; /* Comments - muted grey */
+    color: #7f8c8d;
 }
 
 .token.punctuation {
-    color: #e0e0e0; /* Punctuation - same as default text */
+    color: #e0e0e0;
 }
 
 .token.attr-name,
 .token.deleted,
 .token.namespace,
 .token.tag {
-    color: #f28282; /* Tags and attribute names - reddish */
+    color: #f28282;
 }
 
 .token.function-name {
-    color: #5ab1ff; /* Function names - light blue */
+    color: #5ab1ff;
 }
 
 .token.boolean,
 .token.function,
 .token.number {
-    color: #B181EA; /* Booleans, functions (often similar to values in Xcode), numbers - orange/yellow */
+    color: #B181EA;
 }
 
 .token.class-name,
 .token.constant,
 .token.property,
 .token.symbol {
-    color: #6ADFFF; /* Class names, constants, properties, symbols - pink/purple */
+    color: #6ADFFF;
 }
 
 .token.atrule,
@@ -75,7 +75,7 @@ pre[class*=language-] {
 .token.important,
 .token.keyword,
 .token.selector {
-    color: #FF79B2; /* Keywords, at-rules, important - purple */
+    color: #FF79B2;
 }
 
 .token.attr-value,
@@ -83,13 +83,13 @@ pre[class*=language-] {
 .token.regex,
 .token.string,
 .token.variable {
-    color: #79c4a4; /* Strings, regex, variables - green */
+    color: #79c4a4;
 }
 
 .token.entity,
 .token.operator,
 .token.url {
-    color: #67cdcc; /* Operators, entities, URLs - cyan */
+    color: #67cdcc;
 }
 
 .token.bold,
@@ -106,10 +106,9 @@ pre[class*=language-] {
 }
 
 .token.inserted {
-    color: #a4e69d; /* Inserted code - lighter green */
+    color: #a4e69d;
 }
 
-/* Swift token colors; keep the existing palette for other languages. */
 .language-swift .token.comment {
     color: #6c7986;
 }
