@@ -65,11 +65,12 @@
 }
 
 .screenshots img {
+    width: auto;
+    height: 260px;
     max-height: 260px;
     border-radius: 8px;
     background: #18181A;
     object-fit: contain;
-    outline: none;
 }
 
 .screenshots::-webkit-scrollbar {
@@ -88,6 +89,7 @@
 /* Tablet */
 @media (max-width: 900px) {
     .screenshots img {
+        height: 200px;
         max-height: 200px;
     }
 }
@@ -105,6 +107,7 @@
     }
 
     .screenshots img {
+        height: 150px;
         max-height: 150px;
     }
 

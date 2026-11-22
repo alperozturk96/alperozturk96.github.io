@@ -1,90 +1,97 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { blogData } from '../blog/data/blog.data.js';
+import { parsePostDate } from '../blog/data/post-date.js';
 
-import { blogData } from "../blog/data/blog.data.js";
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const feedPath = path.join(root, 'rss.xml');
+const siteUrl = 'https://alperozturk.me';
+const author = 'Alper Öztürk';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const SITE_URL = "https://alperozturk.me";
-const AUTHOR = "Alper Öztürk";
-
-const MONTHS = {
-  Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4,  Jun: 5,
-  Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
-};
-
-function formatPubDate(dateString) {
-  const [day, month, year] = (dateString || "").split(" ");
-  const monthIndex = MONTHS[month?.slice(0, 3)];
-  const date = new Date(Date.UTC(Number(year), monthIndex, Number(day)));
-  if (Number.isNaN(date.getTime())) throw new Error(`Invalid post date: ${dateString}`);
-
-  return date.toUTCString();
+function escapeXml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
 }
 
-function escapeXml(str) {
-  return (str || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
+function decodeXml(value) {
+    const entities = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
+
+    return value.replace(/&(amp|lt|gt|quot|apos);/g, (_, entity) => entities[entity]);
 }
 
-function existingFeedGuids() {
-  const rssPath = path.resolve(__dirname, "..", "rss.xml");
-  if (!fs.existsSync(rssPath)) return new Map();
-  const previousFeed = fs.readFileSync(rssPath, "utf8");
-  const guids = new Map();
-  for (const [, guid] of previousFeed.matchAll(/<guid\b[^>]*>([^<]+)<\/guid>/g)) {
-    const id = new URL(guid.replace(/&amp;/g, "&")).searchParams.get("id");
-    if (id) guids.set(id.replace(/\.md$/, ""), guid);
-  }
+function previousGuids(feed) {
+    const guids = new Map();
+    for (const [item] of feed.matchAll(/<item>[\s\S]*?<\/item>/g)) {
+        const link = /<link>([^<]+)<\/link>/.exec(item)?.[1];
+        const guid = /<guid\b([^>]*)>([^<]+)<\/guid>/.exec(item);
+        if (!link || !guid) continue;
+        const id = new URL(decodeXml(link)).searchParams.get('id');
+        if (!id) continue;
+        guids.set(id.replace(/\.md$/, ''), {
+            value: decodeXml(guid[2]),
+            isPermaLink: !/isPermaLink=["']false["']/.test(guid[1])
+        });
+    }
 
-  return guids;
+    return guids;
 }
 
-function makeItem(post, previousGuids) {
-  const url = `${SITE_URL}/post/?id=${encodeURIComponent(post.path)}`;
-  const guid = previousGuids.get(post.path.replace(/\.md$/, "")) || url;
+function generate() {
+    const previousFeed = fs.existsSync(feedPath) ? fs.readFileSync(feedPath, 'utf8') : '';
+    const previous = previousGuids(previousFeed);
+    const paths = new Set();
+    const guids = new Set();
+    const posts = blogData.map(post => {
+        if (!post.title || typeof post.path !== 'string' || path.basename(post.path) !== post.path || !post.path.endsWith('.md')) {
+            throw new Error(`Invalid post metadata: ${post.title}`);
+        }
+        if (paths.has(post.path)) throw new Error(`Duplicate post: ${post.path}`);
+        if (!fs.statSync(path.join(root, 'post', post.path)).isFile()) throw new Error(`Missing post: ${post.path}`);
+        paths.add(post.path);
+        const url = `${siteUrl}/post/?id=${encodeURIComponent(post.path)}`;
+        const guid = previous.get(post.path.replace(/\.md$/, '')) || { value: url, isPermaLink: true };
+        if (guids.has(guid.value)) throw new Error(`Duplicate RSS GUID: ${guid.value}`);
+        guids.add(guid.value);
 
-  return `    <item>
+        return { post, url, guid, date: parsePostDate(post.date) };
+    }).sort((first, second) => second.date - first.date);
+    const items = posts.map(({ post, url, guid, date }) => `    <item>
       <title>${escapeXml(post.title)}</title>
-      <link>${url}</link>
-      <guid isPermaLink="true">${guid}</guid>
-      <pubDate>${formatPubDate(post.date)}</pubDate>
+      <link>${escapeXml(url)}</link>
+      <guid isPermaLink="${guid.isPermaLink}">${escapeXml(guid.value)}</guid>
+      <pubDate>${date.toUTCString()}</pubDate>
       <description>${escapeXml(post.summary)}</description>
-    </item>`;
-}
-
-async function generate() {
-  const previousGuids = existingFeedGuids();
-  const items = [...blogData]
-    .sort((first, second) => Date.parse(formatPubDate(second.date)) - Date.parse(formatPubDate(first.date)))
-    .map(post => makeItem(post, previousGuids))
-    .join("\n");
-
-  const rss = `<?xml version="1.0" encoding="UTF-8"?>
+    </item>`).join('\n');
+    const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>${escapeXml(AUTHOR)} - Blog</title>
-    <link>${SITE_URL}/blog</link>
-    <atom:link href="${SITE_URL}/rss.xml" rel="self" type="application/rss+xml"/>
-    <description>${escapeXml("Latest posts from " + AUTHOR)}</description>
+    <title>${escapeXml(author)} - Blog</title>
+    <link>${siteUrl}/blog</link>
+    <atom:link href="${siteUrl}/rss.xml" rel="self" type="application/rss+xml"/>
+    <description>${escapeXml(`Latest posts from ${author}`)}</description>
     <language>en-US</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
 ${items}
   </channel>
 </rss>`;
+    const withoutBuildDate = feed => feed.replace(/<lastBuildDate>[^<]*<\/lastBuildDate>/, '');
+    if (withoutBuildDate(previousFeed) === withoutBuildDate(rss)) {
+        console.log('RSS feed is unchanged.');
+        return;
+    }
+    fs.writeFileSync(feedPath, rss, 'utf8');
 
-  const outPath = path.resolve(__dirname, "..", "rss.xml");
-  fs.writeFileSync(outPath, rss, { encoding: "utf8" });
-  console.log("rss.xml generated at:", outPath);
+    console.log('RSS feed updated.');
 }
 
-generate().catch(err => {
-  console.error(err);
-  process.exit(1);
-});
+try {
+    generate();
+} catch (error) {
+    console.error(error.message);
+    process.exitCode = 1;
+}

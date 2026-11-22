@@ -97,3 +97,17 @@ main.about-page {
 h1 {
     margin-bottom: 3rem;
 }
+
+.tech-stack-heading {
+    font-weight: 700;
+    font-size: 1.25rem;
+    line-height: 1.4;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+@media (max-width: 600px) {
+    .tech-stack-heading {
+        font-size: 1.1rem;
+    }
+}

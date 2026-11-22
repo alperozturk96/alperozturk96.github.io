@@ -97,7 +97,7 @@ test('all post media references resolve inside asset/', async () => {
     }
     const folders = await readdir(new URL('asset/', root), { withFileTypes: true });
     const stored = [];
-    for (const folder of folders) {
+    for (const folder of folders.filter(folder => folder.isDirectory() && blogData.some(post => post.path === `${folder.name}.md`))) {
         for (const file of await readdir(new URL(`asset/${folder.name}/`, root))) stored.push(`/asset/${folder.name}/${file}`);
     }
 

@@ -53,3 +53,8 @@
         display: inline-block;
     }
 }
+
+.nav-base a:focus-visible {
+    outline: 2px solid #2897ff;
+    outline-offset: -4px;
+}

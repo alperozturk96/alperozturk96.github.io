@@ -13,12 +13,17 @@
         <p><a href="/blog/">Return to the blog</a></p>
     </main>
     <script type="module">
-        import { blogData } from '/blog/data/blog.data.js?v=20261122-markdown';
+        import { blogData } from '/blog/data/blog.data.js?v=20261122-audit';
 
         function redirectLegacyPost() {
             const match = /^\/post\/([^/]+)(?:\/(?:index\.html)?)?$/.exec(location.pathname);
             if (!match) return;
-            const slug = decodeURIComponent(match[1]);
+            let slug;
+            try {
+                slug = decodeURIComponent(match[1]);
+            } catch {
+                return;
+            }
             const post = blogData.find(post => post.path.replace(/\.md$/, '') === slug);
             if (!post) return;
 

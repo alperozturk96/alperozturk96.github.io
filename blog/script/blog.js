@@ -1,123 +1,75 @@
-import {blogData} from "../data/blog.data.js?v=20261122-markdown";
-import {BlogType} from "../data/blog.type.js";
+import { blogData } from '../data/blog.data.js?v=20261122-audit';
+import { BlogType } from '../data/blog.type.js';
+import { parsePostDate } from '../data/post-date.js';
 
-document.addEventListener("DOMContentLoaded", () => {
-    const container = document.getElementById("blog-container");
-    renderPosts(blogData, container);
+const sortedPosts = [...blogData].sort((first, second) => parsePostDate(second.date) - parsePostDate(first.date));
+const container = document.getElementById('blog-container');
+const filterNav = document.getElementById('filter-nav');
 
-    const filterNav = document.getElementById("filter-nav");
-    const types = getExistingBlogTypes();
-
-    if (types.length > 0) {
-        addSubNavBar(filterNav, types);
-        const filterLinks = filterNav.querySelectorAll("a");
-        filterPosts(filterLinks, blogData, container, renderPosts);
-    }
-});
-
-function getExistingBlogTypes() {
-    const knownTypes = new Set(
-        Object.values(BlogType).filter(t => t !== BlogType.All)
-    );
-
-    const foundTypes = new Set();
-
-    for (let i = 0; i < blogData.length; i++) {
-
-        const type = blogData[i].type;
-
-        if (Array.isArray(type)) {
-            for (const t of type) {
-                if (knownTypes.has(t)) {
-                    foundTypes.add(t);
-                }
-            }
-        } else {
-            if (knownTypes.has(type)) {
-                foundTypes.add(type);
-            }
-        }
-
-        if (foundTypes.size === knownTypes.size) {
-            break;
-        }
+function renderPosts(posts) {
+    if (!container) return;
+    const fragment = document.createDocumentFragment();
+    for (const post of posts) {
+        const card = document.createElement('article');
+        card.className = 'blog-card';
+        card.dataset.type = post.type;
+        const content = document.createElement('div');
+        content.className = 'card-content';
+        const title = document.createElement('h2');
+        title.textContent = post.title;
+        const date = document.createElement('time');
+        date.className = 'blog-date';
+        date.textContent = post.date;
+        date.dateTime = parsePostDate(post.date).toISOString().slice(0, 10);
+        const summary = document.createElement('p');
+        summary.textContent = post.summary;
+        const links = document.createElement('div');
+        links.className = 'external-link';
+        const link = document.createElement('a');
+        link.href = `/post?id=${encodeURIComponent(post.path)}`;
+        link.textContent = 'Continue Reading';
+        links.appendChild(link);
+        content.append(title, date, summary, links);
+        card.appendChild(content);
+        fragment.appendChild(card);
     }
 
-    return Array.from(foundTypes);
+    container.replaceChildren(fragment);
 }
 
+function initFilters() {
+    if (!filterNav) return;
+    const knownTypes = new Set(Object.values(BlogType));
+    const types = [...new Set(blogData.flatMap(post => post.type))].filter(type => knownTypes.has(type) && type !== BlogType.All);
+    const fragment = document.createDocumentFragment();
+    for (const type of [BlogType.All, ...types]) {
+        const item = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = '#';
+        link.dataset.filter = type;
+        link.textContent = type;
+        if (type === BlogType.All) {
+            link.className = 'active';
+            link.setAttribute('aria-current', 'true');
+        }
+        item.appendChild(link);
+        fragment.appendChild(item);
+    }
+    filterNav.replaceChildren(fragment);
+    filterNav.addEventListener('click', event => {
+        const link = event.target instanceof Element ? event.target.closest('a[data-filter]') : null;
+        if (!link || !filterNav.contains(link)) return;
+        event.preventDefault();
+        const previous = filterNav.querySelector('.active');
+        previous?.classList.remove('active');
+        previous?.removeAttribute('aria-current');
+        link.classList.add('active');
+        link.setAttribute('aria-current', 'true');
+        const type = link.dataset.filter;
 
-function addSubNavBar(filterNav, types) {
-    filterNav.innerHTML = `<li><a href="#" class="active" data-filter=${BlogType.All}>${BlogType.All}</a></li>`;
-
-    types.forEach(type => {
-        const li = document.createElement("li");
-        li.innerHTML = `<a href="#" data-filter="${type}">${type}</a>`;
-        filterNav.appendChild(li);
+        renderPosts(type === BlogType.All ? sortedPosts : sortedPosts.filter(post => [post.type].flat().includes(type)));
     });
 }
 
-// Cache for sorted posts
-let sortedPostsCache = null;
-let sortedPostsCacheKey = '';
-
-function renderPosts(posts, container) {
-    container.innerHTML = "";
-    // Cache sorted posts by reference
-    const cacheKey = posts === blogData ? 'all' : JSON.stringify(posts.map(p => p.path));
-    let sorted;
-    if (sortedPostsCache && sortedPostsCacheKey === cacheKey) {
-        sorted = sortedPostsCache;
-    } else {
-        sorted = [...posts].sort((a, b) => new Date(b.date) - new Date(a.date));
-        sortedPostsCache = sorted;
-        sortedPostsCacheKey = cacheKey;
-    }
-    const fragment = document.createDocumentFragment();
-    for (let i = 0; i < sorted.length; i++) {
-        const post = sorted[i];
-        const card = document.createElement("div");
-        card.className = "blog-card";
-        card.dataset.type = post.type;
-        card.innerHTML = `
-            <div class="card-content">
-                <h2>${post.title}</h2>
-                <span class="blog-date">${post.date}</span>
-                <p>${post.summary}</p>
-                <div class="external-link">
-                   <a href="/post?id=${post.path}">
-                        Continue Reading
-                    </a>
-                </div>
-            </div>
-        `;
-        fragment.appendChild(card);
-    }
-    container.appendChild(fragment);
-}
-
-// Use event delegation for filter links
-function filterPosts(filterLinks, blogData, container, renderPosts) {
-    const filterNav = filterLinks[0]?.closest('ul') || document.getElementById('filter-nav');
-
-    // Remove previous event listeners by replacing parent node
-    const newNav = filterNav.cloneNode(true);
-    filterNav.parentNode.replaceChild(newNav, filterNav);
-    newNav.addEventListener('click', function (e) {
-        const link = e.target.closest('a[data-filter]');
-        if (!link) return;
-        e.preventDefault();
-        Array.from(newNav.querySelectorAll('a')).forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-        const type = link.dataset.filter;
-
-        const filtered = type === BlogType.All
-            ? blogData
-            : blogData.filter(p =>
-                Array.isArray(p.type)
-                    ? p.type.includes(type)
-                    : p.type === type
-            );
-        renderPosts(filtered, container);
-    }, {passive: true});
-}
+renderPosts(sortedPosts);
+initFilters();

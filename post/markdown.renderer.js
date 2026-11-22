@@ -1,3 +1,5 @@
+import { parsePostDate } from '../blog/data/post-date.js';
+
 export function markdownToHtml(markdown, post) {
     const lines = markdown.replace(/\r\n/g, '\n').split('\n');
     const sections = [];
@@ -123,19 +125,6 @@ export function markdownToHtml(markdown, post) {
         curr = [];
     }
 
-    function formatDateForDatetime(dateStr) {
-        const m = dateStr.match(/(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/);
-        if (m) {
-            const months = {jan:'01',feb:'02',mar:'03',apr:'04',may:'05',jun:'06',
-                            jul:'07',aug:'08',sep:'09',oct:'10',nov:'11',dec:'12'};
-            const month = months[m[2].slice(0, 3).toLowerCase()] || '01';
-            return `${m[3]}-${month}-${m[1].padStart(2, '0')}`;
-        }
-        const parsed = Date.parse(dateStr);
-
-        return Number.isNaN(parsed) ? dateStr : new Date(parsed).toISOString().split('T')[0];
-    }
-
     while (i < lines.length) {
         const line = lines[i];
 
@@ -155,7 +144,7 @@ export function markdownToHtml(markdown, post) {
 
             sections.push(
                 `<div class="code-container">` +
-                `<button class="copy-button" title="Copy">Copy</button>` +
+                `<button type="button" class="copy-button" title="Copy">Copy</button>` +
                 `<pre><code class="language-${lang} lang-${lang}">${escapeHtml(codeLines.join('\n'))}</code></pre>` +
                 `</div>`
             );
@@ -268,7 +257,7 @@ export function markdownToHtml(markdown, post) {
     const sectionHtml = sections.join('\n');
 
     const timeHtml = post?.date
-        ? `<time datetime="${formatDateForDatetime(post.date)}">${escapeHtml(post.date)}</time>`
+        ? `<time datetime="${parsePostDate(post.date).toISOString().slice(0, 10)}">${escapeHtml(post.date)}</time>`
         : '';
     const title = escapeHtml(post?.heading || post?.title || '');
 
