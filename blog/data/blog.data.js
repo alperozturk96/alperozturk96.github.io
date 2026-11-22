@@ -221,4 +221,11 @@ export const blogData = [
     path: "understanding-file-manager-in-ios.md",
     date: "04 October 2026",
   },
+  {
+    title: "SwiftUI Toolbars: Placement, Overflow, and Roles",
+    summary: "",
+    type: PostType.iOS,
+    path: "toolbar-in-swiftui.md",
+    date: "22 November 2026",
+  },
 ];

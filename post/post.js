@@ -38,6 +38,7 @@ function init() {
             }
 
             makeAllCodeContainersCollapsibleAndExpandable();
+            configureSwiftHighlighting();
             Prism.highlightAll();
             setCopyButtonEvents();
             makeExpandableImages();
@@ -47,36 +48,70 @@ function init() {
         });
 }
 
+function configureSwiftHighlighting() {
+    Prism.languages.swift.keyword = [
+        Prism.languages.swift.keyword,
+        /\b(?:any|borrowing|consuming|each|package|sending)\b/
+    ];
+
+    Prism.languages.insertBefore('swift', 'function', {
+        'trailing-closure-function': {
+            pattern: /(\.)[a-z_]\w*(?=\s*\{)/,
+            lookbehind: true,
+            alias: 'function'
+        }
+    });
+}
+
 function makeExpandableImages() {
-    const images = document.querySelectorAll('.post-img');
+    const images = contentEl.querySelectorAll('.post-img');
     if (images.length === 0) return;
 
-    if (!document.getElementById('modal-div')) {
-        const modalHtml = `
-        <div id="modal-div" class="modal" style="display:none;">
-            <span class="close">&times;</span>
-            <img class="modal-content" id="img01" alt="">
-        </div>
-        `;
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const dialog = document.createElement('dialog');
+    dialog.className = 'post-image-dialog';
+    dialog.setAttribute('aria-label', 'Expanded image');
+    dialog.innerHTML = `
+        <button type="button" class="post-image-dialog-close" aria-label="Close image">
+            Close <span aria-hidden="true">&times;</span>
+        </button>
+        <img class="post-image-dialog-image" alt="">
+    `;
+    document.body.appendChild(dialog);
+
+    const expandedImage = dialog.querySelector('img');
+    const closeButton = dialog.querySelector('button');
+
+    function openImage(image) {
+        expandedImage.src = image.currentSrc || image.src;
+        expandedImage.alt = image.alt;
+        document.documentElement.classList.add('post-image-open');
+
+        dialog.showModal();
     }
 
-    const modal = document.getElementById("modal-div");
-    const modalImg = document.getElementById("img01");
-    const span = modal.querySelector(".close");
+    closeButton.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', event => {
+        if (event.target !== dialog) return;
 
-    images.forEach(img => {
-        img.style.cursor = 'pointer';
-        img.onclick = function() {
-            modal.style.display = "flex";
-            modalImg.src = this.src;
-        };
+        dialog.close();
+    });
+    dialog.addEventListener('close', () => {
+        document.documentElement.classList.remove('post-image-open');
     });
 
-    span.onclick = () => modal.style.display = "none";
-    modal.onclick = (event) => {
-        if (event.target === modal) modal.style.display = "none";
-    };
+    images.forEach(image => {
+        image.tabIndex = 0;
+        image.setAttribute('role', 'button');
+        image.setAttribute('aria-haspopup', 'dialog');
+        image.setAttribute('aria-label', `Enlarge image: ${image.alt || 'Article image'}`);
+        image.addEventListener('click', () => openImage(image));
+        image.addEventListener('keydown', event => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+
+            openImage(image);
+        });
+    });
 }
 
 function setCopyButtonEvents() {

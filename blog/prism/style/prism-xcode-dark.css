@@ -25,7 +25,7 @@ pre[class*=language-] {
 }
 
 :not(pre) > code[class*=language-], pre[class*=language-] {
-    background: #00000; /* Dark background similar to Xcode */
+    background: #000000; /* Dark background similar to Xcode */
 }
 
 :not(pre) > code[class*=language-] {
@@ -107,4 +107,59 @@ pre[class*=language-] {
 
 .token.inserted {
     color: #a4e69d; /* Inserted code - lighter green */
+}
+
+/* Swift token colors; keep the existing palette for other languages. */
+.language-swift .token.comment {
+    color: #6c7986;
+}
+
+.language-swift .token.keyword,
+.language-swift .token.boolean,
+.language-swift .token.nil {
+    color: #fc5fa3;
+}
+
+.language-swift .token.string,
+.language-swift .token.char {
+    color: #fc6a5d;
+}
+
+.language-swift .token.number {
+    color: #d0bf69;
+}
+
+.language-swift .token.class-name {
+    color: #d0a8ff;
+}
+
+.language-swift .token.function {
+    color: #a167e6;
+}
+
+.language-swift .token.function-definition {
+    color: #41a1c0;
+}
+
+.language-swift .token.attribute {
+    color: #bf8555;
+}
+
+.language-swift .token.constant,
+.language-swift .token.property,
+.language-swift .token.symbol,
+.language-swift .token.short-argument,
+.language-swift .token.variable {
+    color: #67b7a4;
+}
+
+.language-swift .token.directive,
+.language-swift .token.other-directive,
+.language-swift .token.literal {
+    color: #fd8f3f;
+}
+
+.language-swift .token.operator,
+.language-swift .token.punctuation {
+    color: inherit;
 }
